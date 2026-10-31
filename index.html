@@ -1,0 +1,1663 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#d5e8f7">
+<title>Weihnachts-Wunschliste</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    /* Farbpalette: #021024 · #052659 · #5483B3 · #7DA0CA · #C1E8FF */
+    --bg: #d5e8f7;
+    --flaeche: #dbecf9;
+    --text: #021024;
+    --leise: #5483b3;
+    --akzent: #052659;
+    --akzent-hell: #5483b3;
+    --mittel: #7da0ca;
+    --zart: #c1e8ff;
+    --rot: #c94a4a;
+    --schatten-hell: #f5fbff;
+    --schatten-dunkel: #a8c2dc;
+    --aussen: 8px 8px 18px var(--schatten-dunkel), -8px -8px 18px var(--schatten-hell);
+    --aussen-klein: 4px 4px 10px var(--schatten-dunkel), -4px -4px 10px var(--schatten-hell);
+    --innen: inset 5px 5px 10px var(--schatten-dunkel), inset -5px -5px 10px var(--schatten-hell);
+    --radius: 26px;
+    --feder: cubic-bezier(.34, 1.7, .5, 1);
+    --feder-sanft: cubic-bezier(.34, 1.3, .5, 1);
+  }
+  @supports (transition-timing-function: linear(0, 1)) {
+    :root {
+      --feder: linear(0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  [hidden] { display: none !important; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Poppins", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; background: none; }
+  a { color: var(--akzent); }
+  img { display: block; }
+  svg.icon { width: 26px; height: 26px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Federnde Grundbausteine ---------- */
+  .neu { background: var(--flaeche); border-radius: var(--radius); box-shadow: var(--aussen); }
+  .knopf {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: var(--flaeche);
+    box-shadow: var(--aussen-klein);
+    font-weight: 500; font-size: 13px;
+    white-space: nowrap;
+    text-decoration: none; color: var(--text);
+    transition: transform .6s var(--feder), box-shadow .25s ease;
+  }
+  .knopf:hover { transform: translateY(-2px) scale(1.04); }
+  .knopf:active { transform: scale(.9); box-shadow: var(--innen); transition-duration: .08s; }
+  .knopf.blau {
+    background: linear-gradient(135deg, var(--akzent-hell), var(--akzent));
+    color: #fff;
+    box-shadow: 4px 4px 12px rgba(5, 38, 89, .4), -4px -4px 10px var(--schatten-hell);
+  }
+  .knopf.klein { padding: 6px 12px; font-size: 12px; }
+  .knopf.rund { width: 34px; height: 34px; padding: 0; }
+  .knopf.breit { width: 100%; padding: 13px 18px; font-size: 14px; }
+  .knopf.gefahr:hover { color: var(--rot); }
+  .knopf:disabled { opacity: .5; cursor: default; transform: none; }
+
+  .reinfedern { animation: ploppen .8s var(--feder) both; animation-delay: calc(var(--i, 0) * 55ms); }
+  @keyframes ploppen { from { opacity: 0; transform: scale(.7) translateY(24px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Anmeldung / Beitritt / Laden ---------- */
+  .vollbild {
+    min-height: 100vh;
+    display: grid; place-items: center;
+    padding: 24px 16px;
+  }
+  .anmelde-karte {
+    width: 100%; max-width: 420px;
+    padding: 32px 28px;
+    display: flex; flex-direction: column; gap: 14px;
+    text-align: center;
+    animation: ploppen .9s var(--feder) both;
+  }
+  .anmelde-karte .logo-bild { margin: 0 auto; width: 76px; height: 76px; font-size: 40px; }
+  .anmelde-karte h1 { margin: 4px 0 0; font-size: 24px; }
+  .anmelde-karte > p { margin: 0 0 6px; color: var(--leise); font-size: 13px; }
+  .anmelde-karte .feld { text-align: left; margin: 0; }
+  .anmelde-karte .avatare { justify-content: center; }
+  .trenner { display: flex; align-items: center; gap: 12px; color: var(--leise); font-size: 12px; }
+  .trenner::before, .trenner::after { content: ""; flex: 1; height: 2px; border-radius: 2px; box-shadow: var(--innen); }
+  .zeile-knoepfe { display: flex; gap: 10px; }
+  .zeile-knoepfe .knopf { flex: 1; }
+  .link-knopf { color: var(--leise); font-size: 12px; text-decoration: underline; }
+  .fehler-text { color: var(--rot); font-size: 13px; margin: 0; min-height: 1em; }
+  .haekchen { display: flex; gap: 10px; align-items: flex-start; text-align: left; font-size: 12px; color: var(--leise); cursor: pointer; }
+  .haekchen input { width: 18px; height: 18px; accent-color: var(--akzent); flex: none; margin: 1px 0 0; }
+  .lade-flocke { font-size: 56px; color: var(--akzent-hell); animation: drehen 2s linear infinite; }
+  @keyframes drehen { to { transform: rotate(360deg); } }
+
+  /* ---------- Layout ---------- */
+  .app {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 300px;
+    gap: 28px;
+    align-items: start;
+    transition: grid-template-columns .6s var(--feder-sanft);
+  }
+  .app.zu { grid-template-columns: 96px minmax(0, 1fr) 300px; }
+
+  /* Seitenleiste */
+  .seite {
+    position: sticky; top: 28px;
+    padding: 22px 14px;
+    min-height: calc(100vh - 56px);
+    display: flex; flex-direction: column; gap: 26px;
+  }
+  .seite-oben { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .logo { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .logo-bild {
+    width: 54px; height: 54px; flex: none;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 28px;
+    box-shadow: var(--aussen-klein);
+  }
+  .logo-text strong { display: block; font-size: 15px; }
+  .logo-text span { color: var(--leise); font-size: 12px; }
+  .einklappen {
+    width: 34px; height: 34px; flex: none;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    box-shadow: var(--aussen-klein);
+    color: var(--akzent-hell);
+    transition: transform .7s var(--feder);
+  }
+  .einklappen svg { width: 18px; height: 18px; transition: transform .7s var(--feder); }
+  .einklappen:active { transform: scale(.85); }
+  nav { display: flex; flex-direction: column; gap: 8px; }
+  .nav-punkt {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    white-space: nowrap;
+    transition: transform .6s var(--feder), box-shadow .25s, color .2s;
+  }
+  .nav-punkt svg.icon { color: var(--akzent-hell); transition: transform .7s var(--feder); }
+  .nav-punkt:hover { transform: translateX(4px); }
+  .nav-punkt:hover svg.icon { transform: scale(1.18) rotate(-6deg); }
+  .nav-punkt:active { transform: scale(.94); }
+  .nav-punkt.aktiv { box-shadow: var(--innen); color: var(--akzent); font-weight: 600; }
+  .nav-punkt.aktiv svg.icon { color: var(--akzent); }
+  .seite-fuss { margin-top: auto; }
+
+  .app.zu .logo-text, .app.zu .nav-text { display: none; }
+  .app.zu .seite-oben { flex-direction: column; }
+  .app.zu .einklappen svg { transform: rotate(180deg); }
+  .app.zu .nav-punkt { justify-content: center; padding: 14px 0; }
+  .app.zu .nav-punkt:hover { transform: scale(1.06); }
+  .app.zu .seite-fuss .knopf { width: 48px; height: 48px; padding: 0; }
+
+  /* Hauptbereich */
+  main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+  .kopf { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .kopf h1 { margin: 0; font-size: 26px; font-weight: 600; }
+  .kopf p { margin: 2px 0 0; color: var(--leise); font-size: 13px; }
+  .kopf-rechts { display: flex; align-items: center; gap: 14px; }
+  .suche {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 18px;
+    border-radius: 999px;
+    box-shadow: var(--innen);
+    color: var(--leise);
+  }
+  .suche svg { width: 18px; height: 18px; }
+  .suche input { border: 0; outline: 0; background: none; width: 170px; color: var(--text); }
+  .profil {
+    display: flex; align-items: center; gap: 10px;
+    padding: 5px 16px 5px 5px;
+    border-radius: 999px;
+    box-shadow: var(--aussen-klein);
+    text-decoration: none; color: var(--text);
+    font-weight: 500; font-size: 13px;
+    transition: transform .6s var(--feder);
+  }
+  .profil:hover { transform: scale(1.05); }
+  .avatar {
+    width: 40px; height: 40px; flex: none;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 21px;
+    background: var(--zart);
+    box-shadow: var(--aussen-klein);
+  }
+  .avatar.gross { width: 72px; height: 72px; font-size: 38px; }
+
+  #inhalt { display: flex; flex-direction: column; gap: 24px; }
+
+  /* Plus-Balken */
+  .plus-balken {
+    display: flex; align-items: center; gap: 18px;
+    padding: 14px 18px 14px 14px;
+    width: 100%;
+    text-align: left;
+    transition: transform .7s var(--feder);
+  }
+  .plus-balken:hover { transform: translateY(-3px); }
+  .plus-balken:active { transform: scale(.97); }
+  .plus-rund {
+    flex: none;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--akzent-hell), var(--akzent));
+    box-shadow: 5px 5px 14px rgba(5, 38, 89, .45), -5px -5px 12px var(--schatten-hell);
+    transition: transform .8s var(--feder);
+  }
+  .plus-rund svg { width: 30px; height: 30px; }
+  .plus-balken:hover .plus-rund { transform: rotate(90deg) scale(1.08); }
+  .plus-balken:active .plus-rund { transform: rotate(90deg) scale(.85); transition-duration: .1s; }
+  .plus-balken strong { display: block; font-size: 16px; }
+  .plus-balken span { color: var(--leise); font-size: 12px; }
+
+  /* Kennzahlen */
+  .zahlen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .zahl-karte { padding: 20px 16px; text-align: center; transition: transform .7s var(--feder); }
+  .zahl-karte:hover { transform: translateY(-5px); }
+  .zahl-karte h3 { margin: 0 0 12px; font-size: 14px; font-weight: 500; }
+  .zahl-karte p { margin: 0; color: var(--leise); font-size: 12px; }
+  .zahl-gross { font-size: 26px; font-weight: 600; color: var(--akzent); margin: 18px 0 14px; }
+  .ring { width: 74px; height: 74px; margin: 0 auto 10px; position: relative; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 9; }
+  .ring .spur { stroke: var(--zart); }
+  .ring .wert { stroke: var(--akzent); stroke-linecap: round; transition: stroke-dashoffset 1.2s var(--feder); }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 16px; }
+
+  /* Chips */
+  .zeile { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .zeile h2 { margin: 0; font-size: 18px; font-weight: 600; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { padding: 6px 14px; font-size: 12px; }
+  .chip.aktiv { box-shadow: var(--innen); color: var(--akzent); font-weight: 600; }
+
+  /* Wunsch-Karten */
+  .karten { display: flex; flex-direction: column; gap: 16px; }
+  .wunsch-karte {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 20px 14px 14px;
+    transition: transform .7s var(--feder), opacity .3s;
+  }
+  .wunsch-karte:hover { transform: translateY(-3px) scale(1.01); }
+  .wunsch-karte.ploppt { animation: ploppen .9s var(--feder) both; }
+  .wunsch-karte.weg { animation: weg .45s cubic-bezier(.5, 0, .75, 0) forwards; }
+  @keyframes weg { to { opacity: 0; transform: scale(.7) translateX(40px); } }
+  .wunsch-karte.vergeben { opacity: .55; }
+  .wk-bild {
+    width: 96px; height: 76px;
+    border-radius: 16px;
+    overflow: hidden;
+    display: grid; place-items: center;
+    font-size: 34px;
+    background: var(--zart);
+    box-shadow: var(--aussen-klein);
+  }
+  .wk-bild img { width: 100%; height: 100%; object-fit: cover; }
+  .wk-text { min-width: 0; }
+  .wk-text h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+  .wk-text a, .wk-text span { font-size: 12px; color: var(--leise); text-decoration: none; }
+  .wk-text a { color: var(--akzent-hell); font-weight: 500; }
+  .wk-text a:hover { text-decoration: underline; }
+  .wk-text .hinweis { display: block; color: var(--rot); margin-top: 4px; }
+  .wk-rechts { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .wk-aktionen { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .preis { font-size: 16px; font-weight: 600; white-space: nowrap; }
+  .abzeichen {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--akzent);
+    white-space: nowrap;
+  }
+  .abzeichen::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+  .abzeichen.hell { background: var(--mittel); }
+  .abzeichen.zart { background: var(--zart); color: var(--akzent); }
+  .abzeichen.zart::before { background: var(--akzent); }
+
+  .haken {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    box-shadow: var(--innen);
+    color: transparent;
+    font-weight: 700;
+    transition: transform .6s var(--feder), background .2s, color .2s;
+  }
+  .haken.an { background: var(--akzent); color: #fff; box-shadow: var(--aussen-klein); transform: scale(1.1); }
+  .haken:active { transform: scale(.8); }
+
+  /* Gruppen nach Mitglied */
+  .gruppe { display: flex; flex-direction: column; gap: 14px; }
+  .gruppe-kopf { display: flex; align-items: center; gap: 12px; }
+  .gruppe-kopf h2 { margin: 0; font-size: 17px; font-weight: 600; }
+  .gruppe-kopf span { color: var(--leise); font-size: 12px; }
+  .gruppe-kopf .summe { margin-left: auto; font-weight: 600; color: var(--akzent); font-size: 14px; }
+
+  .leer { padding: 40px 20px; text-align: center; color: var(--leise); box-shadow: var(--innen); }
+  .leer .emoji { font-size: 50px; animation: wippen 2.4s ease-in-out infinite; }
+  .leer strong { display: block; color: var(--text); font-size: 15px; margin: 8px 0 4px; }
+  @keyframes wippen { 50% { transform: translateY(-8px) rotate(-6deg); } }
+
+  /* Mitglieder */
+  .mitglieder-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
+  .mitglied-karte {
+    padding: 22px 16px;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    transition: transform .7s var(--feder);
+  }
+  .mitglied-karte:hover { transform: translateY(-5px); }
+  .mitglied-karte h3 { margin: 6px 0 0; font-size: 16px; overflow-wrap: anywhere; }
+  .mitglied-karte p { margin: 0; color: var(--leise); font-size: 12px; }
+  .du { font-size: 11px; padding: 2px 10px; border-radius: 999px; background: var(--zart); color: var(--akzent); font-weight: 600; }
+
+  .formular-karte { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+  .formular-karte h2 { margin: 0; font-size: 17px; }
+  .formular-zeile { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .formular-zeile .feld { flex: 1; min-width: 180px; margin: 0; }
+  .avatare { display: flex; flex-wrap: wrap; gap: 10px; }
+  .avatar-wahl {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    font-size: 24px;
+    box-shadow: var(--aussen-klein);
+    transition: transform .6s var(--feder), box-shadow .2s;
+  }
+  .avatar-wahl:hover { transform: scale(1.12); }
+  .avatar-wahl.aktiv { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); transform: scale(.95); }
+  .notiz { margin: 0; color: var(--leise); font-size: 12px; }
+  .schritte { margin: 0; padding-left: 20px; color: var(--text); font-size: 13px; }
+  .schritte li { margin-bottom: 6px; }
+
+  /* Einstellungen */
+  .einstellung { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .einstellung strong { display: block; font-size: 14px; }
+  .einstellung span { color: var(--leise); font-size: 12px; }
+  .schalter {
+    position: relative;
+    width: 58px; height: 32px; flex: none;
+    border-radius: 999px;
+    box-shadow: var(--innen);
+    transition: background .3s;
+  }
+  .schalter::after {
+    content: "";
+    position: absolute; top: 4px; left: 4px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--flaeche);
+    box-shadow: 2px 2px 6px var(--schatten-dunkel);
+    transition: transform .6s var(--feder);
+  }
+  .schalter.an { background: var(--akzent-hell); }
+  .schalter.an::after { transform: translateX(26px); }
+
+  /* Rechte Spalte */
+  .rechts { display: flex; flex-direction: column; gap: 26px; position: sticky; top: 28px; }
+  .tacho { padding: 22px 20px 20px; text-align: center; }
+  .tacho h3, .panel h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; text-align: left; }
+  .tacho svg { width: 100%; max-width: 220px; overflow: visible; }
+  .tacho .spur { fill: none; stroke: var(--zart); stroke-width: 16; stroke-linecap: round; }
+  .tacho .wert { fill: none; stroke: url(#tachoVerlauf); stroke-width: 16; stroke-linecap: round; transition: stroke-dashoffset 1.6s var(--feder); }
+  .tacho .knauf { fill: var(--akzent); stroke: #fff; stroke-width: 5; transition: transform 1.6s var(--feder); }
+  .tacho-mitte { margin-top: -78px; margin-bottom: 26px; }
+  .tacho-mitte b { display: block; font-size: 32px; font-weight: 600; line-height: 1.1; }
+  .tacho-mitte span { color: var(--leise); font-size: 12px; }
+  .uhr-titel { display: none; }
+  .uhr { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .uhr div { padding: 10px 2px 8px; border-radius: 16px; box-shadow: var(--innen); }
+  .uhr b { display: block; font-size: 20px; font-weight: 600; color: var(--akzent); font-variant-numeric: tabular-nums; }
+  .uhr b.tick { animation: tick .5s var(--feder); }
+  @keyframes tick { from { transform: scale(.6) translateY(-6px); opacity: .3; } }
+  .uhr span { font-size: 10px; color: var(--leise); text-transform: uppercase; letter-spacing: .5px; }
+
+  .panel { padding: 20px; }
+  .panel-zahl { font-size: 26px; font-weight: 600; color: var(--akzent); margin: 6px 0 2px; }
+  .panel p { margin: 0 0 14px; color: var(--leise); font-size: 12px; }
+  .avatar-reihe { display: flex; margin: 12px 0 16px; }
+  .avatar-reihe .avatar { margin-right: -10px; border: 3px solid var(--flaeche); }
+
+  /* ---------- Fenster (Modal) ---------- */
+  .huelle {
+    position: fixed; inset: 0;
+    z-index: 50;
+    display: grid; place-items: center;
+    padding: 16px;
+    background: rgba(2, 16, 36, .3);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  .huelle.offen { opacity: 1; pointer-events: auto; }
+  .fenster {
+    width: 100%; max-width: 440px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    padding: 26px;
+    transform: scale(.75) translateY(40px);
+    transition: transform .8s var(--feder);
+  }
+  .huelle.offen .fenster { transform: none; }
+  .fenster h2 { margin: 0 0 4px; font-size: 20px; }
+  .fenster > p { margin: 0 0 20px; color: var(--leise); font-size: 13px; }
+  .feld { display: block; margin-bottom: 16px; }
+  .feld > span { display: block; font-size: 12px; font-weight: 500; margin: 0 0 6px 6px; }
+  .feld input {
+    width: 100%;
+    border: 0; outline: 0;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: var(--flaeche);
+    box-shadow: var(--innen);
+    transition: box-shadow .2s;
+  }
+  .feld input:focus { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
+  .feld.fehler { animation: schuetteln .5s; }
+  .feld.fehler input { box-shadow: var(--innen), 0 0 0 2px var(--rot); }
+  @keyframes schuetteln { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+  .bild-feld {
+    display: grid; place-items: center;
+    height: 150px;
+    border-radius: 18px;
+    box-shadow: var(--innen);
+    color: var(--leise);
+    text-align: center;
+    font-size: 30px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .6s var(--feder);
+  }
+  .bild-feld small { font-size: 12px; }
+  .bild-feld:hover { transform: scale(1.02); }
+  .bild-feld.drueber { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
+  .bild-feld img { width: 100%; height: 100%; object-fit: cover; }
+  .fenster-knoepfe { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+
+  /* ---------- Schnee ---------- */
+  #schnee { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; }
+  .schneeball {
+    position: fixed; left: 0; top: 0;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    z-index: 61;
+    pointer-events: none;
+    background: radial-gradient(circle at 35% 30%, #fff 0 40%, #dfeaf0 75%, #b9cdd8);
+    box-shadow: 0 6px 14px rgba(2, 16, 36, .3);
+  }
+
+  /* ---------- Tablet ---------- */
+  @media (max-width: 1150px) {
+    .app, .app.zu { grid-template-columns: 96px minmax(0, 1fr); }
+    .app .logo-text, .app .nav-text { display: none; }
+    .app .seite-oben { flex-direction: column; }
+    .app .einklappen { display: none; }
+    .app .nav-punkt { justify-content: center; padding: 14px 0; }
+    .app .seite-fuss .knopf { width: 48px; height: 48px; padding: 0; }
+    .rechts { grid-column: 2; position: static; display: grid; grid-template-columns: 1fr 1fr; }
+    .rechts .tacho { grid-row: span 2; }
+  }
+
+  /* ---------- Handy ---------- */
+  @media (max-width: 760px) {
+    .app, .app.zu {
+      grid-template-columns: minmax(0, 1fr);
+      padding: 16px 16px calc(110px + env(safe-area-inset-bottom));
+      gap: 20px;
+    }
+    /* Seitenleiste wird zur Leiste unten */
+    .seite {
+      position: fixed; top: auto; left: 10px; right: 10px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      z-index: 40;
+      min-height: 0;
+      padding: 8px;
+      border-radius: 26px;
+      flex-direction: row;
+    }
+    .seite-oben, .seite-fuss { display: none; }
+    nav { flex-direction: row; justify-content: space-between; width: 100%; gap: 2px; }
+    .app .nav-punkt, .app.zu .nav-punkt {
+      flex: 1;
+      flex-direction: column;
+      gap: 3px;
+      padding: 8px 0 6px;
+      font-size: 10px;
+      border-radius: 18px;
+    }
+    .app .nav-text, .app.zu .nav-text { display: none; }
+    .nav-punkt::after { content: attr(data-kurz); }
+    .nav-punkt svg.icon { width: 26px; height: 26px; }
+    .nav-punkt:hover { transform: none; }
+    .nav-punkt.aktiv svg.icon { transform: translateY(-2px) scale(1.12); }
+
+    .kopf h1 { font-size: 22px; }
+    .kopf-rechts { width: 100%; }
+    .suche { flex: 1; }
+    .suche input { width: 100%; }
+    .profil span { display: none; }
+    .profil { padding: 5px; }
+
+    .rechts { grid-column: 1; order: -1; display: block; }
+    .rechts .panel, .tacho h3, .tacho svg, .tacho-mitte { display: none; }
+    .tacho { padding: 14px; }
+    .uhr-titel { display: block; margin: 0 0 10px; font-size: 13px; font-weight: 500; text-align: left; }
+    .uhr b { font-size: 18px; }
+
+    .zahlen { gap: 12px; }
+    .zahl-karte { padding: 14px 6px; }
+    .zahl-karte h3 { font-size: 12px; }
+    .ring { width: 56px; height: 56px; }
+    .zahl-gross { font-size: 18px; margin: 12px 0 8px; }
+    .plus-rund { width: 54px; height: 54px; }
+
+    .wunsch-karte { grid-template-columns: 76px minmax(0, 1fr); gap: 12px; padding: 12px; }
+    .wk-bild { width: 76px; height: 64px; }
+    .wk-rechts { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    .mitglieder-raster { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fenster { padding: 22px 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Laden ===== -->
+<div class="vollbild" id="laden"><div class="lade-flocke">❄</div></div>
+
+<!-- ===== Anmeldung ===== -->
+<div class="vollbild" id="anmeldung" hidden>
+  <form class="anmelde-karte neu" id="anmeldeForm" novalidate>
+    <div class="logo-bild">🎄</div>
+    <h1>Wunschliste</h1>
+    <p>Weihnachten 2026 – bitte melde dich an</p>
+    <button type="button" class="knopf blau breit" id="googleLogin">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Mit Google anmelden
+    </button>
+    <div class="trenner">oder mit E-Mail</div>
+    <label class="feld"><span>E-Mail</span><input id="loginMail" type="email" autocomplete="email" placeholder="name@beispiel.ch"></label>
+    <label class="feld"><span>Passwort</span><input id="loginPass" type="password" autocomplete="current-password" placeholder="mind. 6 Zeichen"></label>
+    <div class="zeile-knoepfe">
+      <button type="button" class="knopf" id="registrieren">Konto erstellen</button>
+      <button type="submit" class="knopf blau" id="emailLogin">Anmelden</button>
+    </div>
+    <button type="button" class="link-knopf" id="passVergessen">Passwort vergessen?</button>
+    <p class="fehler-text" id="loginFehler"></p>
+  </form>
+</div>
+
+<!-- ===== Beitritt (erstes Mal) ===== -->
+<div class="vollbild" id="beitritt" hidden>
+  <form class="anmelde-karte neu" id="beitrittForm" novalidate>
+    <div class="logo-bild">🎅</div>
+    <h1>Willkommen!</h1>
+    <p>Wie heisst du, und wie lautet euer Familien-Code?</p>
+    <label class="feld" id="feldBeitrittName"><span>Dein Name</span><input id="beitrittName" maxlength="40" placeholder="z.B. Nicola" autocomplete="off"></label>
+    <div class="avatare" id="beitrittAvatare"></div>
+    <label class="feld" id="feldCode"><span>Familien-Code</span><input id="beitrittCode" maxlength="40" placeholder="bekommst du von der Familie" autocomplete="off"></label>
+    <label class="haekchen"><input type="checkbox" id="ersteEinrichtung"> Ich richte die Wunschliste zum ersten Mal ein und lege den Familien-Code fest.</label>
+    <div class="zeile-knoepfe">
+      <button type="button" class="knopf" id="beitrittAbmelden">Abmelden</button>
+      <button type="submit" class="knopf blau" id="beitrittLos">Beitreten</button>
+    </div>
+    <p class="fehler-text" id="beitrittFehler"></p>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+
+  <!-- ===== Seitenleiste ===== -->
+  <aside class="seite neu">
+    <div class="seite-oben">
+      <div class="logo">
+        <div class="logo-bild">🎄</div>
+        <div class="logo-text"><strong>Wunschliste</strong><span>Weihnachten 2026</span></div>
+      </div>
+      <button class="einklappen" id="einklappen" aria-label="Seitenleiste ein- oder ausklappen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+    </div>
+    <nav id="nav">
+      <a class="nav-punkt" href="#alle" data-seite="alle" data-kurz="Alle">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg>
+        <span class="nav-text">Alle Wünsche</span>
+      </a>
+      <a class="nav-punkt" href="#meine" data-seite="meine" data-kurz="Meine">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12.5h18M12 8C10 4 6 4 6 6.5S9 8 12 8zm0 0c2-4 6-4 6-1.5S15 8 12 8z"/></svg>
+        <span class="nav-text">Meine Wünsche</span>
+      </a>
+      <a class="nav-punkt" href="#schenkung" data-seite="schenkung" data-kurz="Schenken">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 20.5s-8-4.6-8-10.3A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 8 2.2c0 5.7-8 10.3-8 10.3z"/></svg>
+        <span class="nav-text">Schenkung</span>
+      </a>
+      <a class="nav-punkt" href="#mitglieder" data-seite="mitglieder" data-kurz="Familie">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.8.3 5 2.4 5 5.8"/></svg>
+        <span class="nav-text">Mitglieder</span>
+      </a>
+      <a class="nav-punkt" href="#einstellungen" data-seite="einstellungen" data-kurz="Optionen">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+        <span class="nav-text">Einstellungen</span>
+      </a>
+    </nav>
+    <div class="seite-fuss">
+      <button class="knopf" id="schneeKnopf" title="Schnee">❄<span class="nav-text">Schnee</span></button>
+    </div>
+  </aside>
+
+  <!-- ===== Hauptbereich ===== -->
+  <main>
+    <header class="kopf">
+      <div>
+        <h1 id="titel"></h1>
+        <p id="untertitel"></p>
+      </div>
+      <div class="kopf-rechts">
+        <label class="suche" id="sucheBox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="suche" type="search" placeholder="Wunsch suchen …">
+        </label>
+        <a class="profil" id="profil" href="#einstellungen" title="Profil"></a>
+      </div>
+    </header>
+    <div id="inhalt"></div>
+  </main>
+
+  <!-- ===== Rechte Spalte ===== -->
+  <aside class="rechts">
+    <section class="tacho neu">
+      <h3>Countdown</h3>
+      <svg viewBox="0 0 200 150">
+        <defs>
+          <linearGradient id="tachoVerlauf" x1="0" x2="1">
+            <stop offset="0" stop-color="#c1e8ff"/>
+            <stop offset=".5" stop-color="#5483b3"/>
+            <stop offset="1" stop-color="#052659"/>
+          </linearGradient>
+        </defs>
+        <path class="spur" d="M 40 130 A 75 75 0 1 1 160 130"/>
+        <path class="wert" id="tachoBogen" d="M 40 130 A 75 75 0 1 1 160 130"/>
+        <circle class="knauf" id="tachoKnauf" cx="0" cy="0" r="12"/>
+      </svg>
+      <div class="tacho-mitte"><b id="tacho-tage">0</b><span>bis Heiligabend 🎄</span></div>
+      <p class="uhr-titel">🎄 Heiligabend in</p>
+      <div class="uhr">
+        <div><b id="uhrT">0</b><span>Tage</span></div>
+        <div><b id="uhrS">00</b><span>Std</span></div>
+        <div><b id="uhrM">00</b><span>Min</span></div>
+        <div><b id="uhrSek">00</b><span>Sek</span></div>
+      </div>
+    </section>
+    <section class="panel neu" id="miniSchenkung"></section>
+    <section class="panel neu" id="miniMitglieder"></section>
+  </aside>
+</div>
+
+<!-- ===== Fenster: Wunsch erfassen / bearbeiten ===== -->
+<div class="huelle" id="huelle">
+  <form class="fenster neu" id="formular" novalidate>
+    <h2 id="fensterTitel">Neuer Wunsch 🎁</h2>
+    <p>Fülle die Angaben aus und gib den Wunsch frei.</p>
+    <label class="feld" id="feldName">
+      <span>Name *</span>
+      <input id="eingabeName" maxlength="80" placeholder="z.B. Kopfhörer" autocomplete="off">
+    </label>
+    <label class="feld">
+      <span>Preis (CHF)</span>
+      <input id="eingabePreis" type="number" min="0" step="0.05" inputmode="decimal" placeholder="z.B. 49.90">
+    </label>
+    <label class="feld" id="feldLink">
+      <span>Link zum Shop</span>
+      <input id="eingabeLink" type="url" placeholder="https://…" autocomplete="off">
+    </label>
+    <div class="feld">
+      <span>Bild</span>
+      <div class="bild-feld" id="bildFeld" tabindex="0" role="button" aria-label="Bild auswählen"></div>
+      <input id="eingabeBild" type="file" accept="image/*" hidden>
+    </div>
+    <div class="fenster-knoepfe">
+      <button type="button" class="knopf" id="abbrechen">Abbrechen</button>
+      <button type="button" class="knopf" id="alsEntwurf">Als Entwurf</button>
+      <button type="submit" class="knopf blau" id="freigeben">❄ Freigeben</button>
+    </div>
+  </form>
+</div>
+
+<canvas id="schnee"></canvas>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
+    signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  // ============================================================
+  //  Firebase-Verbindung
+  //  (Diese Werte sind öffentlich – geschützt wird über die
+  //   Sicherheitsregeln in firestore.rules)
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDcKy96-tSD-oNKMtzKYyRGxtNH-juLhsU",
+    authDomain: "wunschliste-5c094.firebaseapp.com",
+    projectId: "wunschliste-5c094",
+    storageBucket: "wunschliste-5c094.firebasestorage.app",
+    messagingSenderId: "671423487215",
+    appId: "1:671423487215:web:3444a609b38efb1b880f1a",
+    measurementId: "G-BY4T16JQ78"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  const auth = getAuth(fbApp);
+  const db = getFirestore(fbApp);
+
+  // ============================================================
+  //  Hilfsfunktionen
+  // ============================================================
+  const AVATARE = ["🎅", "🤶", "🧑‍🎄", "🦌", "⛄", "🐧", "🧝", "⭐", "🍪", "🎁", "🦊", "🐻"];
+  const SEITEN = {
+    alle: ["Alle Wünsche", "Die freigegebenen Wünsche der anderen Mitglieder"],
+    meine: ["Meine Wünsche", "Erfassen, bearbeiten, freigeben oder zurückziehen"],
+    schenkung: ["Schenkung", "Was du verschenkst – das siehst nur du"],
+    mitglieder: ["Mitglieder", "Familie & Freunde auf der Wunschliste"],
+    einstellungen: ["Einstellungen", "Profil, Animationen und Konto"]
+  };
+  const $ = id => document.getElementById(id);
+  const warte = ms => new Promise(r => setTimeout(r, ms));
+  const chf = new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" });
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, z => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[z]));
+  const sichererLink = l => /^https?:\/\//i.test(l || "") ? l : "";
+  const sicheresBild = b => /^data:image\//.test(b || "") ? b : "";
+
+  // Einstellungen nur für dieses Gerät
+  const LOKAL = "wunschliste-lokal";
+  const lokal = (() => { try { return { animationen: true, seiteZu: false, ...JSON.parse(localStorage.getItem(LOKAL)) }; } catch { return { animationen: true, seiteZu: false }; } })();
+  const lokalSpeichern = () => { try { localStorage.setItem(LOKAL, JSON.stringify(lokal)); } catch {} };
+  const animiert = () => lokal.animationen;
+
+  function zeige(name) {
+    for (const id of ["laden", "anmeldung", "beitritt", "app"]) $(id).hidden = id !== name;
+  }
+
+  function fehlerText(f) {
+    const code = f && f.code || "";
+    const texte = {
+      "auth/invalid-credential": "E-Mail oder Passwort ist falsch.",
+      "auth/invalid-email": "Diese E-Mail-Adresse ist ungültig.",
+      "auth/user-not-found": "Zu dieser E-Mail gibt es kein Konto.",
+      "auth/wrong-password": "Das Passwort ist falsch.",
+      "auth/email-already-in-use": "Für diese E-Mail gibt es schon ein Konto – bitte anmelden.",
+      "auth/weak-password": "Das Passwort braucht mindestens 6 Zeichen.",
+      "auth/missing-password": "Bitte ein Passwort eingeben.",
+      "auth/too-many-requests": "Zu viele Versuche. Bitte kurz warten.",
+      "auth/network-request-failed": "Keine Internetverbindung.",
+      "auth/unauthorized-domain": "Diese Adresse ist in Firebase noch nicht erlaubt (Authentication → Einstellungen → Autorisierte Domains).",
+      "auth/operation-not-allowed": "Diese Anmeldeart ist in Firebase noch nicht aktiviert.",
+      "permission-denied": "Keine Berechtigung (Sicherheitsregeln prüfen).",
+      "unavailable": "Keine Verbindung zum Server."
+    };
+    return texte[code] || `Etwas ist schiefgelaufen (${code || f}).`;
+  }
+  function schreiben(versprechen) {
+    return versprechen.catch(f => { console.error(f); alert("Speichern fehlgeschlagen: " + fehlerText(f)); throw f; });
+  }
+
+  // ============================================================
+  //  Daten aus Firestore (Echtzeit)
+  // ============================================================
+  let uid = null;
+  let mitglieder = [];
+  let eigene = [];          // meine Wünsche (alle Status)
+  let fremde = [];          // freigegebene Wünsche aller
+  let reservierungen = [];  // nur Reservierungen für Wünsche ANDERER – meine eigenen kann ich nie lesen
+  let abmelder = [];
+  let zeichnenGeplant = false;
+
+  const ich = () => mitglieder.find(m => m.id === uid) || { id: uid, name: "Ich", avatar: "🎅" };
+  const mitglied = id => mitglieder.find(m => m.id === id);
+  const alleWuensche = () => [...eigene, ...fremde.filter(w => w.besitzer !== uid)];
+  const wunsch = id => alleWuensche().find(w => w.id === id);
+  const reservierung = id => reservierungen.find(r => r.id === id);
+  const listeAus = schnappschuss => schnappschuss.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  function spaeterZeichnen() {
+    if (zeichnenGeplant) return;
+    zeichnenGeplant = true;
+    requestAnimationFrame(() => { zeichnenGeplant = false; zeichnen(false); });
+  }
+
+  function aufraeumen() {
+    abmelder.forEach(f => f());
+    abmelder = [];
+    mitglieder = []; eigene = []; fremde = []; reservierungen = [];
+  }
+
+  function datenStarten() {
+    const fehler = f => { console.error(f); };
+    abmelder.push(
+      onSnapshot(collection(db, "mitglieder"), s => { mitglieder = listeAus(s); spaeterZeichnen(); }, fehler),
+      onSnapshot(query(collection(db, "wuensche"), where("besitzer", "==", uid)), s => {
+        eigene = listeAus(s).sort((a, b) => b.erstellt - a.erstellt); spaeterZeichnen();
+      }, fehler),
+      onSnapshot(query(collection(db, "wuensche"), where("status", "==", "freigegeben")), s => {
+        fremde = listeAus(s).sort((a, b) => b.erstellt - a.erstellt); spaeterZeichnen();
+      }, fehler),
+      onSnapshot(query(collection(db, "reservierungen"), where("besitzer", "!=", uid)), s => {
+        reservierungen = listeAus(s); spaeterZeichnen();
+      }, fehler)
+    );
+  }
+
+  // ============================================================
+  //  Anmeldung
+  // ============================================================
+  if (location.protocol === "file:") {
+    $("loginFehler").textContent = "Hinweis: Die Anmeldung funktioniert nur online (GitHub Pages), nicht direkt aus dem Ordner.";
+  }
+
+  $("googleLogin").addEventListener("click", async () => {
+    $("loginFehler").textContent = "";
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+    catch (f) { if (f.code !== "auth/popup-closed-by-user" && f.code !== "auth/cancelled-popup-request") $("loginFehler").textContent = fehlerText(f); }
+  });
+  $("anmeldeForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    $("loginFehler").textContent = "";
+    try { await signInWithEmailAndPassword(auth, $("loginMail").value.trim(), $("loginPass").value); }
+    catch (f) { $("loginFehler").textContent = fehlerText(f); }
+  });
+  $("registrieren").addEventListener("click", async () => {
+    $("loginFehler").textContent = "";
+    try { await createUserWithEmailAndPassword(auth, $("loginMail").value.trim(), $("loginPass").value); }
+    catch (f) { $("loginFehler").textContent = fehlerText(f); }
+  });
+  $("passVergessen").addEventListener("click", async () => {
+    const mail = $("loginMail").value.trim();
+    if (!mail) { $("loginFehler").textContent = "Bitte zuerst die E-Mail eingeben."; return; }
+    try { await sendPasswordResetEmail(auth, mail); $("loginFehler").textContent = "📧 E-Mail zum Zurücksetzen wurde gesendet."; }
+    catch (f) { $("loginFehler").textContent = fehlerText(f); }
+  });
+
+  // ---------- Beitritt ----------
+  let beitrittAvatar = "🎅";
+  function beitrittAvatareZeichnen() {
+    $("beitrittAvatare").innerHTML = AVATARE.map(a =>
+      `<button type="button" class="avatar-wahl ${a === beitrittAvatar ? "aktiv" : ""}" data-wert="${a}">${a}</button>`).join("");
+  }
+  $("beitrittAvatare").addEventListener("click", e => {
+    const b = e.target.closest(".avatar-wahl");
+    if (!b) return;
+    beitrittAvatar = b.dataset.wert;
+    beitrittAvatareZeichnen();
+  });
+  $("beitrittAbmelden").addEventListener("click", () => signOut(auth));
+  $("beitrittForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const name = $("beitrittName").value.trim();
+    const code = $("beitrittCode").value.trim();
+    $("beitrittFehler").textContent = "";
+    if (!name) return wackeln("feldBeitrittName");
+    if (code.length < 4) { $("beitrittFehler").textContent = "Der Familien-Code braucht mindestens 4 Zeichen."; return wackeln("feldCode"); }
+    $("beitrittLos").disabled = true;
+    try {
+      if ($("ersteEinrichtung").checked) {
+        try { await setDoc(doc(db, "einstellungen", "zugang"), { code, erstelltVon: uid }); }
+        catch (f) {
+          $("beitrittFehler").textContent = f.code === "permission-denied"
+            ? "Es gibt schon einen Familien-Code. Frag ein Mitglied danach und entferne das Häkchen."
+            : fehlerText(f);
+          return;
+        }
+      }
+      try { await setDoc(doc(db, "mitglieder", uid), { name, avatar: beitrittAvatar, code, erstellt: Date.now() }); }
+      catch (f) {
+        $("beitrittFehler").textContent = f.code === "permission-denied" ? "Der Familien-Code stimmt nicht." : fehlerText(f);
+        wackeln("feldCode");
+        return;
+      }
+      appStarten();
+      schneien(4000);
+    } finally {
+      $("beitrittLos").disabled = false;
+    }
+  });
+
+  onAuthStateChanged(auth, async nutzer => {
+    aufraeumen();
+    if (!nutzer) { uid = null; zeige("anmeldung"); return; }
+    uid = nutzer.uid;
+    zeige("laden");
+    let istMitglied = false;
+    try { istMitglied = (await getDoc(doc(db, "mitglieder", uid))).exists(); } catch {}
+    if (!istMitglied) {
+      $("beitrittName").value = nutzer.displayName || "";
+      beitrittAvatareZeichnen();
+      zeige("beitritt");
+      return;
+    }
+    appStarten();
+  });
+
+  function appStarten() {
+    datenStarten();
+    zeige("app");
+    leisteSetzen();
+    zeichnen();
+    tachoSetzen(letzteTage);
+  }
+
+  // ============================================================
+  //  Seitenaufbau
+  // ============================================================
+  let seite = "alle";
+  let suchtext = "";
+  let filterMeine = "alle";
+  let filterPerson = "alle";
+  let avatarProfil = "";
+
+  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] ? h : "alle"; };
+
+  function zeichnen(mitAnimation = true) {
+    if ($("app").hidden) return;
+    seite = seiteAusHash();
+    $("titel").textContent = SEITEN[seite][0];
+    $("untertitel").textContent = SEITEN[seite][1];
+    document.title = `${SEITEN[seite][0]} · Wunschliste`;
+    document.querySelectorAll(".nav-punkt").forEach(a => a.classList.toggle("aktiv", a.dataset.seite === seite));
+    $("sucheBox").style.display = seite === "alle" || seite === "meine" ? "" : "none";
+    const m = ich();
+    $("profil").innerHTML = `<div class="avatar">${esc(m.avatar)}</div><span>${esc(m.name)}</span>`;
+
+    // Eingaben auf Formular-Seiten nicht durch Echtzeit-Updates überschreiben
+    const aktiv = document.activeElement;
+    if (!mitAnimation && aktiv && aktiv.closest && aktiv.closest("#inhalt") && aktiv.tagName === "INPUT") {
+      seitenleisteRechts();
+      return;
+    }
+
+    const inhalt = $("inhalt");
+    inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, einstellungen: seiteEinstellungen }[seite]();
+
+    if (mitAnimation) {
+      [...inhalt.querySelectorAll(":scope > *, .karten > *, .mitglieder-raster > *")].forEach((el, i) => {
+        el.style.setProperty("--i", Math.min(i, 12));
+        el.classList.add("reinfedern");
+      });
+    }
+    inhalt.querySelectorAll("[data-ring]").forEach(r => ring(r, Number(r.dataset.ring), mitAnimation));
+    inhalt.querySelectorAll("[data-zahl]").forEach(z => hochzaehlen(z, Number(z.dataset.zahl), mitAnimation));
+    seitenleisteRechts();
+  }
+
+  // ---------- Bausteine ----------
+  function leer(emoji, titel, text) {
+    return `<div class="leer neu"><div class="emoji">${emoji}</div><strong>${titel}</strong>${text}</div>`;
+  }
+  function plusBalken(titel, text) {
+    return `<button class="plus-balken neu" data-aktion="neu">
+      <div class="plus-rund"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div><strong>${titel}</strong><span>${text}</span></div>
+    </button>`;
+  }
+  function ringKarte(titel, anteil, mitte, text) {
+    return `<div class="zahl-karte neu">
+      <h3>${titel}</h3>
+      <div class="ring"><svg viewBox="0 0 80 80"><circle class="spur" cx="40" cy="40" r="32"/><circle class="wert" data-ring="${anteil}" cx="40" cy="40" r="32"/></svg><b>${mitte}</b></div>
+      <p>${text}</p>
+    </div>`;
+  }
+  function karte(w, abzeichen, aktionen, klasse = "", hinweis = "") {
+    const bild = sicheresBild(w.bild);
+    const link = sichererLink(w.link);
+    return `<article class="wunsch-karte neu ${klasse}" data-id="${esc(w.id)}">
+      <div class="wk-bild">${bild ? `<img src="${bild}" alt="">` : "🎁"}</div>
+      <div class="wk-text">
+        <h3>${esc(w.name)}</h3>
+        ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : `<span>Kein Link</span>`}
+        ${hinweis ? `<span class="hinweis">${hinweis}</span>` : ""}
+      </div>
+      <div class="wk-rechts">
+        ${abzeichen}
+        <span class="preis">${w.preis != null ? chf.format(w.preis) : "–"}</span>
+        <div class="wk-aktionen">${aktionen}</div>
+      </div>
+    </article>`;
+  }
+  const passt = w => (w.name || "").toLowerCase().includes(suchtext);
+  const summe = liste => liste.reduce((s, w) => s + (w.preis || 0), 0);
+  const avatarWahl = aktiv => `<div class="avatare">${AVATARE.map(a =>
+    `<button type="button" class="avatar-wahl ${a === aktiv ? "aktiv" : ""}" data-aktion="avatar" data-wert="${a}">${a}</button>`).join("")}</div>`;
+
+  // ---------- Alle Wünsche ----------
+  function seiteAlle() {
+    const andere = mitglieder.filter(m => m.id !== uid);
+    if (!andere.length) {
+      return leer("👥", "Noch keine anderen Mitglieder", `Lade unter <a href="#mitglieder">Mitglieder</a> deine Familie und Freunde ein.`);
+    }
+    if (!andere.some(m => m.id === filterPerson)) filterPerson = "alle";
+
+    const chips = `<div class="chips">
+      <button class="knopf chip ${filterPerson === "alle" ? "aktiv" : ""}" data-aktion="person" data-wert="alle">Alle</button>
+      ${andere.map(m => `<button class="knopf chip ${filterPerson === m.id ? "aktiv" : ""}" data-aktion="person" data-wert="${esc(m.id)}">${esc(m.avatar)} ${esc(m.name)}</button>`).join("")}
+    </div>`;
+
+    const gruppen = andere
+      .filter(m => filterPerson === "alle" || filterPerson === m.id)
+      .map(m => {
+        const liste = fremde.filter(w => w.besitzer === m.id && passt(w));
+        if (!liste.length) return "";
+        return `<section class="gruppe">
+          <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"}</span></div></div>
+          <div class="karten">${liste.map(karteAlle).join("")}</div>
+        </section>`;
+      }).join("");
+
+    return chips + (gruppen || leer("🎁", "Keine Wünsche gefunden", "Die anderen haben noch nichts freigegeben."));
+  }
+
+  function karteAlle(w) {
+    const r = reservierung(w.id);
+    if (r && r.von === uid) {
+      return karte(w, `<span class="abzeichen">Von dir reserviert</span>`,
+        `<button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`);
+    }
+    if (r) {
+      const wer = mitglied(r.von);
+      return karte(w, `<span class="abzeichen hell">Schon vergeben</span>`, "", "vergeben",
+        wer ? `Wird von ${esc(wer.name)} geschenkt` : "");
+    }
+    return karte(w, "", `<button class="knopf blau klein" data-aktion="schenken">🎁 Ich schenke das</button>`);
+  }
+
+  // ---------- Meine Wünsche ----------
+  // Hier gibt es keine Reservierungs-Infos: Firestore lässt mich die Reservierungen meiner eigenen Wünsche gar nicht lesen.
+  function seiteMeine() {
+    const frei = eigene.filter(w => w.status === "freigegeben").length;
+    const wert = summe(eigene);
+    const liste = eigene.filter(w => (filterMeine === "alle" || w.status === filterMeine) && passt(w));
+
+    return `
+      ${plusBalken("Neuen Wunsch hinzufügen", "Name, Preis, Link und Bild – dann freigeben")}
+      <section class="zahlen">
+        ${ringKarte("Wünsche", Math.min(1, eigene.length / 10), `<span data-zahl="${eigene.length}">0</span>`, "insgesamt erfasst")}
+        ${ringKarte("Freigegeben", eigene.length ? frei / eigene.length : 0, `<span data-zahl="${frei}">0</span>`, `${eigene.length ? Math.round(frei / eigene.length * 100) : 0} % sichtbar`)}
+        ${ringKarte("Gesamtwert", Math.min(1, wert / 1000), "💰", chf.format(wert))}
+      </section>
+      <div class="zeile">
+        <h2>Meine Liste</h2>
+        <div class="chips">
+          ${[["alle", "Alle"], ["freigegeben", "Freigegeben"], ["entwurf", "Entwürfe"]].map(([w, t]) =>
+            `<button class="knopf chip ${filterMeine === w ? "aktiv" : ""}" data-aktion="filter" data-wert="${w}">${t}</button>`).join("")}
+        </div>
+      </div>
+      ${liste.length ? `<div class="karten">${liste.map(karteMeine).join("")}</div>`
+        : leer("🎁", eigene.length ? "Keine passenden Wünsche" : "Noch keine Wünsche", eigene.length ? "" : "Drück auf das grosse Plus!")}
+      ${eigene.length ? plusBalken("Noch ein Wunsch?", "Einfach hier drücken") : ""}`;
+  }
+
+  function karteMeine(w) {
+    const bearbeiten = `<button class="knopf klein" data-aktion="bearbeiten">✏️ Bearbeiten</button>`;
+    const loeschen = `<button class="knopf rund gefahr" data-aktion="loeschen" title="Löschen" aria-label="Löschen">✕</button>`;
+    if (w.status === "entwurf") {
+      return karte(w, `<span class="abzeichen hell">Entwurf</span>`,
+        `${bearbeiten}<button class="knopf blau klein" data-aktion="freigeben">❄ Freigeben</button>${loeschen}`, "entwurf");
+    }
+    return karte(w, `<span class="abzeichen">Freigegeben</span>`,
+      `${bearbeiten}<button class="knopf klein" data-aktion="zurueckziehen">Zurückziehen</button>${loeschen}`);
+  }
+
+  // ---------- Schenkung ----------
+  function meineGeschenke() {
+    return reservierungen.filter(r => r.von === uid).map(r => {
+      const w = fremde.find(x => x.id === r.id);
+      return w
+        ? { ...w, gekauft: !!r.gekauft, fehlt: false }
+        : { id: r.id, name: r.name, preis: r.preis, besitzer: r.besitzer, gekauft: !!r.gekauft, fehlt: true };
+    });
+  }
+
+  function seiteSchenkung() {
+    const geschenke = meineGeschenke();
+    const gesamt = summe(geschenke);
+    const gekauft = geschenke.filter(w => w.gekauft).length;
+    const personen = [...new Set(geschenke.map(w => w.besitzer))];
+
+    const kopf = `<section class="zahlen">
+      <div class="zahl-karte neu"><h3>Du verschenkst</h3><div class="zahl-gross">${chf.format(gesamt)}</div><p>Gesamtbetrag</p></div>
+      ${ringKarte("Geschenke", Math.min(1, geschenke.length / 10), `<span data-zahl="${geschenke.length}">0</span>`, `für ${personen.length} ${personen.length === 1 ? "Person" : "Personen"}`)}
+      ${ringKarte("Gekauft", geschenke.length ? gekauft / geschenke.length : 0, `<span data-zahl="${gekauft}">0</span>`, `von ${geschenke.length}`)}
+    </section>`;
+
+    if (!geschenke.length) {
+      return kopf + leer("🎁", "Noch keine Geschenke ausgewählt", `Wähle bei <a href="#alle">Alle Wünsche</a> aus, was du schenken möchtest.`);
+    }
+
+    const gruppen = personen.map(id => {
+      const m = mitglied(id) || { name: "Unbekannt", avatar: "❔" };
+      const liste = geschenke.filter(w => w.besitzer === id);
+      return `<section class="gruppe">
+        <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>Für ${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Geschenk" : "Geschenke"}</span></div><span class="summe">${chf.format(summe(liste))}</span></div>
+        <div class="karten">${liste.map(w => karte(w,
+          w.gekauft ? `<span class="abzeichen">Gekauft</span>` : `<span class="abzeichen zart">Noch kaufen</span>`,
+          `<button class="haken ${w.gekauft ? "an" : ""}" data-aktion="gekauft" title="Als gekauft markieren" aria-label="Als gekauft markieren">✓</button>
+           <button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`,
+          "", w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : "")).join("")}</div>
+      </section>`;
+    }).join("");
+
+    return kopf + gruppen + `<p class="notiz">🔒 Die Beschenkten sehen nie, welche Wünsche reserviert sind und von wem.</p>`;
+  }
+
+  // ---------- Mitglieder ----------
+  function seiteMitglieder() {
+    const karten = mitglieder.map(m => {
+      const anzahl = fremde.filter(w => w.besitzer === m.id).length;
+      return `<div class="mitglied-karte neu">
+        <div class="avatar gross">${esc(m.avatar)}</div>
+        <h3>${esc(m.name)}</h3>
+        ${m.id === uid ? `<span class="du">Das bist du</span>` : ""}
+        <p>${anzahl} ${anzahl === 1 ? "Wunsch" : "Wünsche"} freigegeben</p>
+      </div>`;
+    }).join("");
+
+    return `
+      <section class="formular-karte neu">
+        <h2>Jemanden einladen</h2>
+        <ol class="schritte">
+          <li>Schick den Link zur Wunschliste.</li>
+          <li>Die Person meldet sich mit Google oder E-Mail an.</li>
+          <li>Sie gibt euren <b>Familien-Code</b> ein – fertig!</li>
+        </ol>
+        <div class="wk-aktionen" style="justify-content:flex-start">
+          <button class="knopf blau" data-aktion="link-kopieren">🔗 Link kopieren</button>
+        </div>
+      </section>
+      <div class="mitglieder-raster">${karten}</div>`;
+  }
+
+  // ---------- Einstellungen ----------
+  function seiteEinstellungen() {
+    const m = ich();
+    avatarProfil = avatarProfil || m.avatar;
+    return `
+      <section class="formular-karte neu">
+        <h2>Mein Profil</h2>
+        <div class="formular-zeile">
+          <label class="feld" id="feldProfil"><span>Mein Name</span><input id="profilName" maxlength="40" value="${esc(m.name)}" autocomplete="off"></label>
+          <button class="knopf blau" data-aktion="profil-speichern">Speichern</button>
+        </div>
+        ${avatarWahl(avatarProfil)}
+      </section>
+      <section class="formular-karte neu">
+        <div class="einstellung">
+          <div><strong>Schnee & Schneebälle</strong><span>Animationen beim Freigeben und Schenken (nur auf diesem Gerät)</span></div>
+          <button class="schalter ${animiert() ? "an" : ""}" data-aktion="animationen" role="switch" aria-checked="${animiert()}" aria-label="Animationen"></button>
+        </div>
+      </section>
+      <section class="formular-karte neu">
+        <h2>Konto</h2>
+        <p class="notiz">Angemeldet als ${esc(auth.currentUser?.email || "")}</p>
+        <div class="wk-aktionen" style="justify-content:flex-start">
+          <button class="knopf" data-aktion="export">⬇ Meine Wünsche sichern</button>
+          <button class="knopf gefahr" data-aktion="abmelden">Abmelden</button>
+        </div>
+      </section>`;
+  }
+
+  // ---------- Rechte Spalte ----------
+  function seitenleisteRechts() {
+    const geschenke = meineGeschenke();
+    $("miniSchenkung").innerHTML = `
+      <h3>Meine Schenkung</h3>
+      <div class="panel-zahl">${chf.format(summe(geschenke))}</div>
+      <p>${geschenke.length} ${geschenke.length === 1 ? "Geschenk" : "Geschenke"} ausgewählt</p>
+      <a class="knopf klein" href="#schenkung">Ansehen</a>`;
+    $("miniMitglieder").innerHTML = `
+      <h3>Familie & Freunde</h3>
+      <div class="avatar-reihe">${mitglieder.slice(0, 6).map(m => `<div class="avatar" title="${esc(m.name)}">${esc(m.avatar)}</div>`).join("")}</div>
+      <a class="knopf klein" href="#mitglieder">+ Einladen</a>`;
+  }
+
+  function ring(kreis, anteil, mitAnimation) {
+    const umfang = 2 * Math.PI * 32;
+    const ziel = umfang * (1 - Math.max(0, Math.min(1, anteil)));
+    kreis.style.strokeDasharray = umfang;
+    if (!mitAnimation) { kreis.style.strokeDashoffset = ziel; return; }
+    kreis.style.strokeDashoffset = umfang;
+    requestAnimationFrame(() => requestAnimationFrame(() => { kreis.style.strokeDashoffset = ziel; }));
+  }
+
+  function hochzaehlen(el, ziel, mitAnimation) {
+    if (!mitAnimation) { el.textContent = ziel; return; }
+    const t0 = performance.now();
+    const schritt = t => {
+      const p = Math.min(1, (t - t0) / 600);
+      el.textContent = Math.round(ziel * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(schritt);
+    };
+    requestAnimationFrame(schritt);
+  }
+
+  // ============================================================
+  //  Countdown (Tage, Stunden, Minuten, Sekunden)
+  // ============================================================
+  let letzteTage = -1;
+  function heiligabend() {
+    const jetzt = new Date();
+    const j = jetzt.getFullYear();
+    // Bis Ende 25. Dezember gilt noch dieses Jahr, danach das nächste
+    return jetzt < new Date(j, 11, 26) ? new Date(j, 11, 24) : new Date(j + 1, 11, 24);
+  }
+  function setzeUhr(id, wert) {
+    const el = $(id);
+    if (el.textContent === wert) return;
+    el.textContent = wert;
+    el.classList.remove("tick");
+    void el.offsetWidth;
+    el.classList.add("tick");
+  }
+  function uhrTick() {
+    const rest = Math.max(0, heiligabend() - new Date());
+    const s = Math.floor(rest / 1000);
+    const tage = Math.floor(s / 86400);
+    setzeUhr("uhrT", String(tage));
+    setzeUhr("uhrS", String(Math.floor(s % 86400 / 3600)).padStart(2, "0"));
+    setzeUhr("uhrM", String(Math.floor(s % 3600 / 60)).padStart(2, "0"));
+    setzeUhr("uhrSek", String(s % 60).padStart(2, "0"));
+    if (tage !== letzteTage) {
+      letzteTage = tage;
+      $("tacho-tage").textContent = rest ? `${tage} Tage` : "Frohe Weihnachten!";
+      tachoSetzen(tage);
+    }
+  }
+  function tachoSetzen(tage) {
+    if ($("app").hidden || tage < 0) return;
+    // Bogen füllt sich, je näher Heiligabend kommt (über 100 Tage gerechnet)
+    const anteil = 1 - Math.min(tage, 100) / 100;
+    const bogen = $("tachoBogen");
+    const laenge = bogen.getTotalLength();
+    bogen.style.strokeDasharray = laenge;
+    bogen.style.strokeDashoffset = laenge;
+    const punkt = bogen.getPointAtLength(Math.max(0.01, laenge * anteil));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      bogen.style.strokeDashoffset = laenge * (1 - anteil);
+      $("tachoKnauf").style.transform = `translate(${punkt.x}px, ${punkt.y}px)`;
+    }));
+  }
+
+  // ============================================================
+  //  Aktionen
+  // ============================================================
+  $("inhalt").addEventListener("click", async e => {
+    const knopf = e.target.closest("[data-aktion]");
+    if (!knopf) return;
+    const aktion = knopf.dataset.aktion;
+    const kartenEl = knopf.closest(".wunsch-karte");
+    const id = kartenEl ? kartenEl.dataset.id : null;
+    const w = id ? wunsch(id) : null;
+
+    try {
+      switch (aktion) {
+        case "neu": return oeffnen();
+        case "bearbeiten": return w && oeffnen(w);
+        case "filter": filterMeine = knopf.dataset.wert; return zeichnen();
+        case "person": filterPerson = knopf.dataset.wert; return zeichnen();
+
+        case "freigeben":
+          await schneeballAuf(kartenEl);
+          await schreiben(updateDoc(doc(db, "wuensche", id), { status: "freigegeben", freigegebenAm: Date.now() }));
+          zeichnen(false);
+          ploppen(id);
+          return schneien(3500);
+
+        case "zurueckziehen":
+          await schreiben(updateDoc(doc(db, "wuensche", id), { status: "entwurf" }));
+          return ploppen(id);
+
+        case "loeschen":
+          if (!confirm(`„${w.name}“ wirklich löschen?`)) return;
+          kartenEl.classList.add("weg");
+          await warte(400);
+          return await schreiben(deleteDoc(doc(db, "wuensche", id)));
+
+        case "schenken":
+          await schreiben(setDoc(doc(db, "reservierungen", id), {
+            besitzer: w.besitzer, von: uid, gekauft: false,
+            name: w.name, preis: w.preis ?? null, erstellt: Date.now()
+          }));
+          await schneeballAuf(document.querySelector(`.wunsch-karte[data-id="${id}"]`) || kartenEl);
+          zeichnen(false);
+          ploppen(id);
+          return schneien(3000);
+
+        case "zurueckgeben": {
+          const name = (w || reservierung(id) || {}).name || "Dieses Geschenk";
+          if (!confirm(`„${name}“ zurückgeben, damit jemand anderes es schenken kann?`)) return;
+          kartenEl.classList.add("weg");
+          await warte(400);
+          return await schreiben(deleteDoc(doc(db, "reservierungen", id)));
+        }
+
+        case "gekauft": {
+          const neu = !(reservierung(id) || {}).gekauft;
+          knopf.classList.toggle("an", neu);
+          if (neu && animiert()) { const r = knopf.getBoundingClientRect(); splat(r.left + r.width / 2, r.top + r.height / 2); }
+          return await schreiben(updateDoc(doc(db, "reservierungen", id), { gekauft: neu }));
+        }
+
+        case "avatar":
+          avatarProfil = knopf.dataset.wert;
+          knopf.parentElement.querySelectorAll(".avatar-wahl").forEach(b => b.classList.toggle("aktiv", b === knopf));
+          return;
+
+        case "profil-speichern": {
+          const name = $("profilName").value.trim();
+          if (!name) return wackeln("feldProfil");
+          await schreiben(updateDoc(doc(db, "mitglieder", uid), { name, avatar: avatarProfil || ich().avatar }));
+          $("profilName").blur();
+          zeichnen(false);
+          if (animiert()) { const r = $("profil").getBoundingClientRect(); splat(r.left + 25, r.top + 25); }
+          return;
+        }
+
+        case "animationen":
+          lokal.animationen = !lokal.animationen;
+          lokalSpeichern();
+          knopf.classList.toggle("an", animiert());
+          knopf.setAttribute("aria-checked", animiert());
+          if (animiert()) schneien(2000);
+          return;
+
+        case "link-kopieren": {
+          const link = location.origin + location.pathname;
+          try { await navigator.clipboard.writeText(link); knopf.textContent = "✓ Kopiert!"; }
+          catch { prompt("Diesen Link verschicken:", link); }
+          return;
+        }
+
+        case "export": {
+          const blob = new Blob([JSON.stringify(eigene, null, 2)], { type: "application/json" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `meine-wuensche-${new Date().toISOString().slice(0, 10)}.json`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+          return;
+        }
+
+        case "abmelden":
+          if (confirm("Wirklich abmelden?")) await signOut(auth);
+          return;
+      }
+    } catch {
+      zeichnen(false);
+    }
+  });
+
+  function ploppen(id) {
+    const k = document.querySelector(`.wunsch-karte[data-id="${id}"]`);
+    if (k) k.classList.add("ploppt");
+  }
+
+  // ============================================================
+  //  Fenster: Wunsch erfassen / bearbeiten
+  // ============================================================
+  let bearbeiteId = null;
+  let neuesBild = "";
+
+  function oeffnen(w) {
+    bearbeiteId = w ? w.id : null;
+    $("fensterTitel").textContent = w ? "Wunsch bearbeiten ✏️" : "Neuer Wunsch 🎁";
+    $("eingabeName").value = w ? w.name : "";
+    $("eingabePreis").value = w && w.preis != null ? w.preis : "";
+    $("eingabeLink").value = w ? w.link || "" : "";
+    neuesBild = w ? sicheresBild(w.bild) : "";
+    bildVorschau();
+    document.querySelectorAll(".fenster .feld.fehler").forEach(f => f.classList.remove("fehler"));
+    $("huelle").classList.add("offen");
+    setTimeout(() => $("eingabeName").focus(), 150);
+  }
+  function schliessen() { $("huelle").classList.remove("offen"); }
+
+  $("abbrechen").addEventListener("click", schliessen);
+  $("huelle").addEventListener("click", e => { if (e.target === $("huelle")) schliessen(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") schliessen(); });
+
+  const bildFeld = $("bildFeld");
+  bildFeld.addEventListener("click", () => $("eingabeBild").click());
+  bildFeld.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("eingabeBild").click(); } });
+  $("eingabeBild").addEventListener("change", e => { bildLaden(e.target.files[0]); e.target.value = ""; });
+  bildFeld.addEventListener("dragover", e => { e.preventDefault(); bildFeld.classList.add("drueber"); });
+  bildFeld.addEventListener("dragleave", () => bildFeld.classList.remove("drueber"));
+  bildFeld.addEventListener("drop", e => { e.preventDefault(); bildFeld.classList.remove("drueber"); bildLaden(e.dataTransfer.files[0]); });
+
+  async function bildLaden(datei) {
+    if (!datei || !datei.type.startsWith("image/")) return;
+    try { neuesBild = await verkleinern(datei); bildVorschau(); }
+    catch { alert("Das Bild konnte nicht geladen werden."); }
+  }
+  function bildVorschau() {
+    bildFeld.innerHTML = neuesBild ? `<img src="${neuesBild}" alt="Vorschau">` : `<div>📷<br><small>Bild hierher ziehen oder antippen</small></div>`;
+  }
+  // Bilder verkleinern, damit sie direkt in der Datenbank Platz haben (max. 1 MB pro Wunsch)
+  function verkleinern(datei) {
+    return new Promise((ok, fehler) => {
+      const img = new Image();
+      const url = URL.createObjectURL(datei);
+      img.onload = () => {
+        const faktor = Math.min(1, 600 / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * faktor);
+        c.height = Math.round(img.height * faktor);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        ok(c.toDataURL("image/jpeg", 0.75));
+      };
+      img.onerror = fehler;
+      img.src = url;
+    });
+  }
+
+  function wackeln(id) {
+    const f = $(id);
+    f.classList.remove("fehler");
+    void f.offsetWidth;
+    f.classList.add("fehler");
+  }
+
+  // Gibt die Wunsch-ID zurück (oder null bei ungültigen Eingaben)
+  function eingabenSpeichern(status) {
+    const name = $("eingabeName").value.trim();
+    const link = $("eingabeLink").value.trim();
+    const preisText = $("eingabePreis").value;
+    let ok = true;
+    if (!name) { wackeln("feldName"); ok = false; }
+    if (link && !sichererLink(link)) { wackeln("feldLink"); ok = false; }
+    if (!ok) return null;
+
+    const felder = { name, link, bild: neuesBild, status, preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
+    const alt = bearbeiteId && eigene.find(w => w.id === bearbeiteId);
+    if (status === "freigegeben" && !(alt && alt.status === "freigegeben")) felder.freigegebenAm = Date.now();
+
+    if (alt) {
+      schreiben(updateDoc(doc(db, "wuensche", alt.id), felder)).catch(() => {});
+      return alt.id;
+    }
+    const ref = doc(collection(db, "wuensche"));
+    schreiben(setDoc(ref, { ...felder, besitzer: uid, erstellt: Date.now() })).catch(() => {});
+    return ref.id;
+  }
+
+  function nachMeine() {
+    filterMeine = "alle";
+    if (location.hash !== "#meine") history.replaceState(null, "", "#meine");
+  }
+
+  $("alsEntwurf").addEventListener("click", async () => {
+    const id = eingabenSpeichern("entwurf");
+    if (!id) return;
+    schliessen();
+    nachMeine();
+    await warte(30);
+    zeichnen(false);
+    ploppen(id);
+  });
+
+  $("formular").addEventListener("submit", async e => {
+    e.preventDefault();
+    const id = eingabenSpeichern("freigegeben");
+    if (!id) return;
+    const r = $("freigeben").getBoundingClientRect();
+    const start = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    schliessen();
+    nachMeine();
+    await warte(30);
+    zeichnen(false);
+    const k = document.querySelector(`.wunsch-karte[data-id="${id}"]`);
+    if (k && animiert()) {
+      k.style.opacity = "0";
+      await insBild(k);
+      await schneeballWerfen(start, mitte(k));
+    }
+    zeichnen(false);
+    ploppen(id);
+    schneien(3500);
+  });
+
+  function mitte(el) {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  async function insBild(el) {
+    const r = el.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight - 100) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      await warte(550);
+    }
+  }
+  async function schneeballAuf(el) {
+    if (!animiert() || !el || !el.isConnected) return;
+    await insBild(el);
+    await schneeballWerfen({ x: innerWidth / 2, y: innerHeight + 30 }, mitte(el));
+  }
+
+  // ============================================================
+  //  Schnee & Schneeball
+  // ============================================================
+  const leinwand = $("schnee");
+  const ctx = leinwand.getContext("2d");
+  const wenigBewegung = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let flocken = [];
+  let schneeBis = 0;
+  let laeuft = false;
+
+  function groesse() {
+    const dpr = window.devicePixelRatio || 1;
+    leinwand.width = innerWidth * dpr;
+    leinwand.height = innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  addEventListener("resize", groesse);
+  groesse();
+
+  function schneien(ms) {
+    if (!animiert()) return;
+    schneeBis = Math.max(schneeBis, performance.now() + (wenigBewegung ? 800 : ms));
+    starten();
+  }
+
+  function splat(x, y) {
+    const anzahl = wenigBewegung ? 12 : 46;
+    for (let i = 0; i < anzahl; i++) {
+      const winkel = Math.random() * Math.PI * 2;
+      const tempo = 2 + Math.random() * 7;
+      flocken.push({ art: "splat", x, y, vx: Math.cos(winkel) * tempo, vy: Math.sin(winkel) * tempo - 2, r: 2 + Math.random() * 4, leben: 1 });
+    }
+    starten();
+  }
+
+  function starten() {
+    if (laeuft) return;
+    laeuft = true;
+    requestAnimationFrame(bild);
+  }
+
+  function bild(t) {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    if (t < schneeBis) {
+      for (let i = 0; i < 3; i++) {
+        flocken.push({ art: "flocke", x: Math.random() * innerWidth, y: -10, vx: 0, vy: 1 + Math.random() * 2.2, r: 1.5 + Math.random() * 3.5, phase: Math.random() * 6.28, leben: 1 });
+      }
+    }
+    flocken = flocken.filter(f => {
+      if (f.art === "flocke") {
+        f.phase += 0.03;
+        f.x += Math.sin(f.phase) * 0.8;
+        f.y += f.vy;
+        if (t > schneeBis) f.leben -= 0.01;
+      } else {
+        f.vy += 0.35;
+        f.vx *= 0.97;
+        f.x += f.vx;
+        f.y += f.vy;
+        f.leben -= 0.022;
+      }
+      ctx.globalAlpha = Math.max(0, f.leben);
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(5,38,89,.45)";
+      ctx.shadowBlur = 4;
+      ctx.fill();
+      return f.leben > 0 && f.y < innerHeight + 20;
+    });
+    ctx.globalAlpha = 1;
+    if (flocken.length || t < schneeBis) requestAnimationFrame(bild);
+    else { laeuft = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+
+  function schneeballWerfen(von, nach) {
+    return new Promise(fertig => {
+      const ball = document.createElement("div");
+      ball.className = "schneeball";
+      document.body.appendChild(ball);
+      const dx = nach.x - von.x;
+      const dy = nach.y - von.y;
+      const hoehe = Math.max(140, Math.abs(dx) * 0.4);
+      const schritte = [];
+      for (let i = 0; i <= 24; i++) {
+        const p = i / 24;
+        const x = von.x + dx * p - 15;
+        const y = von.y + dy * p - Math.sin(Math.PI * p) * hoehe - 15;
+        const s = 1 + 0.7 * Math.sin(Math.PI * p);
+        schritte.push({ transform: `translate(${x}px, ${y}px) scale(${s}) rotate(${p * 600}deg)` });
+      }
+      const anim = ball.animate(schritte, { duration: wenigBewegung ? 1 : 700, easing: "linear" });
+      anim.onfinish = () => { ball.remove(); splat(nach.x, nach.y); fertig(); };
+    });
+  }
+
+  $("schneeKnopf").addEventListener("click", e => {
+    splat(e.clientX, e.clientY);
+    schneeBis = Math.max(schneeBis, performance.now() + 5000);
+    starten();
+  });
+
+  // ============================================================
+  //  Seitenleiste einklappen, Suche, Navigation
+  // ============================================================
+  function leisteSetzen() { $("app").classList.toggle("zu", !!lokal.seiteZu); }
+  $("einklappen").addEventListener("click", () => {
+    lokal.seiteZu = !lokal.seiteZu;
+    lokalSpeichern();
+    leisteSetzen();
+  });
+  $("suche").addEventListener("input", e => { suchtext = e.target.value.trim().toLowerCase(); zeichnen(false); });
+  addEventListener("hashchange", () => { suchtext = ""; $("suche").value = ""; avatarProfil = ""; zeichnen(); scrollTo({ top: 0, behavior: "smooth" }); });
+
+  uhrTick();
+  setInterval(uhrTick, 1000);
+</script>
+</body>
+</html>
