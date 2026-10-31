@@ -568,6 +568,9 @@
   }
   .avatar-wahl:hover { transform: scale(1.12); }
   .avatar-wahl.aktiv { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); transform: scale(.95); }
+  .avatar-wahl.besetzt { position: relative; cursor: not-allowed; opacity: .4; filter: grayscale(.8); box-shadow: var(--innen); }
+  .avatar-wahl.besetzt:hover { transform: none; }
+  .avatar-wahl.besetzt small { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); font-size: 9px; color: var(--text); background: var(--flaeche); padding: 0 4px; border-radius: 6px; white-space: nowrap; }
   .notiz { margin: 0; color: var(--leise); font-size: 12px; }
 
   /* Admin */
@@ -672,6 +675,27 @@
   .huelle.offen .fenster { transform: none; }
   .fenster h2 { margin: 0 0 4px; font-size: 20px; }
   .fenster > p { margin: 0 0 20px; color: var(--leise); font-size: 13px; }
+  .schenk-mit { margin: -8px 0 16px; padding: 12px 14px; border-radius: 16px; box-shadow: var(--innen); font-size: 13px; line-height: 1.6; }
+  .schenk-mit:empty { display: none; }
+  .schenk-wahl { display: flex; flex-direction: column; gap: 12px; }
+  .schenk-option {
+    display: flex; gap: 14px; align-items: flex-start; text-align: left;
+    padding: 14px 16px; border: 0; border-radius: 20px;
+    background: var(--flaeche); box-shadow: var(--aussen-klein); color: var(--text); font: inherit;
+    transition: transform .6s var(--feder), box-shadow .2s;
+  }
+  button.schenk-option { cursor: pointer; }
+  button.schenk-option:hover { transform: translateY(-2px); }
+  button.schenk-option:active { transform: scale(.97); }
+  .schenk-option > span { font-size: 30px; line-height: 1; }
+  .schenk-option > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .schenk-option b { font-size: 15px; }
+  .schenk-option small { color: var(--leise); font-size: 12px; }
+  .schenk-option .formular-zeile { margin-top: 10px; }
+  .schenk-option .feld { min-width: 140px; }
+  .sterne-legende { line-height: 1.6; }
+  .sterne-legende .gelb { color: #e0a526; letter-spacing: 1px; }
+  .wk-text .info.mit { color: var(--text); font-weight: 400; line-height: 1.5; }
   .meldung-herz { font-size: 46px; text-align: center; color: var(--rot); animation: herzschlag 1.1s ease-in-out infinite; }
   .meldung-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
   .meldung-liste li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 16px; box-shadow: var(--innen); font-size: 14px; }
@@ -1015,6 +1039,34 @@
   </div>
 </div>
 
+<!-- ===== Fenster: Wie viel möchtest du schenken? ===== -->
+<div class="huelle" id="schenkHuelle">
+  <div class="fenster neu" role="dialog" aria-labelledby="schenkTitel">
+    <h2 id="schenkTitel"></h2>
+    <p id="schenkInfo"></p>
+    <div class="schenk-mit" id="schenkMit"></div>
+    <div class="schenk-wahl">
+      <button type="button" class="schenk-option" id="schenkVoll"><span>🎁</span><div><b id="schenkVollTitel"></b><small id="schenkVollText"></small></div></button>
+      <div class="schenk-option eigen" id="schenkEigen">
+        <span>🤝</span>
+        <div>
+          <b>Eigenen Betrag eintragen</b>
+          <small>Das Geschenk bleibt offen – andere können mitschenken und sehen, dass du dabei bist.</small>
+          <div class="formular-zeile">
+            <label class="feld" id="feldAnteil"><span>Mein Anteil (CHF)</span><input id="eingabeAnteil" type="number" min="1" step="1" inputmode="decimal"></label>
+            <label class="feld"><span>Notiz für die anderen (optional)</span><input id="eingabeAnteilNotiz" maxlength="120" placeholder="z.B. Ich kann es kaufen"></label>
+          </div>
+          <small class="link-status" id="schenkHinweis"></small>
+        </div>
+      </div>
+    </div>
+    <div class="fenster-knoepfe">
+      <button type="button" class="knopf" id="schenkAbbrechen">Abbrechen</button>
+      <button type="button" class="knopf blau" id="schenkAnteilOk">🤝 Mitschenken</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" onclick="this.classList.remove('da')"></div>
 
 <canvas id="schnee"></canvas>
@@ -1026,7 +1078,7 @@
     signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updatePassword
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
   import {
-    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot, writeBatch
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot, writeBatch, deleteField
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   // ============================================================
@@ -1133,6 +1185,11 @@
   const geladen = new Set(); // welche Listen schon einmal angekommen sind (gegen Fehlalarm beim Start)
   let limiten = {};         // meine Schenkungslimite pro Person { uid: CHF } – privat
   let budgetGemeldet = null; // zuletzt gezeigte Budget-Meldung (damit sie nicht ständig wiederkommt)
+  // Gemeinsam schenken: anteile/{wunschId} = { besitzer, name, preis, gekauft, teile: { uid: { betrag, notiz, gekauft, erstellt } } }
+  // Sehen dürfen das alle ausser dem Beschenkten.
+  let anteileListe = [];
+  let adminAnteile = [];
+  let bescherungAnteile = [];
   let bescherungRes = [];   // ab Heiligabend: wer mir was schenkt (vorher von den Regeln gesperrt)
   let bescherungGemeldet = false;
   let archivBekommen = [];  // Rückblick: was ich in früheren Jahren bekommen habe
@@ -1142,6 +1199,19 @@
   let zeichnenGeplant = false;
 
   const istAdmin = () => rolle === "admin";
+  // Jeder Avatar nur einmal: gibt das Mitglied zurück, das ihn schon hat (ausser mir)
+  const avatarBesetzt = a => mitglieder.find(m => m.id !== uid && m.avatar === a);
+  // Doppelte Avatare auflösen (z.B. beim ersten Anmelden): wer später kam, bekommt einen freien
+  let avatarGeprueft = false;
+  function avatarPruefen() {
+    if (avatarGeprueft) return;
+    const me = mitglieder.find(m => m.id === uid);
+    if (!me) return;
+    avatarGeprueft = true;
+    const frueher = mitglieder.some(m => m.id !== uid && m.avatar === me.avatar && (m.erstellt || 0) <= (me.erstellt || 0));
+    const frei = AVATARE.find(a => !mitglieder.some(m => m.avatar === a));
+    if (frueher && frei) updateDoc(doc(db, "mitglieder", uid), { avatar: frei }).catch(f => console.error(f));
+  }
   const ich = () => mitglieder.find(m => m.id === uid) || { id: uid, name: "Ich", avatar: "🎅" };
   const mitglied = id => mitglieder.find(m => m.id === id);
   const wunsch = id => [...eigene, ...fremde, ...adminWuensche].find(w => w.id === id);
@@ -1167,6 +1237,8 @@
     limiten = {};
     budgetGemeldet = null;
     bescherungRes = []; bescherungGemeldet = false;
+    anteileListe = []; adminAnteile = []; bescherungAnteile = [];
+    avatarGeprueft = false;
     archivBekommen = []; archivGeschenkt = [];
     $("meldungHuelle").classList.remove("offen");
   }
@@ -1174,20 +1246,23 @@
   function datenStarten() {
     const fehler = f => console.error(f);
     const hoeren = (q, fn) => abmelder.push(onSnapshot(q, s => { fn(s); spaeterZeichnen(); }, fehler));
-    hoeren(collection(db, "mitglieder"), s => { mitglieder = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); });
+    hoeren(collection(db, "mitglieder"), s => { mitglieder = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); avatarPruefen(); });
     hoeren(query(collection(db, "wuensche"), where("besitzer", "==", uid)), s => { eigene = nachDatum(listeAus(s)); });
     hoeren(query(collection(db, "wuensche"), where("status", "==", "freigegeben")), s => { fremde = nachDatum(listeAus(s)); geladen.add("fremde"); });
     hoeren(query(collection(db, "vergeben"), where("besitzer", "!=", uid)), s => { vergeben = new Set(s.docs.map(d => d.id)); });
     hoeren(query(collection(db, "reservierungen"), where("von", "==", uid)), s => { meineRes = listeAus(s); geladen.add("res"); });
+    hoeren(query(collection(db, "anteile"), where("besitzer", "!=", uid)), s => { anteileListe = listeAus(s); geladen.add("anteile"); });
     hoeren(doc(db, "limiten", uid), s => { limiten = s.exists() ? (s.data().betraege || {}) : {}; geladen.add("limiten"); });
     hoeren(query(collection(db, "archiv"), where("besitzer", "==", uid)), s => { archivBekommen = listeAus(s); });
     hoeren(query(collection(db, "archiv"), where("von", "==", uid)), s => { archivGeschenkt = listeAus(s); });
     if (istBescherung()) {
       hoeren(query(collection(db, "reservierungen"), where("besitzer", "==", uid)), s => { bescherungRes = listeAus(s); geladen.add("bescherung"); });
+      hoeren(query(collection(db, "anteile"), where("besitzer", "==", uid)), s => { bescherungAnteile = listeAus(s); });
     }
     if (istAdmin()) {
       hoeren(collection(db, "wuensche"), s => { adminWuensche = nachDatum(listeAus(s)); });
       hoeren(collection(db, "reservierungen"), s => { adminRes = listeAus(s); });
+      hoeren(collection(db, "anteile"), s => { adminAnteile = listeAus(s); });
       hoeren(collection(db, "einladungen"), s => { einladungen = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); });
     }
   }
@@ -1387,16 +1462,27 @@
           <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"} offen</span></div>
             ${b.limite != null ? `<span class="summe ${b.ueber ? "rot" : ""}">${b.ueber ? esc(budgetText(b)) : `noch ${chf.format(b.rest)}`}</span>` : ""}</div>
           <div class="karten">${liste.map(w => {
-            // Übersteigt dieses Produkt meine (Rest-)Limite für diese Person?
-            const zuTeuer = b.limite != null && (w.preis || 0) > Math.max(0, b.rest);
-            return karte(w, "", `<button class="knopf blau klein" data-aktion="schenken">🎁 Ich schenke das</button>`,
+            // Gemeinsam schenken: wer ist schon dabei, wie viel ist noch offen?
+            const a = anteilVon(w.id);
+            const dabei = a && a.teile && a.teile[uid];
+            const zugesagt = anteilSumme(a);
+            const offen = w.preis != null ? Math.max(0, w.preis - zugesagt) : null;
+            const info = a && Object.keys(a.teile || {}).length
+              ? `<span class="info mit">🤝 ${anteileText(mitschenker(a))}${offen != null ? `<br><b>Noch offen: ${chf.format(offen)}</b>` : ""}</span>` : "";
+            const knopfText = dabei ? "✏️ Mein Anteil" : a ? "🤝 Mitschenken" : "🎁 Ich schenke das";
+            // Übersteigt dieses Produkt (bzw. der offene Rest) meine Limite für diese Person?
+            const kosten = a ? (offen ?? 0) : (w.preis || 0);
+            const zuTeuer = !dabei && b.limite != null && kosten > Math.max(0, b.rest);
+            return karte(w, dabei ? `<span class="abzeichen zart">Du bist dabei</span>` : "",
+              `<button class="knopf blau klein" data-aktion="schenken">${knopfText}</button>`,
               zuTeuer ? "ueber-limite" : "",
-              zuTeuer ? `⚠ Übersteigt deine Limite um ${chf.format((w.preis || 0) - Math.max(0, b.rest))}` : "");
+              zuTeuer ? `⚠ Übersteigt deine Limite um ${chf.format(kosten - Math.max(0, b.rest))}` : "", info);
           }).join("")}</div>
         </section>`;
       }).join("");
 
-    return budgetLeiste() + chips + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
+    const legende = `<p class="notiz sterne-legende">Wichtigkeit: <span class="gelb">★★★</span> = Priorität 1 (Herzenswunsch) · <span class="gelb">★★</span> = Priorität 2 · <span class="gelb">★</span> = Priorität 3 – Herzenswünsche stehen zuoberst.<br>🤝 Mit „Ich schenke das“ kannst du den ganzen Betrag oder nur einen Teil übernehmen.</p>`;
+    return budgetLeiste() + chips + legende + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
   }
 
   // ---------- Meine Wünsche ----------
@@ -1422,8 +1508,7 @@
         </div>
       </div>
       ${liste.length ? `<div class="karten">${liste.map(karteMeine).join("")}</div>`
-        : leer("🎁", eigene.length ? "Keine passenden Wünsche" : "Noch keine Wünsche", eigene.length ? "" : "Drück auf das grosse Plus!")}
-      ${eigene.length ? plusBalken("Noch ein Wunsch?", "Einfach hier drücken") : ""}`;
+        : leer("🎁", eigene.length ? "Keine passenden Wünsche" : "Noch keine Wünsche", eigene.length ? "" : "Drück auf das grosse Plus!")}`;
   }
 
   function karteMeine(w) {
@@ -1434,23 +1519,32 @@
         `${bearbeiten}<button class="knopf blau klein" data-aktion="freigeben">❄ Freigeben</button>${loeschen}`, "entwurf");
     }
     // Bescherung: ab Heiligabend sehe ich, wer mir was schenkt
-    const r = istBescherung() && bescherungRes.find(x => x.id === w.id);
-    if (r) {
+    const von = istBescherung() ? schenkerVon(w.id) : [];
+    if (von.length) {
       const offen = !lokal.ausgepackt.includes(w.id);
-      const von = mitglied(r.von) || { name: "?", avatar: "🎅" };
+      const namen = von.map(id => { const m = mitglied(id) || { name: "?", avatar: "🎅" }; return `${esc(m.name)} ${esc(m.avatar)}`; });
       return karte(w, `<span class="abzeichen">Geschenkt</span>`,
         offen ? `<button class="knopf blau klein" data-aktion="auspacken">🎁 Auspacken</button>` : "",
         offen ? "beschert" : "ausgepackt", "",
-        offen ? "✨ Jemand schenkt dir das!" : `🎁 Von ${esc(von.name)} ${esc(von.avatar)}`);
+        offen ? `✨ ${von.length > 1 ? "Mehrere schenken" : "Jemand schenkt"} dir das!` : `🎁 Von ${namen.join(" & ")}`);
     }
     return karte(w, `<span class="abzeichen">Freigegeben</span>`,
       `${bearbeiten}<button class="knopf klein" data-aktion="zurueckziehen">Zurückziehen</button>${loeschen}`);
   }
 
+  // Bescherung: alle, die mir diesen Wunsch schenken (ganz oder mit Anteil)
+  function schenkerVon(id) {
+    const r = bescherungRes.find(x => x.id === id);
+    if (r) return [r.von];
+    const a = bescherungAnteile.find(x => x.id === id);
+    return a ? Object.keys(a.teile || {}) : [];
+  }
+  const istBeschert = id => schenkerVon(id).length > 0;
+
   function bescherungBanner() {
     if (!istBescherung()) return "";
-    const offen = eigene.filter(w => bescherungRes.some(r => r.id === w.id) && !lokal.ausgepackt.includes(w.id)).length;
-    const alle = eigene.filter(w => bescherungRes.some(r => r.id === w.id)).length;
+    const offen = eigene.filter(w => istBeschert(w.id) && !lokal.ausgepackt.includes(w.id)).length;
+    const alle = eigene.filter(w => istBeschert(w.id)).length;
     return `<section class="bescherung-banner">
       <div class="baum">🎄</div>
       <div><h2>Frohe Weihnachten!</h2><p>${offen ? `Es ist Bescherung – ${offen} ${offen === 1 ? "Geschenk wartet" : "Geschenke warten"} darauf, ausgepackt zu werden.`
@@ -1486,12 +1580,141 @@
 
   // ---------- Schenkung ----------
   function meineGeschenke() {
-    return meineRes.map(r => {
+    const ganz = meineRes.map(r => {
       const w = fremde.find(x => x.id === r.id);
       return w
         ? { ...w, gekauft: !!r.gekauft, genommen: r.erstellt, fehlt: false }
         : { id: r.id, name: r.name, preis: r.preis, besitzer: r.besitzer, gekauft: !!r.gekauft, fehlt: geladen.has("fremde") && geladen.has("res") };
     });
+    // Geteilte Geschenke: "preis" ist hier MEIN Anteil (zählt so auch in Limite und Summen)
+    const geteilt = anteileListe.filter(a => a.teile && a.teile[uid]).map(a => {
+      const mein = a.teile[uid];
+      const w = fremde.find(x => x.id === a.id);
+      const basis = w ? { ...w, fehlt: false }
+        : { id: a.id, name: a.name, besitzer: a.besitzer, fehlt: geladen.has("fremde") && geladen.has("anteile") };
+      return { ...basis, vollpreis: w ? w.preis : a.preis, preis: mein.betrag, gekauft: !!mein.gekauft,
+        genommen: mein.erstellt, notiz: mein.notiz || "", geteilt: true, mit: mitschenker(a, uid) };
+    });
+    return [...ganz, ...geteilt];
+  }
+
+  // ---------- Gemeinsam schenken ----------
+  const anteilVon = id => anteileListe.find(a => a.id === id);
+  const mitschenker = (a, ohne) => Object.entries(a.teile || {}).filter(([k]) => k !== ohne)
+    .map(([k, t]) => ({ id: k, betrag: t.betrag || 0, notiz: t.notiz || "", gekauft: !!t.gekauft }));
+  const anteilSumme = (a, ohne) => Object.entries((a && a.teile) || {}).filter(([k]) => k !== ohne).reduce((s, [, t]) => s + (t.betrag || 0), 0);
+  // Wer ist mit wie viel dabei? (für die Anzeige bei den anderen Schenkern)
+  function anteileText(liste) {
+    return liste.map(t => {
+      const m = mitglied(t.id) || { name: "?", avatar: "" };
+      return `${esc(m.avatar)} <b>${esc(m.name)}</b> ${chf.format(t.betrag)}${t.notiz ? ` – „${esc(t.notiz)}“` : ""}`;
+    }).join("<br>");
+  }
+  // Dialog beim Schenken: ganzer Betrag (bzw. Rest) oder eigener Anteil.
+  // Antwort: { art: "voll" } | { art: "anteil", betrag, notiz } | null (abgebrochen)
+  function schenkDialog(w, a) {
+    const mein = a && a.teile && a.teile[uid];
+    const andere = a ? mitschenker(a, uid) : [];
+    const schonDa = anteilSumme(a, uid);
+    const offen = w.preis != null ? Math.max(0, Math.round((w.preis - schonDa) * 100) / 100) : null;
+    const m = mitglied(w.besitzer) || { name: "diese Person" };
+    $("schenkTitel").textContent = mein ? `Dein Anteil an „${w.name}“` : `„${w.name}“ schenken 🎁`;
+    $("schenkInfo").textContent = w.preis == null ? `Wunsch von ${m.name} · ohne Preisangabe`
+      : `Wunsch von ${m.name} · Preis ${chf.format(w.preis)}${schonDa ? ` · schon zugesagt ${chf.format(schonDa)} · offen ${chf.format(offen)}` : ""}`;
+    $("schenkMit").innerHTML = andere.length ? `🤝 <b>Schon dabei – sprecht euch ab:</b><br>${anteileText(andere)}` : "";
+
+    const voll = $("schenkVoll");
+    const nurRest = andere.length > 0 || !!mein;
+    voll.hidden = nurRest && offen == null;
+    $("schenkVollTitel").textContent = mein ? "Deinen Anteil auf den Rest erhöhen" : nurRest ? "Restbetrag übernehmen" : "Ganzen Betrag übernehmen";
+    $("schenkVollText").textContent = nurRest
+      ? `${mein ? "Dein Anteil wird " : ""}${chf.format(offen || 0)} – damit ist das Geschenk komplett.`
+      : `${w.preis != null ? chf.format(w.preis) + " – " : ""}das Geschenk gehört ganz dir und verschwindet für alle anderen.`;
+
+    const feld = $("eingabeAnteil");
+    feld.value = mein ? mein.betrag : offen ? Math.max(1, Math.round(offen / 2)) : "";
+    $("eingabeAnteilNotiz").value = mein ? mein.notiz || "" : "";
+    const pruefen = () => {
+      const betrag = Number(feld.value) || 0;
+      const b = budget(w.besitzer);
+      const rest = b.rest == null ? null : b.rest + (mein ? mein.betrag || 0 : 0);
+      let text = "", art = "";
+      if (offen != null && betrag > offen) { text = `Das ist mehr als der offene Betrag (${chf.format(offen)}).`; art = "fehler"; }
+      else if (rest != null && betrag > rest) { text = `⚠ Übersteigt deine Limite für ${m.name} um ${chf.format(betrag - Math.max(0, rest))}.`; art = "fehler"; }
+      else if (offen != null && betrag && betrag >= offen) { text = "✓ Damit ist das Geschenk komplett."; art = "ok"; }
+      $("schenkHinweis").textContent = text;
+      $("schenkHinweis").className = `link-status ${art}`;
+    };
+    feld.oninput = pruefen;
+    pruefen();
+
+    const huelle = $("schenkHuelle");
+    huelle.classList.add("offen");
+    setTimeout(() => (nurRest ? feld : voll).focus(), 150);
+    return new Promise(fertig => {
+      const ende = antwort => {
+        huelle.classList.remove("offen");
+        voll.onclick = $("schenkAnteilOk").onclick = $("schenkAbbrechen").onclick = huelle.onclick = feld.onkeydown = null;
+        fertig(antwort);
+      };
+      voll.onclick = () => ende(nurRest ? { art: "anteil", betrag: offen, notiz: $("eingabeAnteilNotiz").value.trim() } : { art: "voll" });
+      $("schenkAnteilOk").onclick = () => {
+        const betrag = Math.round((Number(feld.value) || 0) * 100) / 100;
+        if (betrag <= 0) return wackeln("feldAnteil");
+        ende({ art: "anteil", betrag, notiz: $("eingabeAnteilNotiz").value.trim().slice(0, 120) });
+      };
+      feld.onkeydown = e => { if (e.key === "Enter") $("schenkAnteilOk").click(); };
+      $("schenkAbbrechen").onclick = () => ende(null);
+      huelle.onclick = e => { if (e.target === huelle) ende(null); };
+    });
+  }
+
+  // Anteil speichern – ist die Summe erreicht, verschwindet das Geschenk für alle anderen
+  async function anteilSpeichern(w, a, wahl) {
+    const alt = a && a.teile && a.teile[uid];
+    const summeNeu = anteilSumme(a, uid) + wahl.betrag;
+    const komplett = w.preis != null && summeNeu >= w.preis - 0.001;
+    const batch = writeBatch(db);
+    batch.set(doc(db, "anteile", w.id), {
+      besitzer: w.besitzer, name: w.name, preis: w.preis ?? null,
+      teile: { [uid]: { betrag: wahl.betrag, notiz: wahl.notiz || "", gekauft: alt ? !!alt.gekauft : false, erstellt: alt ? alt.erstellt || Date.now() : Date.now() } }
+    }, { merge: true });
+    if (komplett && !vergeben.has(w.id)) batch.set(doc(db, "vergeben", w.id), { besitzer: w.besitzer });
+    if (!komplett && vergeben.has(w.id)) batch.delete(doc(db, "vergeben", w.id));
+    await batch.commit();
+    return komplett;
+  }
+
+  // Kleiner Flug: 🤝 vom Knopf zur Schenkung (die Karte bleibt stehen)
+  async function anteilFliegen(knopf) {
+    const ziel = document.querySelector('.nav-punkt[data-seite="schenkung"]');
+    if (!animiert() || !knopf || !ziel) return;
+    const von = mitte(knopf), nach = mitte(ziel);
+    const el = document.createElement("div");
+    el.className = "paket-flug";
+    el.style.fontSize = el.style.width = el.style.height = "56px";
+    el.textContent = "🤝";
+    document.body.appendChild(el);
+    const bahn = [];
+    for (let i = 0; i <= 20; i++) {
+      const p = i / 20;
+      const x = von.x + (nach.x - von.x) * p - 28, y = von.y + (nach.y - von.y) * p - Math.sin(Math.PI * p) * 140 - 28;
+      bahn.push({ transform: `translate(${x}px, ${y}px) scale(${1.3 - .7 * p}) rotate(${p * 30}deg)` });
+    }
+    await el.animate(bahn, { duration: 900, easing: "ease-in-out", fill: "forwards" }).finished;
+    el.remove();
+    navPop(ziel);
+    splat(nach.x, nach.y);
+  }
+
+  // Mein Anteil wieder herausnehmen – ist das Geschenk danach nicht mehr voll, taucht es wieder auf
+  function anteilVerlassen(batch, a) {
+    const ref = doc(db, "anteile", a.id);
+    const rest = Object.keys(a.teile || {}).filter(k => k !== uid);
+    if (!rest.length) batch.delete(ref);
+    else batch.update(ref, { [`teile.${uid}`]: deleteField(), gekauft: rest.some(k => a.teile[k].gekauft) });
+    const preis = a.preis;
+    if (vergeben.has(a.id) && !(preis != null && anteilSumme(a, uid) >= preis - 0.001)) batch.delete(doc(db, "vergeben", a.id));
   }
 
   // ---------- Schenkungslimite (privat, pro Person) ----------
@@ -1555,7 +1778,7 @@
   function bescherungMelden() {
     if (bescherungGemeldet || !geladen.has("bescherung") || !geladen.has("fremde")) return;
     bescherungGemeldet = true;
-    const offen = eigene.filter(w => bescherungRes.some(r => r.id === w.id) && !lokal.ausgepackt.includes(w.id)).length;
+    const offen = eigene.filter(w => istBeschert(w.id) && !lokal.ausgepackt.includes(w.id)).length;
     if (offen) toast(`<h4>🎄 Es ist Bescherung!</h4><ul><li>${offen} ${offen === 1 ? "Geschenk wartet" : "Geschenke warten"} in <a href="#meine">Meine Wünsche</a> aufs Auspacken.</li></ul>`, 9000);
   }
   function budgetMelden(geschenke) {
@@ -1599,6 +1822,8 @@
       // Verwaiste Reservierungen aufräumen – danach ist alles wieder normal
       const batch = writeBatch(db);
       for (const g of weg) {
+        const a = g.geteilt && anteilVon(g.id);
+        if (a) { anteilVerlassen(batch, a); continue; }
         batch.delete(doc(db, "reservierungen", g.id));
         batch.delete(doc(db, "vergeben", g.id));
       }
@@ -1608,6 +1833,14 @@
       knopf.disabled = false;
     }
   });
+
+  // Geteiltes Geschenk: mein Anteil + wer sonst noch dabei ist
+  function geteiltInfo(g) {
+    const offen = g.vollpreis != null ? Math.max(0, g.vollpreis - g.preis - g.mit.reduce((s, t) => s + t.betrag, 0)) : null;
+    return `<span class="info mit">🤝 Dein Anteil${g.vollpreis != null ? ` von ${chf.format(g.vollpreis)}` : ""}${g.notiz ? ` – „${esc(g.notiz)}“` : ""}`
+      + (g.mit.length ? `<br>Mit: ${anteileText(g.mit)}` : "<br>Noch niemand sonst dabei")
+      + (offen ? `<br><b>Noch offen: ${chf.format(offen)}</b>` : "") + `</span>`;
+  }
 
   // Einkaufsliste: was noch zu kaufen ist, nach Shop sortiert (auch zum Ausdrucken)
   const shopVon = link => { try { return new URL(link).hostname.replace(/^www\./, ""); } catch { return ""; } };
@@ -1619,7 +1852,7 @@
       const link = sichererLink(g.link);
       return `<div class="einkauf-zeile ${g.gekauft ? "erledigt" : ""}" data-id="${esc(g.id)}">
         <button class="haken ${g.gekauft ? "an" : ""}" data-aktion="gekauft" title="Als gekauft markieren" aria-label="Als gekauft markieren">✓</button>
-        <div class="einkauf-text"><b>${esc(g.name)}</b><span>für ${esc(m.name)} ${esc(m.avatar)}${link ? ` · <a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : ""}</span></div>
+        <div class="einkauf-text"><b>${esc(g.name)}</b><span>für ${esc(m.name)} ${esc(m.avatar)}${g.geteilt ? ` · 🤝 dein Anteil${g.mit.length ? ` (mit ${g.mit.map(t => esc((mitglied(t.id) || { name: "?" }).name)).join(", ")})` : ""}` : ""}${link ? ` · <a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : ""}</span></div>
         <span class="preis">${g.preis != null ? chf.format(g.preis) : "–"}</span>
       </div>`;
     };
@@ -1690,7 +1923,8 @@
           `<button class="haken ${w.gekauft ? "an" : ""}" data-aktion="gekauft" title="Als gekauft markieren" aria-label="Als gekauft markieren">✓</button>
            <button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`,
           zuViel.has(w.id) ? "ueber-limite" : "",
-          w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : zuViel.has(w.id) ? "⚠ Damit übersteigst du deine Limite" : "")).join("")}</div>
+          w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : zuViel.has(w.id) ? "⚠ Damit übersteigst du deine Limite" : "",
+          w.geteilt ? geteiltInfo(w) : "")).join("")}</div>
       </section>`;
     }).join("");
 
@@ -1749,14 +1983,16 @@
     const bloecke = mitglieder.map(m => {
       const liste = adminWuensche.filter(w => w.besitzer === m.id);
       const versteckt = m.id === uid && !spoiler;
-      const anzahlVergeben = versteckt ? "?" : liste.filter(w => adminRes.some(r => r.id === w.id)).length;
+      const anzahlVergeben = versteckt ? "?" : liste.filter(w => adminRes.some(r => r.id === w.id) || adminAnteile.some(a => a.id === w.id)).length;
       const karten = liste.map(w => {
         const r = adminRes.find(x => x.id === w.id);
+        const a = adminAnteile.find(x => x.id === w.id);
         const wer = r && mitglied(r.von);
-        const info = versteckt ? "" : r ? `🎁 Wird von ${esc(wer ? wer.name : "?")} geschenkt${r.gekauft ? " · gekauft" : ""}` : "";
+        const info = versteckt ? "" : r ? `🎁 Wird von ${esc(wer ? wer.name : "?")} geschenkt${r.gekauft ? " · gekauft" : ""}`
+          : a ? `🤝 Gemeinsam:<br>${anteileText(mitschenker(a))}${a.gekauft ? "<br>gekauft" : ""}` : "";
         return karte(w,
           w.status === "entwurf" ? `<span class="abzeichen hell">Entwurf</span>` : `<span class="abzeichen">Freigegeben</span>`,
-          `${r && !versteckt ? `<button class="knopf klein" data-aktion="admin-loesen">Reservierung lösen</button>` : ""}
+          `${(r || a) && !versteckt ? `<button class="knopf klein" data-aktion="admin-loesen">Reservierung lösen</button>` : ""}
            <button class="knopf rund gefahr" data-aktion="admin-loeschen" title="Wunsch löschen" aria-label="Wunsch löschen">✕</button>`,
           "", "", info);
       }).join("");
@@ -1786,8 +2022,13 @@
     return `
       <section class="formular-karte neu">
         <h2>Mein Avatar</h2>
-        <div class="avatare">${AVATARE.map(a =>
-          `<button type="button" class="avatar-wahl ${a === avatarProfil ? "aktiv" : ""}" data-aktion="avatar" data-wert="${a}">${a}</button>`).join("")}</div>
+        <p class="notiz">Jeder Avatar gibt es nur einmal – schon gewählte sind gesperrt.</p>
+        <div class="avatare">${AVATARE.map(a => {
+          const besetzt = avatarBesetzt(a);
+          return besetzt
+            ? `<button type="button" class="avatar-wahl besetzt" disabled title="Schon von ${esc(besetzt.name)} gewählt" aria-label="${a} – schon von ${esc(besetzt.name)} gewählt">${a}<small>${esc(besetzt.name)}</small></button>`
+            : `<button type="button" class="avatar-wahl ${a === avatarProfil ? "aktiv" : ""}" data-aktion="avatar" data-wert="${a}">${a}</button>`;
+        }).join("")}</div>
         <div><button class="knopf blau" data-aktion="profil-speichern">Speichern</button></div>
       </section>
       <section class="formular-karte neu">
@@ -1863,7 +2104,8 @@
   function rueckblick() {
     const jahre = [...new Set([...archivBekommen, ...archivGeschenkt].map(a => a.jahr))].sort((a, b) => b - a);
     if (!jahre.length) return "";
-    const zeile = (a, text) => `<li><span class="rb-name">${esc(a.name)}</span><span>${text}</span><b>${a.preis != null ? chf.format(a.preis) : ""}</b></li>`;
+    const zeile = (a, text) => `<li><span class="rb-name">${esc(a.name)}</span><span>${text}${a.geteilt ? " 🤝" : ""}</span><b>${
+      a.geteilt ? `Anteil ${chf.format(a.betrag || 0)}` : a.preis != null ? chf.format(a.preis) : ""}</b></li>`;
     return `<section class="formular-karte neu rueckblick">
       <h2>📜 Rückblick</h2>
       ${jahre.map(j => {
@@ -1881,8 +2123,9 @@
   const abschlussJahr = () => { const j = new Date(); return j.getMonth() >= 6 ? j.getFullYear() : j.getFullYear() - 1; };
   function jahrAbschliessenTeil() {
     const jahr = abschlussJahr();
-    const verschenkt = adminRes.filter(r => adminWuensche.some(w => w.id === r.id)).length;
-    const rest = adminWuensche.filter(w => !adminRes.some(r => r.id === w.id)).length;
+    const istVerschenkt = w => adminRes.some(r => r.id === w.id) || adminAnteile.some(a => a.id === w.id);
+    const verschenkt = adminWuensche.filter(istVerschenkt).length;
+    const rest = adminWuensche.length - verschenkt;
     return `<section class="formular-karte neu">
       <h2>🎄 Weihnachten ${jahr} abschliessen <span class="admin-marke">Admin</span></h2>
       <p class="notiz">Nach den Festtagen: Alle verschenkten Wünsche (${verschenkt}) kommen in den Rückblick und verschwinden aus den Listen.
@@ -1909,8 +2152,23 @@
       schritte.push(b => b.delete(doc(db, "reservierungen", r.id)));
       schritte.push(b => b.delete(doc(db, "vergeben", r.id)));
     }
+    // Gemeinsame Geschenke: pro Mitschenker ein Eintrag im Rückblick (mit seinem Anteil)
+    for (const a of adminAnteile) {
+      const w = adminWuensche.find(x => x.id === a.id);
+      if (w) {
+        for (const [von, t] of Object.entries(a.teile || {})) {
+          schritte.push(b => b.set(doc(db, "archiv", `${jahr}_${w.id}_${von}`), {
+            jahr, name: w.name, preis: w.preis ?? null, link: w.link || "", bild: w.bild || "",
+            besitzer: w.besitzer, von, betrag: t.betrag || 0, geteilt: true, gekauft: !!t.gekauft
+          }));
+        }
+        schritte.push(b => b.delete(doc(db, "wuensche", w.id)));
+      }
+      schritte.push(b => b.delete(doc(db, "anteile", a.id)));
+      if (!adminRes.some(r => r.id === a.id)) schritte.push(b => b.delete(doc(db, "vergeben", a.id)));
+    }
     for (const w of adminWuensche) {
-      if (!adminRes.some(r => r.id === w.id) && w.status !== "entwurf") schritte.push(b => b.update(doc(db, "wuensche", w.id), { status: "entwurf" }));
+      if (!adminRes.some(r => r.id === w.id) && !adminAnteile.some(a => a.id === w.id) && w.status !== "entwurf") schritte.push(b => b.update(doc(db, "wuensche", w.id), { status: "entwurf" }));
     }
     pause = true;
     try {
@@ -2062,7 +2320,7 @@
 
         case "alle-auspacken": {
           knopf.disabled = true;
-          const ids = eigene.filter(x => bescherungRes.some(r => r.id === x.id) && !lokal.ausgepackt.includes(x.id)).map(x => x.id);
+          const ids = eigene.filter(x => istBeschert(x.id) && !lokal.ausgepackt.includes(x.id)).map(x => x.id);
           for (const x of ids) {
             const el = document.querySelector(`.wunsch-karte[data-id="${x}"]`);
             if (el) await insBild(el);
@@ -2121,6 +2379,30 @@
         }
 
         case "schenken": {
+          // Erst fragen: ganzer Betrag oder eigener Anteil?
+          const a = anteilVon(id);
+          const wahl = await schenkDialog(w, a);
+          if (!wahl) return;
+          if (wahl.art === "anteil") {
+            pause = true;
+            knopf.disabled = true;
+            try {
+              let komplett;
+              try { komplett = await anteilSpeichern(w, a, wahl); }
+              catch (f) {
+                console.error(f);
+                alert(f.code === "permission-denied" ? "Das geht leider nicht mehr – das Geschenk wurde inzwischen ganz von jemandem übernommen oder zurückgezogen." : fehlerText(f));
+                return;
+              }
+              if (komplett) await paketFliegen(kartenEl, knopf);
+              else await anteilFliegen(knopf);
+            } finally {
+              pause = false;
+              nachholen = false;
+              zeichnen(false);
+            }
+            return;
+          }
           const b = budget(w.besitzer);
           if (b.limite != null && (w.preis || 0) > Math.max(0, b.rest)) {
             const m = mitglied(w.besitzer) || { name: "diese Person" };
@@ -2151,18 +2433,27 @@
         }
 
         case "zurueckgeben": {
-          const name = (w || meineRes.find(r => r.id === id) || {}).name || "Dieses Geschenk";
-          if (!confirm(`„${name}“ zurückgeben? Es erscheint dann wieder in „Alle Wünsche“.`)) return;
+          const a = meineRes.some(r => r.id === id) ? null : anteilVon(id);
+          const name = (w || meineRes.find(r => r.id === id) || a || {}).name || "Dieses Geschenk";
+          if (!confirm(a ? `Deinen Anteil an „${name}“ zurückziehen? Die anderen Mitschenker bleiben dabei.`
+            : `„${name}“ zurückgeben? Es erscheint dann wieder in „Alle Wünsche“.`)) return;
           kartenEl.classList.add("weg");
           await warte(400);
+          if (a) { const batch = writeBatch(db); anteilVerlassen(batch, a); return await schreiben(batch.commit()); }
           return await reservierungLoesen(id);
         }
 
         case "gekauft": {
-          const r = meineRes.find(x => x.id === id);
+          const a = meineRes.some(r => r.id === id) ? null : anteilVon(id);
+          const r = a ? a.teile[uid] : meineRes.find(x => x.id === id);
           const neu = !(r && r.gekauft);
           knopf.classList.toggle("an", neu);
           if (neu && animiert()) { const rect = knopf.getBoundingClientRect(); splat(rect.left + rect.width / 2, rect.top + rect.height / 2); }
+          if (a) {
+            // "gekauft" oben im Dokument sperrt Zurückziehen/Löschen beim Beschenkten
+            const sonst = mitschenker(a, uid).some(t => t.gekauft);
+            return await schreiben(updateDoc(doc(db, "anteile", id), { [`teile.${uid}.gekauft`]: neu, gekauft: neu || sonst }));
+          }
           return await schreiben(updateDoc(doc(db, "reservierungen", id), { gekauft: neu }));
         }
 
@@ -2172,6 +2463,11 @@
           return;
 
         case "profil-speichern": {
+          if (avatarProfil && avatarBesetzt(avatarProfil)) {
+            alert(`Diesen Avatar hat ${avatarBesetzt(avatarProfil).name} gerade eben gewählt – bitte nimm einen anderen.`);
+            avatarProfil = "";
+            return zeichnen(false);
+          }
           await schreiben(updateDoc(doc(db, "mitglieder", uid), { avatar: avatarProfil || ich().avatar }));
           if (animiert()) { const r = $("profil").getBoundingClientRect(); splat(r.left + 25, r.top + 25); }
           return;
@@ -2263,6 +2559,10 @@
             batch.delete(doc(db, "reservierungen", id));
             batch.delete(doc(db, "vergeben", id));
           }
+          if (adminAnteile.some(a => a.id === id)) {
+            batch.delete(doc(db, "anteile", id));
+            batch.delete(doc(db, "vergeben", id));
+          }
           pause = true;
           try {
             await schreiben(batch.commit());
@@ -2284,6 +2584,7 @@
     const batch = writeBatch(db);
     batch.delete(doc(db, "reservierungen", id));
     batch.delete(doc(db, "vergeben", id));
+    if (istAdmin() && adminAnteile.some(a => a.id === id)) batch.delete(doc(db, "anteile", id));
     return schreiben(batch.commit());
   }
 
@@ -2396,7 +2697,7 @@
   }
 
   // ---------- Wichtigkeit ----------
-  const STERNE_TEXT = ["Keine Angabe", "Wäre schön", "Wünsche ich mir sehr", "Mein Herzenswunsch ❤"];
+  const STERNE_TEXT = ["Keine Angabe", "Wäre schön (Priorität 3)", "Wünsche ich mir sehr (Priorität 2)", "Mein Herzenswunsch ❤ (Priorität 1)"];
   let neueWichtigkeit = 0;
   function sterneSetzen(n) {
     neueWichtigkeit = n;
