@@ -78,12 +78,13 @@
   .knopf.rund { width: 34px; height: 34px; padding: 0; }
   .knopf.breit { width: 100%; padding: 13px 18px; font-size: 14px; }
   .knopf.gefahr:hover { color: var(--rot); }
+  .knopf.aktiv { box-shadow: var(--innen); color: var(--akzent); font-weight: 600; }
   .knopf:disabled { opacity: .5; cursor: default; transform: none; }
 
   .reinfedern { animation: ploppen .8s var(--feder) both; animation-delay: calc(var(--i, 0) * 55ms); }
   @keyframes ploppen { from { opacity: 0; transform: scale(.7) translateY(24px); } to { opacity: 1; transform: none; } }
 
-  /* ---------- Anmeldung / Beitritt / Laden ---------- */
+  /* ---------- Anmeldung / Laden ---------- */
   .vollbild {
     min-height: 100vh;
     display: grid; place-items: center;
@@ -98,17 +99,12 @@
   }
   .anmelde-karte .logo-bild { margin: 0 auto; width: 76px; height: 76px; font-size: 40px; }
   .anmelde-karte h1 { margin: 4px 0 0; font-size: 24px; }
-  .anmelde-karte > p { margin: 0 0 6px; color: var(--leise); font-size: 13px; }
+  .anmelde-karte > p { margin: 0 0 6px; color: var(--leise); font-size: 13px; overflow-wrap: anywhere; }
   .anmelde-karte .feld { text-align: left; margin: 0; }
-  .anmelde-karte .avatare { justify-content: center; }
   .trenner { display: flex; align-items: center; gap: 12px; color: var(--leise); font-size: 12px; }
   .trenner::before, .trenner::after { content: ""; flex: 1; height: 2px; border-radius: 2px; box-shadow: var(--innen); }
-  .zeile-knoepfe { display: flex; gap: 10px; }
-  .zeile-knoepfe .knopf { flex: 1; }
   .link-knopf { color: var(--leise); font-size: 12px; text-decoration: underline; }
   .fehler-text { color: var(--rot); font-size: 13px; margin: 0; min-height: 1em; }
-  .haekchen { display: flex; gap: 10px; align-items: flex-start; text-align: left; font-size: 12px; color: var(--leise); cursor: pointer; }
-  .haekchen input { width: 18px; height: 18px; accent-color: var(--akzent); flex: none; margin: 1px 0 0; }
   .lade-flocke { font-size: 56px; color: var(--akzent-hell); animation: drehen 2s linear infinite; }
   @keyframes drehen { to { transform: rotate(360deg); } }
 
@@ -155,6 +151,7 @@
   .einklappen:active { transform: scale(.85); }
   nav { display: flex; flex-direction: column; gap: 8px; }
   .nav-punkt {
+    position: relative;
     display: flex; align-items: center; gap: 14px;
     padding: 12px 14px;
     border-radius: 18px;
@@ -170,6 +167,15 @@
   .nav-punkt:active { transform: scale(.94); }
   .nav-punkt.aktiv { box-shadow: var(--innen); color: var(--akzent); font-weight: 600; }
   .nav-punkt.aktiv svg.icon { color: var(--akzent); }
+  .nav-punkt.pop { animation: navpop .7s var(--feder); }
+  @keyframes navpop { 35% { transform: scale(1.35) rotate(-8deg); } }
+  .zaehler {
+    position: absolute; top: 4px; left: 32px;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: 999px;
+    background: var(--akzent); color: #fff;
+    font-size: 10px; font-weight: 600; line-height: 18px; text-align: center;
+  }
   .seite-fuss { margin-top: auto; }
 
   .app.zu .logo-text, .app.zu .nav-text { display: none; }
@@ -260,7 +266,6 @@
   .zeile h2 { margin: 0; font-size: 18px; font-weight: 600; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; }
   .chip { padding: 6px 14px; font-size: 12px; }
-  .chip.aktiv { box-shadow: var(--innen); color: var(--akzent); font-weight: 600; }
 
   /* Wunsch-Karten */
   .karten { display: flex; flex-direction: column; gap: 16px; }
@@ -276,7 +281,8 @@
   .wunsch-karte.ploppt { animation: ploppen .9s var(--feder) both; }
   .wunsch-karte.weg { animation: weg .45s cubic-bezier(.5, 0, .75, 0) forwards; }
   @keyframes weg { to { opacity: 0; transform: scale(.7) translateX(40px); } }
-  .wunsch-karte.vergeben { opacity: .55; }
+  .wunsch-karte.einpacken { animation: einpacken .45s cubic-bezier(.5, 0, .75, 0) forwards; }
+  @keyframes einpacken { to { opacity: 0; transform: scale(.2) rotate(-12deg); } }
   .wk-bild {
     width: 96px; height: 76px;
     border-radius: 16px;
@@ -293,6 +299,7 @@
   .wk-text a { color: var(--akzent-hell); font-weight: 500; }
   .wk-text a:hover { text-decoration: underline; }
   .wk-text .hinweis { display: block; color: var(--rot); margin-top: 4px; }
+  .wk-text .info { display: block; color: var(--akzent); font-weight: 500; margin-top: 4px; }
   .wk-rechts { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
   .wk-aktionen { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .preis { font-size: 16px; font-weight: 600; white-space: nowrap; }
@@ -329,13 +336,36 @@
   .gruppe-kopf span { color: var(--leise); font-size: 12px; }
   .gruppe-kopf .summe { margin-left: auto; font-weight: 600; color: var(--akzent); font-size: 14px; }
 
+  /* Grosses Paket in der Schenkung */
+  .paket-kopf {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 22px;
+    background: linear-gradient(135deg, var(--akzent-hell), var(--akzent));
+    color: #fff;
+    border-radius: var(--radius);
+    box-shadow: 6px 6px 16px rgba(5, 38, 89, .35), -6px -6px 14px var(--schatten-hell);
+  }
+  .paket-kopf .paket-icon { font-size: 46px; animation: wippen 2.6s ease-in-out infinite; }
+  .paket-kopf h2 { margin: 0; font-size: 18px; }
+  .paket-kopf span { opacity: .8; font-size: 12px; }
+  .paket-kopf .summe { margin-left: auto; font-size: 20px; font-weight: 600; white-space: nowrap; }
+
+  /* fliegendes Paket */
+  .paket-flug {
+    position: fixed; left: 0; top: 0;
+    z-index: 61;
+    font-size: 96px; line-height: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 12px 18px rgba(2, 16, 36, .35));
+  }
+
   .leer { padding: 40px 20px; text-align: center; color: var(--leise); box-shadow: var(--innen); }
   .leer .emoji { font-size: 50px; animation: wippen 2.4s ease-in-out infinite; }
   .leer strong { display: block; color: var(--text); font-size: 15px; margin: 8px 0 4px; }
   @keyframes wippen { 50% { transform: translateY(-8px) rotate(-6deg); } }
 
   /* Mitglieder */
-  .mitglieder-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
+  .mitglieder-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; }
   .mitglied-karte {
     padding: 22px 16px;
     text-align: center;
@@ -362,8 +392,36 @@
   .avatar-wahl:hover { transform: scale(1.12); }
   .avatar-wahl.aktiv { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); transform: scale(.95); }
   .notiz { margin: 0; color: var(--leise); font-size: 12px; }
-  .schritte { margin: 0; padding-left: 20px; color: var(--text); font-size: 13px; }
-  .schritte li { margin-bottom: 6px; }
+
+  /* Admin */
+  .admin-marke { font-size: 11px; padding: 2px 10px; border-radius: 999px; background: var(--akzent); color: #fff; font-weight: 600; }
+  .einladung {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px 10px 16px;
+    border-radius: 18px;
+    box-shadow: var(--innen);
+  }
+  .einladung b { display: block; font-size: 14px; }
+  .einladung small { color: var(--leise); font-size: 12px; overflow-wrap: anywhere; }
+  .status-ok { font-size: 11px; color: var(--akzent); font-weight: 600; white-space: nowrap; }
+  .status-offen { font-size: 11px; color: var(--leise); white-space: nowrap; }
+  details.uebersicht { padding: 0; }
+  details.uebersicht summary {
+    list-style: none;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+  }
+  details.uebersicht summary::-webkit-details-marker { display: none; }
+  details.uebersicht summary h3 { margin: 0; font-size: 15px; }
+  details.uebersicht summary span { color: var(--leise); font-size: 12px; }
+  details.uebersicht summary .pfeil { margin-left: auto; transition: transform .6s var(--feder); color: var(--leise); }
+  details.uebersicht[open] summary .pfeil { transform: rotate(90deg); }
+  details.uebersicht .karten { padding: 4px 14px 18px; }
+  details.uebersicht .wunsch-karte { box-shadow: var(--aussen-klein); }
 
   /* Einstellungen */
   .einstellung { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -526,6 +584,7 @@
     .nav-punkt svg.icon { width: 26px; height: 26px; }
     .nav-punkt:hover { transform: none; }
     .nav-punkt.aktiv svg.icon { transform: translateY(-2px) scale(1.12); }
+    .zaehler { left: calc(50% + 4px); top: 2px; }
 
     .kopf h1 { font-size: 22px; }
     .kopf-rechts { width: 100%; }
@@ -551,6 +610,10 @@
     .wk-bild { width: 76px; height: 64px; }
     .wk-rechts { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; }
     .mitglieder-raster { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .paket-kopf { flex-wrap: wrap; }
+    .paket-kopf .paket-icon { font-size: 36px; }
+    .einladung { grid-template-columns: minmax(0, 1fr) auto; }
+    .einladung .knopf { grid-column: 2; grid-row: 1 / span 2; }
     .fenster { padding: 22px 18px; }
   }
 
@@ -570,38 +633,28 @@
     <div class="logo-bild">🎄</div>
     <h1>Wunschliste</h1>
     <p>Weihnachten 2026 – bitte melde dich an</p>
-    <button type="button" class="knopf blau breit" id="googleLogin">
-      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+    <label class="feld"><span>E-Mail</span><input id="loginMail" type="email" autocomplete="email" placeholder="name@beispiel.ch"></label>
+    <label class="feld"><span>Passwort</span><input id="loginPass" type="password" autocomplete="current-password"></label>
+    <button type="submit" class="knopf blau breit" id="emailLogin">Anmelden</button>
+    <button type="button" class="link-knopf" id="passVergessen">Passwort vergessen?</button>
+    <div class="trenner">oder</div>
+    <button type="button" class="knopf breit" id="googleLogin">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
       Mit Google anmelden
     </button>
-    <div class="trenner">oder mit E-Mail</div>
-    <label class="feld"><span>E-Mail</span><input id="loginMail" type="email" autocomplete="email" placeholder="name@beispiel.ch"></label>
-    <label class="feld"><span>Passwort</span><input id="loginPass" type="password" autocomplete="current-password" placeholder="mind. 6 Zeichen"></label>
-    <div class="zeile-knoepfe">
-      <button type="button" class="knopf" id="registrieren">Konto erstellen</button>
-      <button type="submit" class="knopf blau" id="emailLogin">Anmelden</button>
-    </div>
-    <button type="button" class="link-knopf" id="passVergessen">Passwort vergessen?</button>
+    <p class="notiz">Dein Zugang wird von Nicola eingerichtet.</p>
     <p class="fehler-text" id="loginFehler"></p>
   </form>
 </div>
 
-<!-- ===== Beitritt (erstes Mal) ===== -->
-<div class="vollbild" id="beitritt" hidden>
-  <form class="anmelde-karte neu" id="beitrittForm" novalidate>
-    <div class="logo-bild">🎅</div>
-    <h1>Willkommen!</h1>
-    <p>Wie heisst du, und wie lautet euer Familien-Code?</p>
-    <label class="feld" id="feldBeitrittName"><span>Dein Name</span><input id="beitrittName" maxlength="40" placeholder="z.B. Nicola" autocomplete="off"></label>
-    <div class="avatare" id="beitrittAvatare"></div>
-    <label class="feld" id="feldCode"><span>Familien-Code</span><input id="beitrittCode" maxlength="40" placeholder="bekommst du von der Familie" autocomplete="off"></label>
-    <label class="haekchen"><input type="checkbox" id="ersteEinrichtung"> Ich richte die Wunschliste zum ersten Mal ein und lege den Familien-Code fest.</label>
-    <div class="zeile-knoepfe">
-      <button type="button" class="knopf" id="beitrittAbmelden">Abmelden</button>
-      <button type="submit" class="knopf blau" id="beitrittLos">Beitreten</button>
-    </div>
-    <p class="fehler-text" id="beitrittFehler"></p>
-  </form>
+<!-- ===== Kein Zugang ===== -->
+<div class="vollbild" id="keinZugang" hidden>
+  <div class="anmelde-karte neu">
+    <div class="logo-bild">🔒</div>
+    <h1>Noch kein Zugang</h1>
+    <p>Für <b id="keinZugangMail"></b> gibt es noch keine Einladung. Bitte frag Nicola.</p>
+    <button type="button" class="knopf breit" id="keinZugangAbmelden">Abmelden</button>
+  </div>
 </div>
 
 <div class="app" id="app" hidden>
@@ -629,6 +682,7 @@
       <a class="nav-punkt" href="#schenkung" data-seite="schenkung" data-kurz="Schenken">
         <svg class="icon" viewBox="0 0 24 24"><path d="M12 20.5s-8-4.6-8-10.3A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 8 2.2c0 5.7-8 10.3-8 10.3z"/></svg>
         <span class="nav-text">Schenkung</span>
+        <span class="zaehler" id="zaehlerSchenkung" hidden></span>
       </a>
       <a class="nav-punkt" href="#mitglieder" data-seite="mitglieder" data-kurz="Familie">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.8.3 5 2.4 5 5.8"/></svg>
@@ -728,10 +782,10 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import {
     getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
-    signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut
+    signInWithEmailAndPassword, sendPasswordResetEmail, signOut
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
   import {
-    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot, writeBatch
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
   // ============================================================
@@ -755,11 +809,12 @@
   // ============================================================
   //  Hilfsfunktionen
   // ============================================================
+  const FAMILIE = ["Roland", "Beatrice", "Gioiana", "Vanessa", "Jonathan", "Nicola"];
   const AVATARE = ["🎅", "🤶", "🧑‍🎄", "🦌", "⛄", "🐧", "🧝", "⭐", "🍪", "🎁", "🦊", "🐻"];
   const SEITEN = {
-    alle: ["Alle Wünsche", "Die freigegebenen Wünsche der anderen Mitglieder"],
+    alle: ["Alle Wünsche", "Was sich die anderen wünschen – und noch zu haben ist"],
     meine: ["Meine Wünsche", "Erfassen, bearbeiten, freigeben oder zurückziehen"],
-    schenkung: ["Schenkung", "Was du verschenkst – das siehst nur du"],
+    schenkung: ["Schenkung", "Dein grosses Geschenk-Paket – das siehst nur du"],
     mitglieder: ["Mitglieder", "Familie & Freunde auf der Wunschliste"],
     einstellungen: ["Einstellungen", "Profil, Animationen und Konto"]
   };
@@ -769,6 +824,7 @@
   const esc = s => String(s ?? "").replace(/[&<>"']/g, z => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[z]));
   const sichererLink = l => /^https?:\/\//i.test(l || "") ? l : "";
   const sicheresBild = b => /^data:image\//.test(b || "") ? b : "";
+  const startAvatar = name => AVATARE[[...name].reduce((s, z) => s + z.charCodeAt(0), 0) % AVATARE.length];
 
   // Einstellungen nur für dieses Gerät
   const LOKAL = "wunschliste-lokal";
@@ -777,7 +833,7 @@
   const animiert = () => lokal.animationen;
 
   function zeige(name) {
-    for (const id of ["laden", "anmeldung", "beitritt", "app"]) $(id).hidden = id !== name;
+    for (const id of ["laden", "anmeldung", "keinZugang", "app"]) $(id).hidden = id !== name;
   }
 
   function fehlerText(f) {
@@ -787,14 +843,13 @@
       "auth/invalid-email": "Diese E-Mail-Adresse ist ungültig.",
       "auth/user-not-found": "Zu dieser E-Mail gibt es kein Konto.",
       "auth/wrong-password": "Das Passwort ist falsch.",
-      "auth/email-already-in-use": "Für diese E-Mail gibt es schon ein Konto – bitte anmelden.",
-      "auth/weak-password": "Das Passwort braucht mindestens 6 Zeichen.",
       "auth/missing-password": "Bitte ein Passwort eingeben.",
+      "auth/user-disabled": "Dieses Konto ist gesperrt.",
       "auth/too-many-requests": "Zu viele Versuche. Bitte kurz warten.",
       "auth/network-request-failed": "Keine Internetverbindung.",
       "auth/unauthorized-domain": "Diese Adresse ist in Firebase noch nicht erlaubt (Authentication → Einstellungen → Autorisierte Domains).",
       "auth/operation-not-allowed": "Diese Anmeldeart ist in Firebase noch nicht aktiviert.",
-      "permission-denied": "Keine Berechtigung (Sicherheitsregeln prüfen).",
+      "permission-denied": "Keine Berechtigung.",
       "unavailable": "Keine Verbindung zum Server."
     };
     return texte[code] || `Etwas ist schiefgelaufen (${code || f}).`;
@@ -807,19 +862,25 @@
   //  Daten aus Firestore (Echtzeit)
   // ============================================================
   let uid = null;
+  let rolle = "nutzer";
   let mitglieder = [];
   let eigene = [];          // meine Wünsche (alle Status)
-  let fremde = [];          // freigegebene Wünsche aller
-  let reservierungen = [];  // nur Reservierungen für Wünsche ANDERER – meine eigenen kann ich nie lesen
+  let fremde = [];          // freigegebene Wünsche (aller)
+  let vergeben = new Set(); // Wunsch-IDs, die jemand schenkt – OHNE wer. Für meine eigenen Wünsche nie lesbar.
+  let meineRes = [];        // Reservierungen, die ICH gemacht habe
+  // nur für Admin:
+  let adminWuensche = [];
+  let adminRes = [];
+  let einladungen = [];
   let abmelder = [];
   let zeichnenGeplant = false;
 
+  const istAdmin = () => rolle === "admin";
   const ich = () => mitglieder.find(m => m.id === uid) || { id: uid, name: "Ich", avatar: "🎅" };
   const mitglied = id => mitglieder.find(m => m.id === id);
-  const alleWuensche = () => [...eigene, ...fremde.filter(w => w.besitzer !== uid)];
-  const wunsch = id => alleWuensche().find(w => w.id === id);
-  const reservierung = id => reservierungen.find(r => r.id === id);
+  const wunsch = id => [...eigene, ...fremde, ...adminWuensche].find(w => w.id === id);
   const listeAus = schnappschuss => schnappschuss.docs.map(d => ({ id: d.id, ...d.data() }));
+  const nachDatum = liste => liste.sort((a, b) => (b.erstellt || 0) - (a.erstellt || 0));
 
   function spaeterZeichnen() {
     if (zeichnenGeplant) return;
@@ -830,23 +891,23 @@
   function aufraeumen() {
     abmelder.forEach(f => f());
     abmelder = [];
-    mitglieder = []; eigene = []; fremde = []; reservierungen = [];
+    mitglieder = []; eigene = []; fremde = []; vergeben = new Set(); meineRes = [];
+    adminWuensche = []; adminRes = []; einladungen = [];
   }
 
   function datenStarten() {
-    const fehler = f => { console.error(f); };
-    abmelder.push(
-      onSnapshot(collection(db, "mitglieder"), s => { mitglieder = listeAus(s); spaeterZeichnen(); }, fehler),
-      onSnapshot(query(collection(db, "wuensche"), where("besitzer", "==", uid)), s => {
-        eigene = listeAus(s).sort((a, b) => b.erstellt - a.erstellt); spaeterZeichnen();
-      }, fehler),
-      onSnapshot(query(collection(db, "wuensche"), where("status", "==", "freigegeben")), s => {
-        fremde = listeAus(s).sort((a, b) => b.erstellt - a.erstellt); spaeterZeichnen();
-      }, fehler),
-      onSnapshot(query(collection(db, "reservierungen"), where("besitzer", "!=", uid)), s => {
-        reservierungen = listeAus(s); spaeterZeichnen();
-      }, fehler)
-    );
+    const fehler = f => console.error(f);
+    const hoeren = (q, fn) => abmelder.push(onSnapshot(q, s => { fn(s); spaeterZeichnen(); }, fehler));
+    hoeren(collection(db, "mitglieder"), s => { mitglieder = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); });
+    hoeren(query(collection(db, "wuensche"), where("besitzer", "==", uid)), s => { eigene = nachDatum(listeAus(s)); });
+    hoeren(query(collection(db, "wuensche"), where("status", "==", "freigegeben")), s => { fremde = nachDatum(listeAus(s)); });
+    hoeren(query(collection(db, "vergeben"), where("besitzer", "!=", uid)), s => { vergeben = new Set(s.docs.map(d => d.id)); });
+    hoeren(query(collection(db, "reservierungen"), where("von", "==", uid)), s => { meineRes = listeAus(s); });
+    if (istAdmin()) {
+      hoeren(collection(db, "wuensche"), s => { adminWuensche = nachDatum(listeAus(s)); });
+      hoeren(collection(db, "reservierungen"), s => { adminRes = listeAus(s); });
+      hoeren(collection(db, "einladungen"), s => { einladungen = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); });
+    }
   }
 
   // ============================================================
@@ -856,21 +917,16 @@
     $("loginFehler").textContent = "Hinweis: Die Anmeldung funktioniert nur online (GitHub Pages), nicht direkt aus dem Ordner.";
   }
 
-  $("googleLogin").addEventListener("click", async () => {
-    $("loginFehler").textContent = "";
-    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
-    catch (f) { if (f.code !== "auth/popup-closed-by-user" && f.code !== "auth/cancelled-popup-request") $("loginFehler").textContent = fehlerText(f); }
-  });
   $("anmeldeForm").addEventListener("submit", async e => {
     e.preventDefault();
     $("loginFehler").textContent = "";
     try { await signInWithEmailAndPassword(auth, $("loginMail").value.trim(), $("loginPass").value); }
     catch (f) { $("loginFehler").textContent = fehlerText(f); }
   });
-  $("registrieren").addEventListener("click", async () => {
+  $("googleLogin").addEventListener("click", async () => {
     $("loginFehler").textContent = "";
-    try { await createUserWithEmailAndPassword(auth, $("loginMail").value.trim(), $("loginPass").value); }
-    catch (f) { $("loginFehler").textContent = fehlerText(f); }
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+    catch (f) { if (f.code !== "auth/popup-closed-by-user" && f.code !== "auth/cancelled-popup-request") $("loginFehler").textContent = fehlerText(f); }
   });
   $("passVergessen").addEventListener("click", async () => {
     const mail = $("loginMail").value.trim();
@@ -878,74 +934,46 @@
     try { await sendPasswordResetEmail(auth, mail); $("loginFehler").textContent = "📧 E-Mail zum Zurücksetzen wurde gesendet."; }
     catch (f) { $("loginFehler").textContent = fehlerText(f); }
   });
-
-  // ---------- Beitritt ----------
-  let beitrittAvatar = "🎅";
-  function beitrittAvatareZeichnen() {
-    $("beitrittAvatare").innerHTML = AVATARE.map(a =>
-      `<button type="button" class="avatar-wahl ${a === beitrittAvatar ? "aktiv" : ""}" data-wert="${a}">${a}</button>`).join("");
-  }
-  $("beitrittAvatare").addEventListener("click", e => {
-    const b = e.target.closest(".avatar-wahl");
-    if (!b) return;
-    beitrittAvatar = b.dataset.wert;
-    beitrittAvatareZeichnen();
-  });
-  $("beitrittAbmelden").addEventListener("click", () => signOut(auth));
-  $("beitrittForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const name = $("beitrittName").value.trim();
-    const code = $("beitrittCode").value.trim();
-    $("beitrittFehler").textContent = "";
-    if (!name) return wackeln("feldBeitrittName");
-    if (code.length < 4) { $("beitrittFehler").textContent = "Der Familien-Code braucht mindestens 4 Zeichen."; return wackeln("feldCode"); }
-    $("beitrittLos").disabled = true;
-    try {
-      if ($("ersteEinrichtung").checked) {
-        try { await setDoc(doc(db, "einstellungen", "zugang"), { code, erstelltVon: uid }); }
-        catch (f) {
-          $("beitrittFehler").textContent = f.code === "permission-denied"
-            ? "Es gibt schon einen Familien-Code. Frag ein Mitglied danach und entferne das Häkchen."
-            : fehlerText(f);
-          return;
-        }
-      }
-      try { await setDoc(doc(db, "mitglieder", uid), { name, avatar: beitrittAvatar, code, erstellt: Date.now() }); }
-      catch (f) {
-        $("beitrittFehler").textContent = f.code === "permission-denied" ? "Der Familien-Code stimmt nicht." : fehlerText(f);
-        wackeln("feldCode");
-        return;
-      }
-      appStarten();
-      schneien(4000);
-    } finally {
-      $("beitrittLos").disabled = false;
-    }
-  });
+  $("keinZugangAbmelden").addEventListener("click", () => signOut(auth));
 
   onAuthStateChanged(auth, async nutzer => {
     aufraeumen();
     if (!nutzer) { uid = null; zeige("anmeldung"); return; }
     uid = nutzer.uid;
     zeige("laden");
-    let istMitglied = false;
-    try { istMitglied = (await getDoc(doc(db, "mitglieder", uid))).exists(); } catch {}
-    if (!istMitglied) {
-      $("beitrittName").value = nutzer.displayName || "";
-      beitrittAvatareZeichnen();
-      zeige("beitritt");
-      return;
-    }
-    appStarten();
-  });
 
-  function appStarten() {
+    let profil = null;
+    try {
+      const d = await getDoc(doc(db, "mitglieder", uid));
+      if (d.exists()) profil = d.data();
+    } catch {}
+
+    // Beim ersten Anmelden: Einladung (E-Mail → Name + Rolle) einlösen
+    if (!profil) {
+      const mail = (nutzer.email || "").toLowerCase();
+      try {
+        const einl = await getDoc(doc(db, "einladungen", mail));
+        if (einl.exists()) {
+          const { name, rolle: r } = einl.data();
+          profil = { name, rolle: r, avatar: startAvatar(name), erstellt: Date.now() };
+          await setDoc(doc(db, "mitglieder", uid), profil);
+          setTimeout(() => schneien(4000), 600);
+        }
+      } catch (f) { console.error(f); profil = null; }
+      if (!profil) {
+        $("keinZugangMail").textContent = mail || "dieses Konto";
+        zeige("keinZugang");
+        return;
+      }
+    }
+
+    rolle = profil.rolle === "admin" ? "admin" : "nutzer";
     datenStarten();
     zeige("app");
     leisteSetzen();
     zeichnen();
     tachoSetzen(letzteTage);
-  }
+  });
 
   // ============================================================
   //  Seitenaufbau
@@ -955,6 +983,9 @@
   let filterMeine = "alle";
   let filterPerson = "alle";
   let avatarProfil = "";
+  let spoiler = false;      // Admin: eigene Überraschungen anzeigen?
+  let einladungRolle = "nutzer";
+  const offeneDetails = new Set();
 
   const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] ? h : "alle"; };
 
@@ -968,13 +999,11 @@
     $("sucheBox").style.display = seite === "alle" || seite === "meine" ? "" : "none";
     const m = ich();
     $("profil").innerHTML = `<div class="avatar">${esc(m.avatar)}</div><span>${esc(m.name)}</span>`;
+    seitenleisteRechts();
 
     // Eingaben auf Formular-Seiten nicht durch Echtzeit-Updates überschreiben
     const aktiv = document.activeElement;
-    if (!mitAnimation && aktiv && aktiv.closest && aktiv.closest("#inhalt") && aktiv.tagName === "INPUT") {
-      seitenleisteRechts();
-      return;
-    }
+    if (!mitAnimation && aktiv && aktiv.closest && aktiv.closest("#inhalt") && aktiv.tagName === "INPUT") return;
 
     const inhalt = $("inhalt");
     inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, einstellungen: seiteEinstellungen }[seite]();
@@ -987,7 +1016,6 @@
     }
     inhalt.querySelectorAll("[data-ring]").forEach(r => ring(r, Number(r.dataset.ring), mitAnimation));
     inhalt.querySelectorAll("[data-zahl]").forEach(z => hochzaehlen(z, Number(z.dataset.zahl), mitAnimation));
-    seitenleisteRechts();
   }
 
   // ---------- Bausteine ----------
@@ -1007,7 +1035,7 @@
       <p>${text}</p>
     </div>`;
   }
-  function karte(w, abzeichen, aktionen, klasse = "", hinweis = "") {
+  function karte(w, abzeichen, aktionen, klasse = "", hinweis = "", info = "") {
     const bild = sicheresBild(w.bild);
     const link = sichererLink(w.link);
     return `<article class="wunsch-karte neu ${klasse}" data-id="${esc(w.id)}">
@@ -1015,6 +1043,7 @@
       <div class="wk-text">
         <h3>${esc(w.name)}</h3>
         ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : `<span>Kein Link</span>`}
+        ${info ? `<span class="info">${info}</span>` : ""}
         ${hinweis ? `<span class="hinweis">${hinweis}</span>` : ""}
       </div>
       <div class="wk-rechts">
@@ -1026,14 +1055,13 @@
   }
   const passt = w => (w.name || "").toLowerCase().includes(suchtext);
   const summe = liste => liste.reduce((s, w) => s + (w.preis || 0), 0);
-  const avatarWahl = aktiv => `<div class="avatare">${AVATARE.map(a =>
-    `<button type="button" class="avatar-wahl ${a === aktiv ? "aktiv" : ""}" data-aktion="avatar" data-wert="${a}">${a}</button>`).join("")}</div>`;
 
   // ---------- Alle Wünsche ----------
+  // Zeigt nur Wünsche der anderen, die noch niemand schenkt. Wer etwas genommen hat, ist hier nie sichtbar.
   function seiteAlle() {
     const andere = mitglieder.filter(m => m.id !== uid);
     if (!andere.length) {
-      return leer("👥", "Noch keine anderen Mitglieder", `Lade unter <a href="#mitglieder">Mitglieder</a> deine Familie und Freunde ein.`);
+      return leer("👥", "Noch keine anderen Mitglieder", "Sobald sich die Familie anmeldet, erscheinen hier ihre Wünsche.");
     }
     if (!andere.some(m => m.id === filterPerson)) filterPerson = "alle";
 
@@ -1045,33 +1073,19 @@
     const gruppen = andere
       .filter(m => filterPerson === "alle" || filterPerson === m.id)
       .map(m => {
-        const liste = fremde.filter(w => w.besitzer === m.id && passt(w));
+        const liste = fremde.filter(w => w.besitzer === m.id && !vergeben.has(w.id) && passt(w));
         if (!liste.length) return "";
         return `<section class="gruppe">
-          <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"}</span></div></div>
-          <div class="karten">${liste.map(karteAlle).join("")}</div>
+          <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"} offen</span></div></div>
+          <div class="karten">${liste.map(w => karte(w, "", `<button class="knopf blau klein" data-aktion="schenken">🎁 Ich schenke das</button>`)).join("")}</div>
         </section>`;
       }).join("");
 
-    return chips + (gruppen || leer("🎁", "Keine Wünsche gefunden", "Die anderen haben noch nichts freigegeben."));
-  }
-
-  function karteAlle(w) {
-    const r = reservierung(w.id);
-    if (r && r.von === uid) {
-      return karte(w, `<span class="abzeichen">Von dir reserviert</span>`,
-        `<button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`);
-    }
-    if (r) {
-      const wer = mitglied(r.von);
-      return karte(w, `<span class="abzeichen hell">Schon vergeben</span>`, "", "vergeben",
-        wer ? `Wird von ${esc(wer.name)} geschenkt` : "");
-    }
-    return karte(w, "", `<button class="knopf blau klein" data-aktion="schenken">🎁 Ich schenke das</button>`);
+    return chips + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
   }
 
   // ---------- Meine Wünsche ----------
-  // Hier gibt es keine Reservierungs-Infos: Firestore lässt mich die Reservierungen meiner eigenen Wünsche gar nicht lesen.
+  // Hier gibt es keine Reservierungs-Infos: Firestore lässt mich das für meine eigenen Wünsche gar nicht lesen.
   function seiteMeine() {
     const frei = eigene.filter(w => w.status === "freigegeben").length;
     const wert = summe(eigene);
@@ -1109,7 +1123,7 @@
 
   // ---------- Schenkung ----------
   function meineGeschenke() {
-    return reservierungen.filter(r => r.von === uid).map(r => {
+    return meineRes.map(r => {
       const w = fremde.find(x => x.id === r.id);
       return w
         ? { ...w, gekauft: !!r.gekauft, fehlt: false }
@@ -1130,14 +1144,18 @@
     </section>`;
 
     if (!geschenke.length) {
-      return kopf + leer("🎁", "Noch keine Geschenke ausgewählt", `Wähle bei <a href="#alle">Alle Wünsche</a> aus, was du schenken möchtest.`);
+      return kopf + leer("🎁", "Dein Paket ist noch leer", `Wähle bei <a href="#alle">Alle Wünsche</a> aus, was du schenken möchtest.`);
     }
 
-    const gruppen = personen.map(id => {
+    const pakete = personen.map(id => {
       const m = mitglied(id) || { name: "Unbekannt", avatar: "❔" };
       const liste = geschenke.filter(w => w.besitzer === id);
       return `<section class="gruppe">
-        <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>Für ${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Geschenk" : "Geschenke"}</span></div><span class="summe">${chf.format(summe(liste))}</span></div>
+        <div class="paket-kopf">
+          <div class="paket-icon">🎁</div>
+          <div><h2>Paket für ${esc(m.name)} ${esc(m.avatar)}</h2><span>${liste.length} ${liste.length === 1 ? "Geschenk" : "Geschenke"}</span></div>
+          <span class="summe">${chf.format(summe(liste))}</span>
+        </div>
         <div class="karten">${liste.map(w => karte(w,
           w.gekauft ? `<span class="abzeichen">Gekauft</span>` : `<span class="abzeichen zart">Noch kaufen</span>`,
           `<button class="haken ${w.gekauft ? "an" : ""}" data-aktion="gekauft" title="Als gekauft markieren" aria-label="Als gekauft markieren">✓</button>
@@ -1146,7 +1164,7 @@
       </section>`;
     }).join("");
 
-    return kopf + gruppen + `<p class="notiz">🔒 Die Beschenkten sehen nie, welche Wünsche reserviert sind und von wem.</p>`;
+    return kopf + pakete + `<p class="notiz">🔒 Niemand sieht, dass du diese Geschenke genommen hast – für alle anderen sind sie einfach aus der Liste verschwunden.</p>`;
   }
 
   // ---------- Mitglieder ----------
@@ -1157,23 +1175,77 @@
         <div class="avatar gross">${esc(m.avatar)}</div>
         <h3>${esc(m.name)}</h3>
         ${m.id === uid ? `<span class="du">Das bist du</span>` : ""}
+        ${m.rolle === "admin" ? `<span class="admin-marke">Admin</span>` : ""}
         <p>${anzahl} ${anzahl === 1 ? "Wunsch" : "Wünsche"} freigegeben</p>
       </div>`;
     }).join("");
 
-    return `
-      <section class="formular-karte neu">
-        <h2>Jemanden einladen</h2>
-        <ol class="schritte">
-          <li>Schick den Link zur Wunschliste.</li>
-          <li>Die Person meldet sich mit Google oder E-Mail an.</li>
-          <li>Sie gibt euren <b>Familien-Code</b> ein – fertig!</li>
-        </ol>
-        <div class="wk-aktionen" style="justify-content:flex-start">
-          <button class="knopf blau" data-aktion="link-kopieren">🔗 Link kopieren</button>
+    const raster = `<div class="mitglieder-raster">${karten}</div>`;
+    return istAdmin() ? adminEinladungen() + raster + adminUebersicht() : raster;
+  }
+
+  function adminEinladungen() {
+    const vorschlaege = FAMILIE.filter(n => !einladungen.some(e => e.name === n));
+    const zeilen = einladungen.map(e => {
+      const dabei = mitglieder.some(m => m.name === e.name);
+      return `<div class="einladung">
+        <div><b>${esc(e.name)} ${e.rolle === "admin" ? `<span class="admin-marke">Admin</span>` : ""}</b><small>${esc(e.id)}</small></div>
+        ${dabei ? `<span class="status-ok">✓ angemeldet</span>` : `<span class="status-offen">wartet</span>`}
+        <button class="knopf rund gefahr" data-aktion="einladung-loeschen" data-mail="${esc(e.id)}" title="Einladung löschen" aria-label="Einladung löschen">✕</button>
+      </div>`;
+    }).join("");
+
+    return `<section class="formular-karte neu">
+      <h2>Zugänge verwalten <span class="admin-marke">Admin</span></h2>
+      <p class="notiz">Lege das Konto zuerst in Firebase an (Authentication → Nutzer hinzufügen), dann hier Name und dieselbe E-Mail eintragen.</p>
+      ${vorschlaege.length ? `<div class="chips">${vorschlaege.map(n => `<button class="knopf chip" data-aktion="name-vorschlag" data-wert="${n}">${n}</button>`).join("")}</div>` : ""}
+      <div class="formular-zeile">
+        <label class="feld" id="feldEinlName"><span>Name</span><input id="einlName" maxlength="40" autocomplete="off"></label>
+        <label class="feld" id="feldEinlMail"><span>E-Mail</span><input id="einlMail" type="email" autocomplete="off"></label>
+      </div>
+      <div class="formular-zeile" style="align-items:center">
+        <div class="chips">
+          <button class="knopf chip ${einladungRolle === "nutzer" ? "aktiv" : ""}" data-aktion="einladung-rolle" data-wert="nutzer">Nutzer</button>
+          <button class="knopf chip ${einladungRolle === "admin" ? "aktiv" : ""}" data-aktion="einladung-rolle" data-wert="admin">Admin</button>
         </div>
-      </section>
-      <div class="mitglieder-raster">${karten}</div>`;
+        <button class="knopf blau" data-aktion="einladen" style="margin-left:auto">+ Zugang freischalten</button>
+      </div>
+      ${zeilen ? `<div class="karten" style="gap:10px">${zeilen}</div>` : ""}
+    </section>`;
+  }
+
+  function adminUebersicht() {
+    const bloecke = mitglieder.map(m => {
+      const liste = adminWuensche.filter(w => w.besitzer === m.id);
+      const versteckt = m.id === uid && !spoiler;
+      const anzahlVergeben = versteckt ? "?" : liste.filter(w => adminRes.some(r => r.id === w.id)).length;
+      const karten = liste.map(w => {
+        const r = adminRes.find(x => x.id === w.id);
+        const wer = r && mitglied(r.von);
+        const info = versteckt ? "" : r ? `🎁 Wird von ${esc(wer ? wer.name : "?")} geschenkt${r.gekauft ? " · gekauft" : ""}` : "";
+        return karte(w,
+          w.status === "entwurf" ? `<span class="abzeichen hell">Entwurf</span>` : `<span class="abzeichen">Freigegeben</span>`,
+          `${r && !versteckt ? `<button class="knopf klein" data-aktion="admin-loesen">Reservierung lösen</button>` : ""}
+           <button class="knopf rund gefahr" data-aktion="admin-loeschen" title="Wunsch löschen" aria-label="Wunsch löschen">✕</button>`,
+          "", "", info);
+      }).join("");
+      return `<details class="uebersicht neu" data-mitglied="${esc(m.id)}" ${offeneDetails.has(m.id) ? "open" : ""}>
+        <summary>
+          <div class="avatar">${esc(m.avatar)}</div>
+          <div><h3>${esc(m.name)}</h3><span>${liste.length} Wünsche · ${anzahlVergeben} vergeben</span></div>
+          <span class="pfeil">▶</span>
+        </summary>
+        <div class="karten">${karten || `<p class="notiz">Noch keine Wünsche.</p>`}</div>
+      </details>`;
+    }).join("");
+
+    return `<section class="formular-karte neu">
+      <div class="einstellung">
+        <div><strong>Alle Wünsche verwalten <span class="admin-marke">Admin</span></strong><span>Sieh, wer was schenkt. Deine eigenen Überraschungen bleiben verborgen, ausser du schaltest sie ein.</span></div>
+        <button class="schalter ${spoiler ? "an" : ""}" data-aktion="spoiler" role="switch" aria-checked="${spoiler}" aria-label="Eigene Überraschungen anzeigen"></button>
+      </div>
+    </section>
+    ${bloecke}`;
   }
 
   // ---------- Einstellungen ----------
@@ -1182,12 +1254,10 @@
     avatarProfil = avatarProfil || m.avatar;
     return `
       <section class="formular-karte neu">
-        <h2>Mein Profil</h2>
-        <div class="formular-zeile">
-          <label class="feld" id="feldProfil"><span>Mein Name</span><input id="profilName" maxlength="40" value="${esc(m.name)}" autocomplete="off"></label>
-          <button class="knopf blau" data-aktion="profil-speichern">Speichern</button>
-        </div>
-        ${avatarWahl(avatarProfil)}
+        <h2>Mein Avatar</h2>
+        <div class="avatare">${AVATARE.map(a =>
+          `<button type="button" class="avatar-wahl ${a === avatarProfil ? "aktiv" : ""}" data-aktion="avatar" data-wert="${a}">${a}</button>`).join("")}</div>
+        <div><button class="knopf blau" data-aktion="profil-speichern">Speichern</button></div>
       </section>
       <section class="formular-karte neu">
         <div class="einstellung">
@@ -1197,7 +1267,7 @@
       </section>
       <section class="formular-karte neu">
         <h2>Konto</h2>
-        <p class="notiz">Angemeldet als ${esc(auth.currentUser?.email || "")}</p>
+        <p class="notiz">Angemeldet als ${esc(m.name)} (${esc(auth.currentUser?.email || "")})${istAdmin() ? " · Admin" : ""}</p>
         <div class="wk-aktionen" style="justify-content:flex-start">
           <button class="knopf" data-aktion="export">⬇ Meine Wünsche sichern</button>
           <button class="knopf gefahr" data-aktion="abmelden">Abmelden</button>
@@ -1208,15 +1278,18 @@
   // ---------- Rechte Spalte ----------
   function seitenleisteRechts() {
     const geschenke = meineGeschenke();
+    const z = $("zaehlerSchenkung");
+    z.hidden = !geschenke.length;
+    z.textContent = geschenke.length;
     $("miniSchenkung").innerHTML = `
-      <h3>Meine Schenkung</h3>
+      <h3>Mein Geschenk-Paket 🎁</h3>
       <div class="panel-zahl">${chf.format(summe(geschenke))}</div>
       <p>${geschenke.length} ${geschenke.length === 1 ? "Geschenk" : "Geschenke"} ausgewählt</p>
       <a class="knopf klein" href="#schenkung">Ansehen</a>`;
     $("miniMitglieder").innerHTML = `
-      <h3>Familie & Freunde</h3>
-      <div class="avatar-reihe">${mitglieder.slice(0, 6).map(m => `<div class="avatar" title="${esc(m.name)}">${esc(m.avatar)}</div>`).join("")}</div>
-      <a class="knopf klein" href="#mitglieder">+ Einladen</a>`;
+      <h3>Familie</h3>
+      <div class="avatar-reihe">${mitglieder.map(m => `<div class="avatar" title="${esc(m.name)}">${esc(m.avatar)}</div>`).join("")}</div>
+      <a class="knopf klein" href="#mitglieder">Alle ansehen</a>`;
   }
 
   function ring(kreis, anteil, mitAnimation) {
@@ -1289,6 +1362,11 @@
   // ============================================================
   //  Aktionen
   // ============================================================
+  $("inhalt").addEventListener("toggle", e => {
+    const d = e.target.closest && e.target.closest("details[data-mitglied]");
+    if (d) d.open ? offeneDetails.add(d.dataset.mitglied) : offeneDetails.delete(d.dataset.mitglied);
+  }, true);
+
   $("inhalt").addEventListener("click", async e => {
     const knopf = e.target.closest("[data-aktion]");
     if (!knopf) return;
@@ -1321,28 +1399,36 @@
           await warte(400);
           return await schreiben(deleteDoc(doc(db, "wuensche", id)));
 
-        case "schenken":
-          await schreiben(setDoc(doc(db, "reservierungen", id), {
+        case "schenken": {
+          // Reservierung (geheim, mit "von") + Markierung "vergeben" (ohne Namen) zusammen speichern
+          const batch = writeBatch(db);
+          batch.set(doc(db, "reservierungen", id), {
             besitzer: w.besitzer, von: uid, gekauft: false,
             name: w.name, preis: w.preis ?? null, erstellt: Date.now()
-          }));
-          await schneeballAuf(document.querySelector(`.wunsch-karte[data-id="${id}"]`) || kartenEl);
-          zeichnen(false);
-          ploppen(id);
-          return schneien(3000);
+          });
+          batch.set(doc(db, "vergeben", id), { besitzer: w.besitzer });
+          try { await batch.commit(); }
+          catch (f) {
+            alert(f.code === "permission-denied" ? "Zu spät – dieses Geschenk hat schon jemand anderes genommen." : fehlerText(f));
+            return zeichnen(false);
+          }
+          await paketFliegen(kartenEl);
+          return zeichnen(false);
+        }
 
         case "zurueckgeben": {
-          const name = (w || reservierung(id) || {}).name || "Dieses Geschenk";
-          if (!confirm(`„${name}“ zurückgeben, damit jemand anderes es schenken kann?`)) return;
+          const name = (w || meineRes.find(r => r.id === id) || {}).name || "Dieses Geschenk";
+          if (!confirm(`„${name}“ zurückgeben? Es erscheint dann wieder in „Alle Wünsche“.`)) return;
           kartenEl.classList.add("weg");
           await warte(400);
-          return await schreiben(deleteDoc(doc(db, "reservierungen", id)));
+          return await reservierungLoesen(id);
         }
 
         case "gekauft": {
-          const neu = !(reservierung(id) || {}).gekauft;
+          const r = meineRes.find(x => x.id === id);
+          const neu = !(r && r.gekauft);
           knopf.classList.toggle("an", neu);
-          if (neu && animiert()) { const r = knopf.getBoundingClientRect(); splat(r.left + r.width / 2, r.top + r.height / 2); }
+          if (neu && animiert()) { const rect = knopf.getBoundingClientRect(); splat(rect.left + rect.width / 2, rect.top + rect.height / 2); }
           return await schreiben(updateDoc(doc(db, "reservierungen", id), { gekauft: neu }));
         }
 
@@ -1352,11 +1438,7 @@
           return;
 
         case "profil-speichern": {
-          const name = $("profilName").value.trim();
-          if (!name) return wackeln("feldProfil");
-          await schreiben(updateDoc(doc(db, "mitglieder", uid), { name, avatar: avatarProfil || ich().avatar }));
-          $("profilName").blur();
-          zeichnen(false);
+          await schreiben(updateDoc(doc(db, "mitglieder", uid), { avatar: avatarProfil || ich().avatar }));
           if (animiert()) { const r = $("profil").getBoundingClientRect(); splat(r.left + 25, r.top + 25); }
           return;
         }
@@ -1368,13 +1450,6 @@
           knopf.setAttribute("aria-checked", animiert());
           if (animiert()) schneien(2000);
           return;
-
-        case "link-kopieren": {
-          const link = location.origin + location.pathname;
-          try { await navigator.clipboard.writeText(link); knopf.textContent = "✓ Kopiert!"; }
-          catch { prompt("Diesen Link verschicken:", link); }
-          return;
-        }
 
         case "export": {
           const blob = new Blob([JSON.stringify(eigene, null, 2)], { type: "application/json" });
@@ -1389,11 +1464,72 @@
         case "abmelden":
           if (confirm("Wirklich abmelden?")) await signOut(auth);
           return;
+
+        // ----- Admin -----
+        case "name-vorschlag":
+          $("einlName").value = knopf.dataset.wert;
+          einladungRolle = knopf.dataset.wert === "Nicola" ? "admin" : "nutzer";
+          document.querySelectorAll('[data-aktion="einladung-rolle"]').forEach(b => b.classList.toggle("aktiv", b.dataset.wert === einladungRolle));
+          return $("einlMail").focus();
+
+        case "einladung-rolle":
+          einladungRolle = knopf.dataset.wert;
+          document.querySelectorAll('[data-aktion="einladung-rolle"]').forEach(b => b.classList.toggle("aktiv", b === knopf));
+          return;
+
+        case "einladen": {
+          const name = $("einlName").value.trim();
+          const mail = $("einlMail").value.trim().toLowerCase();
+          if (!name) return wackeln("feldEinlName");
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return wackeln("feldEinlMail");
+          await schreiben(setDoc(doc(db, "einladungen", mail), { name, rolle: einladungRolle, erstellt: Date.now() }));
+          $("einlName").value = "";
+          $("einlMail").value = "";
+          einladungRolle = "nutzer";
+          knopf.blur();
+          zeichnen(false);
+          if (animiert()) { const r = knopf.getBoundingClientRect(); splat(r.left + r.width / 2, r.top); }
+          return;
+        }
+
+        case "einladung-loeschen": {
+          const mail = knopf.dataset.mail;
+          if (!confirm(`Einladung für ${mail} löschen? Wer schon angemeldet ist, bleibt Mitglied.`)) return;
+          return await schreiben(deleteDoc(doc(db, "einladungen", mail)));
+        }
+
+        case "spoiler":
+          spoiler = !spoiler;
+          return zeichnen(false);
+
+        case "admin-loesen":
+          if (!confirm(`Reservierung für „${w.name}“ lösen? Der Wunsch erscheint dann wieder für alle.`)) return;
+          return await reservierungLoesen(id);
+
+        case "admin-loeschen": {
+          if (!confirm(`„${w.name}“ von ${(mitglied(w.besitzer) || {}).name || "?"} wirklich löschen?`)) return;
+          const batch = writeBatch(db);
+          batch.delete(doc(db, "wuensche", id));
+          if (adminRes.some(r => r.id === id)) {
+            batch.delete(doc(db, "reservierungen", id));
+            batch.delete(doc(db, "vergeben", id));
+          }
+          kartenEl.classList.add("weg");
+          await warte(400);
+          return await schreiben(batch.commit());
+        }
       }
     } catch {
       zeichnen(false);
     }
   });
+
+  function reservierungLoesen(id) {
+    const batch = writeBatch(db);
+    batch.delete(doc(db, "reservierungen", id));
+    batch.delete(doc(db, "vergeben", id));
+    return schreiben(batch.commit());
+  }
 
   function ploppen(id) {
     const k = document.querySelector(`.wunsch-karte[data-id="${id}"]`);
@@ -1543,6 +1679,51 @@
   }
 
   // ============================================================
+  //  Grosses Paket: Wunsch springt in die Schenkung
+  // ============================================================
+  async function paketFliegen(kartenEl) {
+    const ziel = document.querySelector('.nav-punkt[data-seite="schenkung"]');
+    if (!animiert() || !kartenEl || !kartenEl.isConnected) { ziel.classList.add("pop"); return; }
+    const von = mitte(kartenEl);
+    const nach = mitte(ziel);
+    kartenEl.classList.add("einpacken");
+
+    const paket = document.createElement("div");
+    paket.className = "paket-flug";
+    paket.textContent = "🎁";
+    document.body.appendChild(paket);
+    const halb = 48;
+    const pos = (x, y, s, r) => `translate(${x - halb}px, ${y - halb}px) scale(${s}) rotate(${r}deg)`;
+
+    // 1. Paket federt aus der Karte heraus und wackelt
+    await paket.animate([
+      { transform: pos(von.x, von.y, 0, -30) },
+      { transform: pos(von.x, von.y - 20, 1.35, 12), offset: .45 },
+      { transform: pos(von.x, von.y - 10, .95, -8), offset: .7 },
+      { transform: pos(von.x, von.y - 14, 1.05, 4), offset: .85 },
+      { transform: pos(von.x, von.y - 12, 1, 0) }
+    ], { duration: wenigBewegung ? 1 : 750, easing: "ease-out", fill: "forwards" }).finished;
+    splat(von.x, von.y - 12);
+
+    // 2. Paket fliegt im Bogen zur Schenkung
+    const schritte = [];
+    for (let i = 0; i <= 24; i++) {
+      const p = i / 24;
+      const x = von.x + (nach.x - von.x) * p;
+      const y = von.y - 12 + (nach.y - von.y + 12) * p - Math.sin(Math.PI * p) * 160;
+      schritte.push({ transform: pos(x, y, 1 - .75 * p, p * 360) });
+    }
+    await paket.animate(schritte, { duration: wenigBewegung ? 1 : 800, easing: "ease-in", fill: "forwards" }).finished;
+    paket.remove();
+
+    ziel.classList.remove("pop");
+    void ziel.offsetWidth;
+    ziel.classList.add("pop");
+    splat(nach.x, nach.y);
+    schneien(3000);
+  }
+
+  // ============================================================
   //  Schnee & Schneeball
   // ============================================================
   const leinwand = $("schnee");
@@ -1568,6 +1749,7 @@
   }
 
   function splat(x, y) {
+    if (!animiert()) return;
     const anzahl = wenigBewegung ? 12 : 46;
     for (let i = 0; i < anzahl; i++) {
       const winkel = Math.random() * Math.PI * 2;
@@ -1639,9 +1821,11 @@
   }
 
   $("schneeKnopf").addEventListener("click", e => {
+    const vorher = lokal.animationen;
+    lokal.animationen = true;
     splat(e.clientX, e.clientY);
-    schneeBis = Math.max(schneeBis, performance.now() + 5000);
-    starten();
+    schneien(5000);
+    lokal.animationen = vorher;
   });
 
   // ============================================================
