@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#d5e8f7">
 <title>Weihnachts-Wunschliste</title>
+<!-- Als App installierbar -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Wunschliste">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -169,6 +177,15 @@
   .nav-punkt.aktiv svg.icon { color: var(--akzent); }
   .nav-punkt.pop { animation: navpop .7s var(--feder); }
   @keyframes navpop { 35% { transform: scale(1.35) rotate(-8deg); } }
+  /* Alarm: Ein Geschenk aus meinem Paket wurde zurückgezogen oder gelöscht */
+  .nav-punkt.alarm svg.icon { color: var(--rot); fill: var(--rot); animation: herzschlag 1.1s ease-in-out infinite; }
+  .nav-punkt.alarm .zaehler { background: var(--rot); }
+  @keyframes herzschlag {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+    15% { transform: scale(1.3); filter: drop-shadow(0 0 6px var(--rot)); }
+    30% { transform: scale(1.05); }
+    45% { transform: scale(1.22); filter: drop-shadow(0 0 4px var(--rot)); }
+  }
   .zaehler {
     position: absolute; top: 4px; left: 32px;
     min-width: 18px; height: 18px; padding: 0 5px;
@@ -284,6 +301,22 @@
   @keyframes weg { to { opacity: 0; transform: scale(.7) translateX(40px); } }
   .wunsch-karte.einpacken { animation: einpacken .45s cubic-bezier(.5, 0, .75, 0) forwards; }
   @keyframes einpacken { to { opacity: 0; transform: scale(.2) rotate(-12deg); } }
+  /* Schmelzen wie Schnee: sackt zusammen, wird weich und verläuft */
+  .wunsch-karte.schmilzt { transform-origin: 50% 100%; animation: schmelzen 1.6s cubic-bezier(.55, 0, .8, .4) forwards; pointer-events: none; }
+  @keyframes schmelzen {
+    0% { transform: none; filter: none; border-radius: 26px; }
+    15% { transform: scale(1.02, .97); filter: brightness(1.08); }
+    45% { transform: scale(1.06, .7) translateY(6px); filter: blur(1.5px) brightness(1.25) saturate(.6); border-radius: 30px 30px 60px 60px / 30px 30px 40px 40px; }
+    80% { transform: scale(1.14, .25) translateY(14px); filter: blur(4px) brightness(1.5) saturate(.2); opacity: .7; }
+    100% { transform: scale(1.2, 0) translateY(20px); filter: blur(7px) brightness(1.7); opacity: 0; }
+  }
+  .pfuetze {
+    position: fixed; z-index: 40; pointer-events: none;
+    height: 18px; border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.95), rgba(193,232,255,.8) 45%, rgba(125,160,202,0) 72%);
+    transform: scaleX(0);
+  }
+  .gesperrt { font-size: 12px; color: var(--leise); white-space: nowrap; }
   .wk-bild {
     width: 96px; height: 76px;
     border-radius: 16px;
@@ -336,6 +369,135 @@
   .gruppe-kopf h2 { margin: 0; font-size: 17px; font-weight: 600; }
   .gruppe-kopf span { color: var(--leise); font-size: 12px; }
   .gruppe-kopf .summe { margin-left: auto; font-weight: 600; color: var(--akzent); font-size: 14px; }
+  .gruppe-kopf .summe.rot { color: var(--rot); }
+
+  /* Schenkungslimite */
+  .wunsch-karte.ueber-limite { box-shadow: var(--aussen), inset 0 0 0 2px rgba(201, 74, 74, .45); }
+  .paket-kopf.ueber { background: linear-gradient(135deg, #d97a7a, var(--rot)); }
+  .budget-leiste { display: flex; gap: 14px; overflow-x: auto; padding: 4px 4px 10px; margin: -4px -4px 0; scrollbar-width: thin; }
+  .budget-chip { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 10px; min-width: 190px; border-radius: 20px; }
+  .budget-chip .avatar { width: 34px; height: 34px; font-size: 18px; }
+  .budget-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+  .budget-info b { font-size: 13px; }
+  .budget-info span { font-size: 11px; color: var(--leise); white-space: nowrap; }
+  .budget-chip.ueber .budget-info span, .limite-zeile.ueber .budget-info span { color: var(--rot); font-weight: 600; }
+  .budget-balken { height: 7px; border-radius: 99px; box-shadow: var(--innen); overflow: hidden; }
+  .budget-balken i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--akzent-hell), var(--akzent)); transition: width 1s var(--feder); }
+  .budget-balken.ueber i { background: linear-gradient(90deg, #e09090, var(--rot)); }
+  .budget-balken.leer i { width: 0; }
+  .budget-hinweis { display: block; padding: 14px 18px; border-radius: 20px; font-size: 13px; color: var(--text); text-decoration: none; transition: transform .6s var(--feder); }
+  .budget-hinweis:hover { transform: translateY(-2px); }
+  .limiten { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .limiten .zeile h2 { font-size: 17px; }
+  .limiten-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .limite-zeile { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; box-shadow: var(--aussen-klein); }
+  .limite-zeile .avatar { width: 36px; height: 36px; font-size: 19px; }
+  .limite-feld { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--leise); }
+  .limite-feld input { width: 78px; border: 0; outline: 0; padding: 9px 10px; border-radius: 12px; background: var(--flaeche); box-shadow: var(--innen); text-align: right; color: var(--text); }
+  .limite-feld input:focus { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
+
+  /* Bescherung */
+  .bescherung-banner {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    padding: 18px 22px; border-radius: var(--radius); color: #fff;
+    background: linear-gradient(135deg, #2f6d4f, #c94a4a);
+    box-shadow: 6px 6px 16px rgba(5, 38, 89, .35), -6px -6px 14px var(--schatten-hell);
+  }
+  .bescherung-banner .baum { font-size: 46px; animation: wippen 2.6s ease-in-out infinite; }
+  .bescherung-banner h2 { margin: 0; font-size: 19px; }
+  .bescherung-banner p { margin: 2px 0 0; font-size: 13px; opacity: .9; }
+  .bescherung-banner .knopf { margin-left: auto; }
+  .wunsch-karte.beschert .wk-bild { animation: wippen 1.8s ease-in-out infinite; }
+  .wunsch-karte.ausgepackt { box-shadow: var(--aussen), inset 0 0 0 2px rgba(224, 165, 38, .5); }
+
+  .nav-punkt[hidden] { display: none !important; }
+
+  /* Adventskalender */
+  .kalender-banner { background: linear-gradient(135deg, var(--akzent-hell), var(--akzent)); }
+  .kalender { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 14px; }
+  .tuer-rahmen {
+    position: relative; aspect-ratio: 1; padding: 0; border: 0;
+    border-radius: 18px; background: var(--flaeche); box-shadow: var(--innen);
+    perspective: 700px; cursor: pointer; font: inherit; color: var(--text);
+  }
+  .tuer-rahmen.gross { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
+  .tuer-innen {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; padding: 8px; text-align: center;
+  }
+  .tuer-emoji { font-size: 34px; transform: scale(.4); opacity: 0; transition: transform .8s var(--feder) .25s, opacity .3s .2s; }
+  .tuer-rahmen.gross .tuer-emoji { font-size: 60px; }
+  .tuer-innen small { font-size: 10px; line-height: 1.25; color: var(--leise); opacity: 0; transition: opacity .4s .4s; }
+  .tuer-rahmen.gross .tuer-innen small { font-size: 13px; }
+  .tuer {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    border-radius: 18px;
+    background: linear-gradient(145deg, var(--akzent-hell), var(--akzent));
+    box-shadow: var(--aussen-klein);
+    color: #fff; transform-origin: 0 50%;
+    transition: transform 1s var(--feder), box-shadow .3s;
+    backface-visibility: hidden;
+  }
+  .tuer::after { content: ""; position: absolute; right: 10px; top: 50%; width: 6px; height: 6px; border-radius: 50%; background: var(--zart); }
+  .tuer b { font-size: 26px; font-weight: 600; }
+  .tuer-rahmen.gross .tuer b { font-size: 48px; }
+  .tuer-rahmen:hover .tuer { transform: rotateY(-14deg); }
+  .tuer-rahmen.offen .tuer { transform: rotateY(-105deg); box-shadow: none; }
+  .tuer-rahmen.offen .tuer-emoji { transform: none; opacity: 1; }
+  .tuer-rahmen.offen .tuer-innen small { opacity: 1; }
+  @media (max-width: 760px) { .kalender { grid-template-columns: repeat(4, 1fr); gap: 10px; } .tuer-emoji { font-size: 26px; } .tuer-innen small { display: none; } .tuer-rahmen.gross .tuer-innen small { display: block; } }
+
+  /* Rückblick */
+  .rueckblick details { border-radius: 18px; box-shadow: var(--aussen-klein); padding: 12px 16px; }
+  .rueckblick summary { cursor: pointer; font-weight: 600; }
+  .rueckblick h3 { margin: 12px 0 6px; font-size: 13px; color: var(--leise); }
+  .rueckblick ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .rueckblick li { display: flex; gap: 10px; align-items: baseline; font-size: 13px; flex-wrap: wrap; }
+  .rueckblick li .rb-name { font-weight: 500; }
+  .rueckblick li span:not(.rb-name) { color: var(--leise); }
+  .rueckblick li b { margin-left: auto; font-weight: 500; }
+
+  /* Einkaufsliste */
+  .einkauf-kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .einkauf-kopf span { color: var(--leise); font-size: 13px; }
+  .einkauf-gruppe { display: flex; flex-direction: column; gap: 8px; }
+  .einkauf-gruppe h3 { display: flex; justify-content: space-between; margin: 8px 4px 0; font-size: 14px; }
+  .einkauf-gruppe h3 span { color: var(--leise); font-weight: 500; }
+  .einkauf-zeile {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 18px; box-shadow: var(--aussen-klein);
+    transition: opacity .3s, transform .6s var(--feder);
+  }
+  .einkauf-zeile .haken { flex: none; }
+  .einkauf-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .einkauf-text b { font-size: 14px; overflow-wrap: anywhere; }
+  .einkauf-text span { font-size: 12px; color: var(--leise); }
+  .einkauf-text a { color: var(--akzent-hell); }
+  .einkauf-zeile.erledigt { opacity: .55; }
+  .einkauf-zeile.erledigt b { text-decoration: line-through; }
+
+  @media print {
+    body * { visibility: hidden; }
+    .einkaufsliste, .einkaufsliste * { visibility: visible; }
+    .einkaufsliste { position: absolute; inset: 0 auto auto 0; width: 100%; box-shadow: none; background: #fff; }
+    .einkauf-zeile { box-shadow: none; border-bottom: 1px solid #ccc; border-radius: 0; }
+    .einkauf-zeile .haken { box-shadow: none; border: 1.5px solid #333; }
+  }
+
+  /* Kurze Meldung oben (Toast) */
+  .toast {
+    position: fixed; z-index: 70; top: 18px; left: 50%;
+    width: min(420px, calc(100vw - 32px));
+    padding: 14px 18px; border-radius: 20px;
+    background: var(--flaeche); box-shadow: var(--aussen);
+    font-size: 13px; cursor: pointer;
+    transform: translate(-50%, -140%); opacity: 0;
+    transition: transform .8s var(--feder), opacity .3s;
+  }
+  .toast.da { transform: translate(-50%, 0); opacity: 1; }
+  .toast h4 { margin: 0 0 6px; font-size: 14px; }
+  .toast ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .toast li.rot { color: var(--rot); font-weight: 600; }
 
   /* Grosses Paket in der Schenkung */
   .paket-kopf {
@@ -510,6 +672,10 @@
   .huelle.offen .fenster { transform: none; }
   .fenster h2 { margin: 0 0 4px; font-size: 20px; }
   .fenster > p { margin: 0 0 20px; color: var(--leise); font-size: 13px; }
+  .meldung-herz { font-size: 46px; text-align: center; color: var(--rot); animation: herzschlag 1.1s ease-in-out infinite; }
+  .meldung-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .meldung-liste li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 16px; box-shadow: var(--innen); font-size: 14px; }
+  .meldung-liste li span { margin-left: auto; color: var(--leise); font-size: 12px; text-align: right; }
   .feld { display: block; margin-bottom: 16px; }
   .feld > span { display: block; font-size: 12px; font-weight: 500; margin: 0 0 6px 6px; }
   .feld input {
@@ -523,6 +689,31 @@
   }
   .feld input:focus { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
   .feld.fehler { animation: schuetteln .5s; }
+
+  /* Wichtigkeit (Sterne) */
+  .sterne-wahl { display: flex; align-items: center; gap: 6px; }
+  .sterne-wahl button {
+    width: 42px; height: 42px; border: 0; border-radius: 50%;
+    background: var(--flaeche); box-shadow: var(--aussen-klein);
+    font-size: 20px; color: var(--schatten-dunkel); cursor: pointer;
+    transition: transform .6s var(--feder), color .2s, box-shadow .2s;
+  }
+  .sterne-wahl button.an { color: #e0a526; box-shadow: var(--innen); }
+  .sterne-wahl button:active { transform: scale(.8); }
+  .sterne-wahl button.hupf { animation: sternHupf .7s var(--feder); }
+  @keyframes sternHupf { 40% { transform: scale(1.4) rotate(-15deg); } }
+  .sterne-wahl small { margin-left: 8px; color: var(--leise); font-size: 12px; }
+  .wk-text .sterne { color: #e0a526; font-size: 14px; letter-spacing: 1px; margin-left: 6px; white-space: nowrap; }
+
+  /* Link: Bild & Preis holen */
+  .link-zeile { display: flex; gap: 8px; align-items: center; }
+  .link-zeile input { flex: 1; min-width: 0; }
+  .link-zeile .knopf { flex: none; }
+  .link-zeile .knopf.laedt { animation: wackelnSanft .8s ease-in-out infinite; }
+  @keyframes wackelnSanft { 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+  .link-status { display: block; min-height: 16px; margin: 6px 0 0 6px; font-size: 11px; color: var(--leise); }
+  .link-status.ok { color: var(--akzent); }
+  .link-status.fehler { color: var(--rot); }
   .feld.fehler input { box-shadow: var(--innen), 0 0 0 2px var(--rot); }
   @keyframes schuetteln { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
   .bild-feld {
@@ -705,6 +896,10 @@
         <svg class="icon" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.8.3 5 2.4 5 5.8"/></svg>
         <span class="nav-text">Mitglieder</span>
       </a>
+      <a class="nav-punkt" href="#kalender" data-seite="kalender" data-kurz="Kalender" hidden>
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M12 13.2l.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2-1.45-1.4 2-.3z"/></svg>
+        <span class="nav-text">Kalender</span>
+      </a>
       <a class="nav-punkt" href="#einstellungen" data-seite="einstellungen" data-kurz="Optionen">
         <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>
         <span class="nav-text">Einstellungen</span>
@@ -777,10 +972,23 @@
       <span>Preis (CHF)</span>
       <input id="eingabePreis" type="number" min="0" step="0.05" inputmode="decimal" placeholder="z.B. 49.90">
     </label>
-    <label class="feld" id="feldLink">
+    <div class="feld">
+      <span>Wie wichtig ist dir das?</span>
+      <div class="sterne-wahl" id="sterneWahl">
+        <button type="button" data-stern="1" aria-label="1 Stern">★</button>
+        <button type="button" data-stern="2" aria-label="2 Sterne">★</button>
+        <button type="button" data-stern="3" aria-label="3 Sterne">★</button>
+        <small id="sterneText"></small>
+      </div>
+    </div>
+    <div class="feld" id="feldLink">
       <span>Link zum Shop</span>
-      <input id="eingabeLink" type="url" placeholder="https://…" autocomplete="off">
-    </label>
+      <div class="link-zeile">
+        <input id="eingabeLink" type="url" placeholder="https://…" autocomplete="off" aria-label="Link zum Shop">
+        <button type="button" class="knopf klein" id="linkHolen" title="Bild, Name und Preis vom Shop holen">✨ Holen</button>
+      </div>
+      <small class="link-status" id="linkStatus"></small>
+    </div>
     <div class="feld">
       <span>Bild</span>
       <div class="bild-feld" id="bildFeld" tabindex="0" role="button" aria-label="Bild auswählen"></div>
@@ -793,6 +1001,21 @@
     </div>
   </form>
 </div>
+
+<!-- ===== Fenster: Geschenk aus meinem Paket ist weg ===== -->
+<div class="huelle" id="meldungHuelle">
+  <div class="fenster neu" role="alertdialog" aria-labelledby="meldungTitel">
+    <div class="meldung-herz">♥</div>
+    <h2 id="meldungTitel">Oh nein – ein Geschenk ist weg</h2>
+    <p id="meldungText"></p>
+    <ul class="meldung-liste" id="meldungListe"></ul>
+    <div class="fenster-knoepfe">
+      <button type="button" class="knopf blau" id="meldungOk">Verstanden</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" onclick="this.classList.remove('da')"></div>
 
 <canvas id="schnee"></canvas>
 
@@ -820,6 +1043,11 @@
     appId: "1:671423487215:web:3444a609b38efb1b880f1a",
     measurementId: "G-BY4T16JQ78"
   };
+  // Service Worker: macht die Seite als App installierbar (lädt immer zuerst die neueste Version)
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    navigator.serviceWorker.register("sw.js").catch(f => console.warn("Service Worker:", f));
+  }
+
   const fbApp = initializeApp(firebaseConfig);
   const auth = getAuth(fbApp);
   const db = getFirestore(fbApp);
@@ -834,6 +1062,7 @@
     meine: ["Meine Wünsche", "Erfassen, bearbeiten, freigeben oder zurückziehen"],
     schenkung: ["Schenkung", "Dein grosses Geschenk-Paket – das siehst nur du"],
     mitglieder: ["Mitglieder", "Familie & Freunde auf der Wunschliste"],
+    kalender: ["Adventskalender", "🚧 In Bearbeitung – nur für dich sichtbar"],
     einstellungen: ["Einstellungen", "Profil, Animationen und Konto"]
   };
   const $ = id => document.getElementById(id);
@@ -853,7 +1082,8 @@
 
   // Einstellungen nur für dieses Gerät
   const LOKAL = "wunschliste-lokal";
-  const lokal = (() => { try { return { animationen: true, seiteZu: false, ...JSON.parse(localStorage.getItem(LOKAL)) }; } catch { return { animationen: true, seiteZu: false }; } })();
+  const LOKAL_START = { animationen: true, seiteZu: false, ausgepackt: [], tuerchen: [] };
+  const lokal = (() => { try { return { ...LOKAL_START, ...JSON.parse(localStorage.getItem(LOKAL)) }; } catch { return { ...LOKAL_START }; } })();
   const lokalSpeichern = () => { try { localStorage.setItem(LOKAL, JSON.stringify(lokal)); } catch {} };
   const animiert = () => lokal.animationen;
 
@@ -900,6 +1130,15 @@
   let adminRes = [];
   let einladungen = [];
   let abmelder = [];
+  const geladen = new Set(); // welche Listen schon einmal angekommen sind (gegen Fehlalarm beim Start)
+  let limiten = {};         // meine Schenkungslimite pro Person { uid: CHF } – privat
+  let budgetGemeldet = null; // zuletzt gezeigte Budget-Meldung (damit sie nicht ständig wiederkommt)
+  let bescherungRes = [];   // ab Heiligabend: wer mir was schenkt (vorher von den Regeln gesperrt)
+  let bescherungGemeldet = false;
+  let archivBekommen = [];  // Rückblick: was ich in früheren Jahren bekommen habe
+  let archivGeschenkt = []; // Rückblick: was ich verschenkt habe
+  // Bescherung: vom 24. bis 31. Dezember (die Regeln in firestore.rules prüfen dasselbe)
+  const istBescherung = () => { const j = new Date(); return j.getMonth() === 11 && j.getDate() >= 24; };
   let zeichnenGeplant = false;
 
   const istAdmin = () => rolle === "admin";
@@ -924,6 +1163,12 @@
     abmelder = [];
     mitglieder = []; eigene = []; fremde = []; vergeben = new Set(); meineRes = [];
     adminWuensche = []; adminRes = []; einladungen = [];
+    geladen.clear();
+    limiten = {};
+    budgetGemeldet = null;
+    bescherungRes = []; bescherungGemeldet = false;
+    archivBekommen = []; archivGeschenkt = [];
+    $("meldungHuelle").classList.remove("offen");
   }
 
   function datenStarten() {
@@ -931,9 +1176,15 @@
     const hoeren = (q, fn) => abmelder.push(onSnapshot(q, s => { fn(s); spaeterZeichnen(); }, fehler));
     hoeren(collection(db, "mitglieder"), s => { mitglieder = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); });
     hoeren(query(collection(db, "wuensche"), where("besitzer", "==", uid)), s => { eigene = nachDatum(listeAus(s)); });
-    hoeren(query(collection(db, "wuensche"), where("status", "==", "freigegeben")), s => { fremde = nachDatum(listeAus(s)); });
+    hoeren(query(collection(db, "wuensche"), where("status", "==", "freigegeben")), s => { fremde = nachDatum(listeAus(s)); geladen.add("fremde"); });
     hoeren(query(collection(db, "vergeben"), where("besitzer", "!=", uid)), s => { vergeben = new Set(s.docs.map(d => d.id)); });
-    hoeren(query(collection(db, "reservierungen"), where("von", "==", uid)), s => { meineRes = listeAus(s); });
+    hoeren(query(collection(db, "reservierungen"), where("von", "==", uid)), s => { meineRes = listeAus(s); geladen.add("res"); });
+    hoeren(doc(db, "limiten", uid), s => { limiten = s.exists() ? (s.data().betraege || {}) : {}; geladen.add("limiten"); });
+    hoeren(query(collection(db, "archiv"), where("besitzer", "==", uid)), s => { archivBekommen = listeAus(s); });
+    hoeren(query(collection(db, "archiv"), where("von", "==", uid)), s => { archivGeschenkt = listeAus(s); });
+    if (istBescherung()) {
+      hoeren(query(collection(db, "reservierungen"), where("besitzer", "==", uid)), s => { bescherungRes = listeAus(s); geladen.add("bescherung"); });
+    }
     if (istAdmin()) {
       hoeren(collection(db, "wuensche"), s => { adminWuensche = nachDatum(listeAus(s)); });
       hoeren(collection(db, "reservierungen"), s => { adminRes = listeAus(s); });
@@ -1035,9 +1286,11 @@
   let avatarProfil = "";
   let spoiler = false;      // Admin: eigene Überraschungen anzeigen?
   let einladungRolle = "nutzer";
+  let ansichtSchenkung = "pakete"; // "pakete" oder "liste" (Einkaufsliste)
   const offeneDetails = new Set();
 
-  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] ? h : "alle"; };
+  // Der Adventskalender ist noch in Bearbeitung: nur der Admin sieht ihn
+  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] && (h !== "kalender" || istAdmin()) ? h : "alle"; };
 
   function zeichnen(mitAnimation = true) {
     if ($("app").hidden) return;
@@ -1046,6 +1299,7 @@
     $("untertitel").textContent = SEITEN[seite][1];
     document.title = `${SEITEN[seite][0]} · Wunschliste`;
     document.querySelectorAll(".nav-punkt").forEach(a => a.classList.toggle("aktiv", a.dataset.seite === seite));
+    document.querySelector('.nav-punkt[data-seite="kalender"]').hidden = !istAdmin();
     $("sucheBox").style.display = seite === "alle" || seite === "meine" ? "" : "none";
     const m = ich();
     $("profil").innerHTML = `<div class="avatar">${esc(m.avatar)}</div><span>${esc(m.name)}</span>`;
@@ -1056,7 +1310,7 @@
     if (!mitAnimation && aktiv && aktiv.closest && aktiv.closest("#inhalt") && aktiv.tagName === "INPUT") return;
 
     const inhalt = $("inhalt");
-    inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, einstellungen: seiteEinstellungen }[seite]();
+    inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, kalender: seiteKalender, einstellungen: seiteEinstellungen }[seite]();
 
     if (mitAnimation) {
       [...inhalt.querySelectorAll(":scope > *, .karten > *, .mitglieder-raster > *")].forEach((el, i) => {
@@ -1091,7 +1345,7 @@
     return `<article class="wunsch-karte neu ${klasse}" data-id="${esc(w.id)}">
       <div class="wk-bild">${bild ? `<img src="${bild}" alt="">` : "🎁"}</div>
       <div class="wk-text">
-        <h3>${esc(w.name)}</h3>
+        <h3>${esc(w.name)}${w.wichtig > 0 ? `<span class="sterne" title="${esc(STERNE_TEXT[Math.min(3, w.wichtig)])}">${"★".repeat(Math.min(3, w.wichtig))}</span>` : ""}</h3>
         ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : `<span>Kein Link</span>`}
         ${info ? `<span class="info">${info}</span>` : ""}
         ${hinweis ? `<span class="hinweis">${hinweis}</span>` : ""}
@@ -1120,18 +1374,29 @@
       ${andere.map(m => `<button class="knopf chip ${filterPerson === m.id ? "aktiv" : ""}" data-aktion="person" data-wert="${esc(m.id)}">${esc(m.avatar)} ${esc(m.name)}</button>`).join("")}
     </div>`;
 
+    const geschenke = meineGeschenke();
     const gruppen = andere
       .filter(m => filterPerson === "alle" || filterPerson === m.id)
       .map(m => {
-        const liste = fremde.filter(w => w.besitzer === m.id && !vergeben.has(w.id) && passt(w));
+        // Herzenswünsche zuerst
+        const liste = fremde.filter(w => w.besitzer === m.id && !vergeben.has(w.id) && passt(w))
+          .sort((a, b) => (b.wichtig || 0) - (a.wichtig || 0));
         if (!liste.length) return "";
+        const b = budget(m.id, geschenke);
         return `<section class="gruppe">
-          <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"} offen</span></div></div>
-          <div class="karten">${liste.map(w => karte(w, "", `<button class="knopf blau klein" data-aktion="schenken">🎁 Ich schenke das</button>`)).join("")}</div>
+          <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"} offen</span></div>
+            ${b.limite != null ? `<span class="summe ${b.ueber ? "rot" : ""}">${b.ueber ? esc(budgetText(b)) : `noch ${chf.format(b.rest)}`}</span>` : ""}</div>
+          <div class="karten">${liste.map(w => {
+            // Übersteigt dieses Produkt meine (Rest-)Limite für diese Person?
+            const zuTeuer = b.limite != null && (w.preis || 0) > Math.max(0, b.rest);
+            return karte(w, "", `<button class="knopf blau klein" data-aktion="schenken">🎁 Ich schenke das</button>`,
+              zuTeuer ? "ueber-limite" : "",
+              zuTeuer ? `⚠ Übersteigt deine Limite um ${chf.format((w.preis || 0) - Math.max(0, b.rest))}` : "");
+          }).join("")}</div>
         </section>`;
       }).join("");
 
-    return chips + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
+    return budgetLeiste() + chips + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
   }
 
   // ---------- Meine Wünsche ----------
@@ -1142,6 +1407,7 @@
     const liste = eigene.filter(w => (filterMeine === "alle" || w.status === filterMeine) && passt(w));
 
     return `
+      ${bescherungBanner()}
       ${plusBalken("Neuen Wunsch hinzufügen", "Name, Preis, Link und Bild – dann freigeben")}
       <section class="zahlen">
         ${ringKarte("Wünsche", Math.min(1, eigene.length / 10), `<span data-zahl="${eigene.length}">0</span>`, "insgesamt erfasst")}
@@ -1167,8 +1433,55 @@
       return karte(w, `<span class="abzeichen hell">Entwurf</span>`,
         `${bearbeiten}<button class="knopf blau klein" data-aktion="freigeben">❄ Freigeben</button>${loeschen}`, "entwurf");
     }
+    // Bescherung: ab Heiligabend sehe ich, wer mir was schenkt
+    const r = istBescherung() && bescherungRes.find(x => x.id === w.id);
+    if (r) {
+      const offen = !lokal.ausgepackt.includes(w.id);
+      const von = mitglied(r.von) || { name: "?", avatar: "🎅" };
+      return karte(w, `<span class="abzeichen">Geschenkt</span>`,
+        offen ? `<button class="knopf blau klein" data-aktion="auspacken">🎁 Auspacken</button>` : "",
+        offen ? "beschert" : "ausgepackt", "",
+        offen ? "✨ Jemand schenkt dir das!" : `🎁 Von ${esc(von.name)} ${esc(von.avatar)}`);
+    }
     return karte(w, `<span class="abzeichen">Freigegeben</span>`,
       `${bearbeiten}<button class="knopf klein" data-aktion="zurueckziehen">Zurückziehen</button>${loeschen}`);
+  }
+
+  function bescherungBanner() {
+    if (!istBescherung()) return "";
+    const offen = eigene.filter(w => bescherungRes.some(r => r.id === w.id) && !lokal.ausgepackt.includes(w.id)).length;
+    const alle = eigene.filter(w => bescherungRes.some(r => r.id === w.id)).length;
+    return `<section class="bescherung-banner">
+      <div class="baum">🎄</div>
+      <div><h2>Frohe Weihnachten!</h2><p>${offen ? `Es ist Bescherung – ${offen} ${offen === 1 ? "Geschenk wartet" : "Geschenke warten"} darauf, ausgepackt zu werden.`
+        : alle ? "Alles ausgepackt – schöne Festtage! ✨" : "Es ist Bescherung! 🎅"}</p></div>
+      ${offen > 1 ? `<button class="knopf" data-aktion="alle-auspacken">Alle auspacken</button>` : ""}
+    </section>`;
+  }
+
+  // Geschenk-Animation: Paket wackelt, platzt auf, Schnee fliegt – dann sieht man, von wem es ist
+  async function auspacken(kartenEl, id) {
+    if (!lokal.ausgepackt.includes(id)) lokal.ausgepackt.push(id);
+    lokalSpeichern();
+    if (kartenEl && kartenEl.isConnected && animiert()) {
+      const ziel = mitte(kartenEl.querySelector(".wk-bild") || kartenEl);
+      const p = document.createElement("div");
+      p.className = "paket-flug";
+      p.textContent = "🎁";
+      document.body.appendChild(p);
+      const pos = (s, r = 0) => `translate(${ziel.x - 48}px, ${ziel.y - 48}px) scale(${s}) rotate(${r}deg)`;
+      await p.animate([
+        { transform: pos(.2), opacity: 0 }, { transform: pos(1.1), opacity: 1, offset: .25 },
+        { transform: pos(1, -14), offset: .4 }, { transform: pos(1, 14), offset: .55 },
+        { transform: pos(1, -10), offset: .7 }, { transform: pos(1.05, 8), offset: .82 }, { transform: pos(1) }
+      ], { duration: 1100, easing: "ease-in-out", fill: "forwards" }).finished;
+      splat(ziel.x, ziel.y);
+      await p.animate([{ transform: pos(1), opacity: 1 }, { transform: pos(2.6, 20), opacity: 0 }], { duration: 380, easing: "ease-out", fill: "forwards" }).finished;
+      p.remove();
+      schneien(3000);
+    }
+    zeichnen(false);
+    ploppen(id);
   }
 
   // ---------- Schenkung ----------
@@ -1176,9 +1489,150 @@
     return meineRes.map(r => {
       const w = fremde.find(x => x.id === r.id);
       return w
-        ? { ...w, gekauft: !!r.gekauft, fehlt: false }
-        : { id: r.id, name: r.name, preis: r.preis, besitzer: r.besitzer, gekauft: !!r.gekauft, fehlt: true };
+        ? { ...w, gekauft: !!r.gekauft, genommen: r.erstellt, fehlt: false }
+        : { id: r.id, name: r.name, preis: r.preis, besitzer: r.besitzer, gekauft: !!r.gekauft, fehlt: geladen.has("fremde") && geladen.has("res") };
     });
+  }
+
+  // ---------- Schenkungslimite (privat, pro Person) ----------
+  const limiteVon = id => typeof limiten[id] === "number" ? limiten[id] : null;
+  const ausgegebenFuer = (id, geschenke = meineGeschenke()) => summe(geschenke.filter(g => g.besitzer === id && !g.fehlt));
+  function budget(id, geschenke) {
+    const limite = limiteVon(id);
+    const aus = ausgegebenFuer(id, geschenke);
+    return { limite, aus, rest: limite == null ? null : limite - aus, ueber: limite != null && aus > limite };
+  }
+  // Welche meiner gewählten Geschenke sprengen die Limite? (der Reihe nach aufsummiert)
+  function ueberLimiteIds(geschenke) {
+    const ids = new Set();
+    const proPerson = {};
+    for (const g of [...geschenke].filter(g => !g.fehlt).sort((a, b) => (a.genommen || 0) - (b.genommen || 0))) {
+      const limite = limiteVon(g.besitzer);
+      proPerson[g.besitzer] = (proPerson[g.besitzer] || 0) + (g.preis || 0);
+      if (limite != null && proPerson[g.besitzer] > limite) ids.add(g.id);
+    }
+    return ids;
+  }
+  function budgetBalken(b) {
+    if (b.limite == null) return `<div class="budget-balken leer"><i></i></div>`;
+    const anteil = b.limite > 0 ? Math.min(1, b.aus / b.limite) : 1;
+    return `<div class="budget-balken ${b.ueber ? "ueber" : ""}"><i style="width:${Math.round(anteil * 100)}%"></i></div>`;
+  }
+  function budgetText(b) {
+    if (b.limite == null) return "Keine Limite";
+    return b.ueber
+      ? `⚠ ${chf.format(b.aus - b.limite)} über Limite`
+      : `${chf.format(b.aus)} von ${chf.format(b.limite)}`;
+  }
+  // Kurze Übersicht auf der Hauptseite (Alle Wünsche)
+  function budgetLeiste() {
+    const andere = mitglieder.filter(m => m.id !== uid);
+    if (!andere.length) return "";
+    const geschenke = meineGeschenke();
+    const mitLimite = andere.filter(m => limiteVon(m.id) != null);
+    if (!mitLimite.length) {
+      return `<a class="budget-hinweis neu" href="#schenkung">💰 Leg in der <b>Schenkung</b> fest, wie viel du pro Person ausgeben möchtest.</a>`;
+    }
+    return `<section class="budget-leiste">${mitLimite.map(m => {
+      const b = budget(m.id, geschenke);
+      return `<div class="budget-chip neu ${b.ueber ? "ueber" : ""}" title="${esc(budgetText(b))}">
+        <div class="avatar">${esc(m.avatar)}</div>
+        <div class="budget-info"><b>${esc(m.name)}</b><span>${b.ueber ? esc(budgetText(b)) : `noch ${chf.format(b.rest)}`}</span>${budgetBalken(b)}</div>
+      </div>`;
+    }).join("")}</section>`;
+  }
+
+  // Kurze Budget-Meldung oben: beim Anmelden (sobald alles geladen ist)
+  // und immer dann, wenn sich etwas an einer Überschreitung ändert
+  let toastTimer = null;
+  function toast(html, ms = 6000) {
+    const t = $("toast");
+    t.innerHTML = html;
+    t.classList.add("da");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("da"), ms);
+  }
+  function bescherungMelden() {
+    if (bescherungGemeldet || !geladen.has("bescherung") || !geladen.has("fremde")) return;
+    bescherungGemeldet = true;
+    const offen = eigene.filter(w => bescherungRes.some(r => r.id === w.id) && !lokal.ausgepackt.includes(w.id)).length;
+    if (offen) toast(`<h4>🎄 Es ist Bescherung!</h4><ul><li>${offen} ${offen === 1 ? "Geschenk wartet" : "Geschenke warten"} in <a href="#meine">Meine Wünsche</a> aufs Auspacken.</li></ul>`, 9000);
+  }
+  function budgetMelden(geschenke) {
+    if (istBescherung()) return bescherungMelden();
+    if (!["fremde", "res", "limiten"].every(x => geladen.has(x)) || !mitglieder.length) return;
+    const zeilen = mitglieder.filter(m => m.id !== uid && limiteVon(m.id) != null)
+      .map(m => ({ m, b: budget(m.id, geschenke) }));
+    const ueber = zeilen.filter(z => z.b.ueber);
+    const signatur = ueber.map(z => `${z.m.id}:${z.b.aus}:${z.b.limite}`).join("|");
+    const erstesMal = budgetGemeldet === null;
+    if (!erstesMal && signatur === budgetGemeldet) return;
+    budgetGemeldet = signatur;
+    // Beim Anmelden Übersicht zeigen, danach nur noch bei neuen Überschreitungen
+    if (!zeilen.length || (!erstesMal && !ueber.length)) return;
+    toast(`<h4>${ueber.length ? "⚠ Limite überschritten" : "💰 Dein Budget"}</h4><ul>${(erstesMal ? zeilen : ueber).map(({ m, b }) =>
+      `<li class="${b.ueber ? "rot" : ""}">${esc(m.avatar)} ${esc(m.name)}: ${b.ueber ? esc(budgetText(b)) : `noch ${chf.format(b.rest)} von ${chf.format(b.limite)}`}</li>`).join("")}</ul>`);
+  }
+
+  // Meldung, wenn ein Geschenk aus meinem Paket zurückgezogen oder gelöscht wurde.
+  // Das Herz pulsiert rot, bis die Meldung mit "Verstanden" bestätigt ist.
+  function alarmPruefen(geschenke) {
+    const weg = geschenke.filter(g => g.fehlt);
+    document.querySelector('.nav-punkt[data-seite="schenkung"]').classList.toggle("alarm", weg.length > 0);
+    const huelle = $("meldungHuelle");
+    if (!weg.length) { huelle.classList.remove("offen"); return; }
+    $("meldungText").textContent = weg.length === 1
+      ? "Dieses Geschenk aus deinem Paket wurde zurückgezogen oder gelöscht. Es wird aus deiner Schenkung entfernt."
+      : "Diese Geschenke aus deinem Paket wurden zurückgezogen oder gelöscht. Sie werden aus deiner Schenkung entfernt.";
+    $("meldungListe").innerHTML = weg.map(g => {
+      const m = mitglied(g.besitzer) || { name: "?", avatar: "❔" };
+      return `<li>🎁 <b>${esc(g.name)}</b><span>Wunsch von ${esc(m.name)} ${esc(m.avatar)}</span></li>`;
+    }).join("");
+    if (!huelle.classList.contains("offen")) huelle.classList.add("offen");
+  }
+
+  $("meldungOk").addEventListener("click", async () => {
+    const knopf = $("meldungOk");
+    const weg = meineGeschenke().filter(g => g.fehlt);
+    knopf.disabled = true;
+    try {
+      // Verwaiste Reservierungen aufräumen – danach ist alles wieder normal
+      const batch = writeBatch(db);
+      for (const g of weg) {
+        batch.delete(doc(db, "reservierungen", g.id));
+        batch.delete(doc(db, "vergeben", g.id));
+      }
+      await schreiben(batch.commit());
+      $("meldungHuelle").classList.remove("offen");
+    } catch {} finally {
+      knopf.disabled = false;
+    }
+  });
+
+  // Einkaufsliste: was noch zu kaufen ist, nach Shop sortiert (auch zum Ausdrucken)
+  const shopVon = link => { try { return new URL(link).hostname.replace(/^www\./, ""); } catch { return ""; } };
+  function einkaufsliste(geschenke) {
+    const offen = geschenke.filter(g => !g.fehlt && !g.gekauft);
+    const erledigt = geschenke.filter(g => !g.fehlt && g.gekauft);
+    const zeile = g => {
+      const m = mitglied(g.besitzer) || { name: "?", avatar: "❔" };
+      const link = sichererLink(g.link);
+      return `<div class="einkauf-zeile ${g.gekauft ? "erledigt" : ""}" data-id="${esc(g.id)}">
+        <button class="haken ${g.gekauft ? "an" : ""}" data-aktion="gekauft" title="Als gekauft markieren" aria-label="Als gekauft markieren">✓</button>
+        <div class="einkauf-text"><b>${esc(g.name)}</b><span>für ${esc(m.name)} ${esc(m.avatar)}${link ? ` · <a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : ""}</span></div>
+        <span class="preis">${g.preis != null ? chf.format(g.preis) : "–"}</span>
+      </div>`;
+    };
+    const shops = [...new Set(offen.map(g => shopVon(g.link)))].sort((a, b) => (a ? 0 : 1) - (b ? 0 : 1) || a.localeCompare(b));
+    const gruppen = shops.map(s => {
+      const liste = offen.filter(g => shopVon(g.link) === s);
+      return `<div class="einkauf-gruppe"><h3>${s ? `🏬 ${esc(s)}` : "📍 Ohne Shop-Link"} <span>${chf.format(summe(liste))}</span></h3>${liste.map(zeile).join("")}</div>`;
+    }).join("");
+    return `<section class="einkaufsliste formular-karte neu">
+      <div class="einkauf-kopf"><h2>🛒 Einkaufsliste</h2><span>Noch ${offen.length} ${offen.length === 1 ? "Geschenk" : "Geschenke"} · ${chf.format(summe(offen))}</span></div>
+      ${gruppen || `<p class="notiz">🎉 Alles gekauft – du bist bereit für Weihnachten!</p>`}
+      ${erledigt.length ? `<div class="einkauf-gruppe"><h3>✓ Schon gekauft <span>${chf.format(summe(erledigt))}</span></h3>${erledigt.map(zeile).join("")}</div>` : ""}
+    </section>`;
   }
 
   function seiteSchenkung() {
@@ -1193,28 +1647,54 @@
       ${ringKarte("Gekauft", geschenke.length ? gekauft / geschenke.length : 0, `<span data-zahl="${gekauft}">0</span>`, `von ${geschenke.length}`)}
     </section>`;
 
+    // Meine Limiten: wie viel möchte ich für wen ausgeben?
+    const andere = mitglieder.filter(m => m.id !== uid);
+    const limitenTeil = andere.length ? `<section class="limiten neu">
+      <div class="zeile"><h2>💰 Meine Limiten</h2><span class="notiz">Nur du siehst diese Beträge</span></div>
+      <div class="limiten-liste">${andere.map(m => {
+        const b = budget(m.id, geschenke);
+        return `<label class="limite-zeile ${b.ueber ? "ueber" : ""}">
+          <div class="avatar">${esc(m.avatar)}</div>
+          <div class="budget-info"><b>${esc(m.name)}</b><span>${esc(budgetText(b))}</span>${budgetBalken(b)}</div>
+          <span class="limite-feld">CHF <input type="number" min="0" step="5" inputmode="decimal" placeholder="–" data-limite="${esc(m.id)}" value="${b.limite ?? ""}"></span>
+        </label>`;
+      }).join("")}</div>
+    </section>` : "";
+
     if (!geschenke.length) {
-      return kopf + leer("🎁", "Dein Paket ist noch leer", `Wähle bei <a href="#alle">Alle Wünsche</a> aus, was du schenken möchtest.`);
+      return kopf + limitenTeil + leer("🎁", "Dein Paket ist noch leer", `Wähle bei <a href="#alle">Alle Wünsche</a> aus, was du schenken möchtest.`);
     }
 
+    const umschalter = `<div class="zeile">
+      <div class="chips">
+        <button class="knopf chip ${ansichtSchenkung === "pakete" ? "aktiv" : ""}" data-aktion="ansicht" data-wert="pakete">🎁 Pakete</button>
+        <button class="knopf chip ${ansichtSchenkung === "liste" ? "aktiv" : ""}" data-aktion="ansicht" data-wert="liste">🛒 Einkaufsliste</button>
+      </div>
+      ${ansichtSchenkung === "liste" ? `<button class="knopf klein" data-aktion="drucken">🖨 Drucken</button>` : ""}
+    </div>`;
+    if (ansichtSchenkung === "liste") return kopf + umschalter + einkaufsliste(geschenke);
+
+    const zuViel = ueberLimiteIds(geschenke);
     const pakete = personen.map(id => {
       const m = mitglied(id) || { name: "Unbekannt", avatar: "❔" };
       const liste = geschenke.filter(w => w.besitzer === id);
+      const b = budget(id, geschenke);
       return `<section class="gruppe">
-        <div class="paket-kopf">
+        <div class="paket-kopf ${b.ueber ? "ueber" : ""}">
           <div class="paket-icon">🎁</div>
-          <div><h2>Paket für ${esc(m.name)} ${esc(m.avatar)}</h2><span>${liste.length} ${liste.length === 1 ? "Geschenk" : "Geschenke"}</span></div>
+          <div><h2>Paket für ${esc(m.name)} ${esc(m.avatar)}</h2><span>${liste.length} ${liste.length === 1 ? "Geschenk" : "Geschenke"}${b.limite != null ? ` · ${esc(budgetText(b))}` : ""}</span></div>
           <span class="summe">${chf.format(summe(liste))}</span>
         </div>
         <div class="karten">${liste.map(w => karte(w,
           w.gekauft ? `<span class="abzeichen">Gekauft</span>` : `<span class="abzeichen zart">Noch kaufen</span>`,
           `<button class="haken ${w.gekauft ? "an" : ""}" data-aktion="gekauft" title="Als gekauft markieren" aria-label="Als gekauft markieren">✓</button>
            <button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`,
-          "", w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : "")).join("")}</div>
+          zuViel.has(w.id) ? "ueber-limite" : "",
+          w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : zuViel.has(w.id) ? "⚠ Damit übersteigst du deine Limite" : "")).join("")}</div>
       </section>`;
     }).join("");
 
-    return kopf + pakete + `<p class="notiz">🔒 Niemand sieht, dass du diese Geschenke genommen hast – für alle anderen sind sie einfach aus der Liste verschwunden.</p>`;
+    return kopf + umschalter + limitenTeil + pakete +`<p class="notiz">🔒 Niemand sieht, dass du diese Geschenke genommen hast – für alle anderen sind sie einfach aus der Liste verschwunden.</p>`;
   }
 
   // ---------- Mitglieder ----------
@@ -1328,7 +1808,126 @@
           <button class="knopf" data-aktion="export">⬇ Meine Wünsche sichern</button>
           <button class="knopf gefahr" data-aktion="abmelden">Abmelden</button>
         </div>
-      </section>`;
+      </section>
+      ${appTeil()}
+      ${rueckblick()}
+      ${istAdmin() ? jahrAbschliessenTeil() : ""}`;
+  }
+
+  // ---------- Adventskalender (in Bearbeitung, nur Admin) ----------
+  const TUERCHEN = [
+    ["⛄", "Heute ist ein guter Tag für heissen Punsch."], ["🍪", "Back heute eine Runde Guetzli!"], ["🎶", "Leg dein liebstes Weihnachtslied auf."],
+    ["🕯️", "Zünd eine Kerze an und mach es dir gemütlich."], ["❄", "Schau mal aus dem Fenster – vielleicht schneit es?"], ["🎅", "Samichlaus-Tag! Stell die Stiefel raus."],
+    ["📮", "Schreib jemandem eine liebe Karte."], ["🧦", "Zeit für die dicksten Socken."], ["🌟", "Du bist ein Stern – einfach so."],
+    ["🎄", "Hast du den Baum schon ausgesucht?"], ["☕", "Heisse Schokolade mit extra Schaum!"], ["🦌", "Wie hiessen nochmal alle Rentiere?"],
+    ["🎁", "Schon an alle Geschenke gedacht?"], ["🧣", "Ein Spaziergang in der Kälte tut gut."], ["📖", "Lies heute eine Weihnachtsgeschichte."],
+    ["🍊", "Mandarinen und Nüsse – ganz klassisch."], ["✨", "Noch eine Woche – die Vorfreude steigt!"], ["🎨", "Bastle einen Stern fürs Fenster."],
+    ["🔔", "Hörst du schon die Glöckchen?"], ["🧁", "Gönn dir heute etwas Süsses."], ["🌙", "Die längste Nacht – Zeit für Kerzenlicht."],
+    ["🤗", "Umarme heute jemanden aus der Familie."], ["🎀", "Letzte Geschenke einpacken!"], ["🎉", "Frohe Weihnachten! Schön, dass es euch gibt."]
+  ];
+  // Fixe, gemischte Reihenfolge wie bei einem echten Kalender
+  const KALENDER_REIHE = [7, 15, 1, 22, 10, 4, 18, 12, 24, 3, 20, 9, 14, 6, 17, 2, 11, 23, 5, 19, 13, 8, 21, 16];
+  function seiteKalender() {
+    if (!istAdmin()) return "";
+    return `<section class="bescherung-banner kalender-banner">
+        <div class="baum">🚧</div>
+        <div><h2>Noch in Bearbeitung</h2><p>Nur du als Admin siehst den Kalender. Im Moment lassen sich zur Vorschau alle Türchen öffnen – später jedes erst an seinem Tag.</p></div>
+        <button class="knopf" data-aktion="kalender-zu">Alle schliessen</button>
+      </section>
+      <section class="kalender">${KALENDER_REIHE.map(n => {
+        const [emoji, text] = TUERCHEN[n - 1];
+        const offen = lokal.tuerchen.includes(n);
+        return `<button class="tuer-rahmen ${offen ? "offen" : ""} ${n === 24 ? "gross" : ""}" data-aktion="tuerchen" data-tag="${n}" aria-label="Türchen ${n}">
+          <span class="tuer-innen"><span class="tuer-emoji">${emoji}</span><small>${esc(text)}</small></span>
+          <span class="tuer"><b>${n}</b></span>
+        </button>`;
+      }).join("")}</section>`;
+  }
+
+  // ---------- Als App installieren ----------
+  let installHinweis = null; // vom Browser gemeldet, wenn die Seite installiert werden kann
+  addEventListener("beforeinstallprompt", e => { e.preventDefault(); installHinweis = e; spaeterZeichnen(); });
+  addEventListener("appinstalled", () => { installHinweis = null; schneien(3000); spaeterZeichnen(); });
+  const alsAppOffen = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  function appTeil() {
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    let inhalt;
+    if (alsAppOffen()) inhalt = `<p class="notiz">✓ Die Wunschliste läuft als App auf diesem Gerät.</p>`;
+    else if (installHinweis) inhalt = `<div><button class="knopf blau" data-aktion="app-installieren">📲 Als App installieren</button></div>`;
+    else if (ios) inhalt = `<p class="notiz">iPhone/iPad: In <b>Safari</b> unten auf <b>Teilen ⬆</b> tippen → <b>Zum Home-Bildschirm</b>.</p>`;
+    else inhalt = `<p class="notiz">Android: Im Chrome-Menü <b>⋮</b> → <b>App installieren</b> bzw. <b>Zum Startbildschirm hinzufügen</b>.<br>Computer: In Chrome/Edge rechts in der Adresszeile auf das Installieren-Symbol klicken.</p>`;
+    return `<section class="formular-karte neu"><h2>📱 Als App</h2><p class="notiz">Leg die Wunschliste wie eine App auf deinen Startbildschirm – mit eigenem Symbol und ohne Browserleiste.</p>${inhalt}</section>`;
+  }
+
+  // ---------- Rückblick (archivierte Jahre) ----------
+  function rueckblick() {
+    const jahre = [...new Set([...archivBekommen, ...archivGeschenkt].map(a => a.jahr))].sort((a, b) => b - a);
+    if (!jahre.length) return "";
+    const zeile = (a, text) => `<li><span class="rb-name">${esc(a.name)}</span><span>${text}</span><b>${a.preis != null ? chf.format(a.preis) : ""}</b></li>`;
+    return `<section class="formular-karte neu rueckblick">
+      <h2>📜 Rückblick</h2>
+      ${jahre.map(j => {
+        const bekommen = archivBekommen.filter(a => a.jahr === j);
+        const geschenkt = archivGeschenkt.filter(a => a.jahr === j);
+        return `<details ${j === jahre[0] ? "open" : ""}><summary>🎄 Weihnachten ${j}</summary>
+          ${bekommen.length ? `<h3>🎁 Bekommen</h3><ul>${bekommen.map(a => { const m = mitglied(a.von) || { name: "?", avatar: "" }; return zeile(a, `von ${esc(m.name)} ${esc(m.avatar)}`); }).join("")}</ul>` : ""}
+          ${geschenkt.length ? `<h3>💝 Verschenkt</h3><ul>${geschenkt.map(a => { const m = mitglied(a.besitzer) || { name: "?", avatar: "" }; return zeile(a, `an ${esc(m.name)} ${esc(m.avatar)}`); }).join("")}</ul>` : ""}
+        </details>`;
+      }).join("")}
+    </section>`;
+  }
+
+  // ---------- Admin: Jahr abschliessen ----------
+  const abschlussJahr = () => { const j = new Date(); return j.getMonth() >= 6 ? j.getFullYear() : j.getFullYear() - 1; };
+  function jahrAbschliessenTeil() {
+    const jahr = abschlussJahr();
+    const verschenkt = adminRes.filter(r => adminWuensche.some(w => w.id === r.id)).length;
+    const rest = adminWuensche.filter(w => !adminRes.some(r => r.id === w.id)).length;
+    return `<section class="formular-karte neu">
+      <h2>🎄 Weihnachten ${jahr} abschliessen <span class="admin-marke">Admin</span></h2>
+      <p class="notiz">Nach den Festtagen: Alle verschenkten Wünsche (${verschenkt}) kommen in den Rückblick und verschwinden aus den Listen.
+        Die übrigen Wünsche (${rest}) werden zu Entwürfen – jeder kann sie fürs nächste Jahr wieder freigeben oder löschen.</p>
+      ${istBescherung() || new Date().getMonth() < 6 ? "" : `<p class="notiz" style="color:var(--rot)">⚠ Die Bescherung war noch nicht. Im Rückblick sieht danach jeder, wer ihm was geschenkt hat.</p>`}
+      <div><button class="knopf gefahr" data-aktion="jahr-abschliessen">Jahr ${jahr} abschliessen</button></div>
+    </section>`;
+  }
+  async function jahrAbschliessen() {
+    const jahr = abschlussJahr();
+    const eingabe = prompt(`Weihnachten ${jahr} wirklich abschliessen?\nDas lässt sich nicht rückgängig machen.\n\nZum Bestätigen die Jahreszahl ${jahr} eintippen:`);
+    if (String(eingabe || "").trim() !== String(jahr)) return;
+    // Alle Schreibvorgänge sammeln und in Paketen à 400 abschicken (Firestore-Grenze: 500)
+    const schritte = [];
+    for (const r of adminRes) {
+      const w = adminWuensche.find(x => x.id === r.id);
+      if (w) {
+        schritte.push(b => b.set(doc(db, "archiv", `${jahr}_${w.id}`), {
+          jahr, name: w.name, preis: w.preis ?? null, link: w.link || "", bild: w.bild || "",
+          besitzer: w.besitzer, von: r.von, gekauft: !!r.gekauft
+        }));
+        schritte.push(b => b.delete(doc(db, "wuensche", w.id)));
+      }
+      schritte.push(b => b.delete(doc(db, "reservierungen", r.id)));
+      schritte.push(b => b.delete(doc(db, "vergeben", r.id)));
+    }
+    for (const w of adminWuensche) {
+      if (!adminRes.some(r => r.id === w.id) && w.status !== "entwurf") schritte.push(b => b.update(doc(db, "wuensche", w.id), { status: "entwurf" }));
+    }
+    pause = true;
+    try {
+      for (let i = 0; i < schritte.length; i += 400) {
+        const batch = writeBatch(db);
+        schritte.slice(i, i + 400).forEach(s => s(batch));
+        await schreiben(batch.commit());
+      }
+      lokal.ausgepackt = [];
+      lokalSpeichern();
+      toast(`<h4>🎄 Weihnachten ${jahr} ist abgeschlossen</h4><ul><li>Alles liegt jetzt im Rückblick. Auf ein schönes nächstes Jahr!</li></ul>`);
+      schneien(5000);
+    } finally {
+      pause = false;
+      nachholen = false;
+      zeichnen(false);
+    }
   }
 
   // ---------- Rechte Spalte ----------
@@ -1337,6 +1936,8 @@
     const z = $("zaehlerSchenkung");
     z.hidden = !geschenke.length;
     z.textContent = geschenke.length;
+    alarmPruefen(geschenke);
+    budgetMelden(geschenke);
     $("miniSchenkung").innerHTML = `
       <h3>Mein Geschenk-Paket 🎁</h3>
       <div class="panel-zahl">${chf.format(summe(geschenke))}</div>
@@ -1423,11 +2024,27 @@
     if (d) d.open ? offeneDetails.add(d.dataset.mitglied) : offeneDetails.delete(d.dataset.mitglied);
   }, true);
 
+  // Limite pro Person speichern (beim Verlassen des Feldes oder Enter)
+  $("inhalt").addEventListener("change", async e => {
+    const feld = e.target.closest && e.target.closest("input[data-limite]");
+    if (!feld) return;
+    const neu = { ...limiten };
+    const wert = parseFloat(feld.value);
+    if (feld.value.trim() === "" || isNaN(wert)) delete neu[feld.dataset.limite];
+    else neu[feld.dataset.limite] = Math.max(0, Math.round(wert * 100) / 100);
+    try {
+      await schreiben(setDoc(doc(db, "limiten", uid), { betraege: neu }));
+      if (animiert()) { const r = feld.getBoundingClientRect(); splat(r.left + r.width / 2, r.top + r.height / 2); }
+      feld.blur();
+      zeichnen(false);
+    } catch {}
+  });
+
   $("inhalt").addEventListener("click", async e => {
     const knopf = e.target.closest("[data-aktion]");
     if (!knopf) return;
     const aktion = knopf.dataset.aktion;
-    const kartenEl = knopf.closest(".wunsch-karte");
+    const kartenEl = knopf.closest(".wunsch-karte, .einkauf-zeile");
     const id = kartenEl ? kartenEl.dataset.id : null;
     const w = id ? wunsch(id) : null;
 
@@ -1437,6 +2054,42 @@
         case "bearbeiten": return w && oeffnen(w);
         case "filter": filterMeine = knopf.dataset.wert; return zeichnen();
         case "person": filterPerson = knopf.dataset.wert; return zeichnen();
+        case "ansicht": ansichtSchenkung = knopf.dataset.wert; return zeichnen();
+
+        case "auspacken":
+          knopf.disabled = true;
+          return await auspacken(kartenEl, id);
+
+        case "alle-auspacken": {
+          knopf.disabled = true;
+          const ids = eigene.filter(x => bescherungRes.some(r => r.id === x.id) && !lokal.ausgepackt.includes(x.id)).map(x => x.id);
+          for (const x of ids) {
+            const el = document.querySelector(`.wunsch-karte[data-id="${x}"]`);
+            if (el) await insBild(el);
+            await auspacken(el, x);
+          }
+          return;
+        }
+        case "drucken": return window.print();
+        case "jahr-abschliessen": return await jahrAbschliessen();
+
+        case "tuerchen": {
+          const tag = Number(knopf.dataset.tag);
+          const auf = !lokal.tuerchen.includes(tag);
+          lokal.tuerchen = auf ? [...lokal.tuerchen, tag] : lokal.tuerchen.filter(t => t !== tag);
+          lokalSpeichern();
+          knopf.classList.toggle("offen", auf);
+          if (auf && animiert()) { const r = knopf.getBoundingClientRect(); splat(r.left + r.width / 2, r.top + r.height / 2); if (tag === 24) schneien(5000); }
+          return;
+        }
+        case "kalender-zu":
+          lokal.tuerchen = [];
+          lokalSpeichern();
+          document.querySelectorAll(".tuer-rahmen.offen").forEach(t => t.classList.remove("offen"));
+          return;
+        case "app-installieren":
+          if (installHinweis) { installHinweis.prompt(); await installHinweis.userChoice; installHinweis = null; zeichnen(false); }
+          return;
 
         case "freigeben":
           await schneeballAuf(kartenEl);
@@ -1446,16 +2099,33 @@
           return schneien(3500);
 
         case "zurueckziehen":
-          await schreiben(updateDoc(doc(db, "wuensche", id), { status: "entwurf" }));
+          try { await updateDoc(doc(db, "wuensche", id), { status: "entwurf" }); }
+          catch (f) { return gesperrtMelden(f, kartenEl); }
           return ploppen(id);
 
-        case "loeschen":
+        case "loeschen": {
           if (!confirm(`„${w.name}“ wirklich löschen?`)) return;
-          kartenEl.classList.add("weg");
-          await warte(400);
-          return await schreiben(deleteDoc(doc(db, "wuensche", id)));
+          // Erst löschen (die Regeln sperren gekaufte Wünsche), dann schmelzen lassen
+          pause = true;
+          knopf.disabled = true;
+          try {
+            try { await deleteDoc(doc(db, "wuensche", id)); }
+            catch (f) { knopf.disabled = false; return gesperrtMelden(f, kartenEl); }
+            await schmelzen(kartenEl);
+          } finally {
+            pause = false;
+            nachholen = false;
+            zeichnen(false);
+          }
+          return;
+        }
 
         case "schenken": {
+          const b = budget(w.besitzer);
+          if (b.limite != null && (w.preis || 0) > Math.max(0, b.rest)) {
+            const m = mitglied(w.besitzer) || { name: "diese Person" };
+            if (!confirm(`„${w.name}“ übersteigt deine Limite für ${m.name} um ${chf.format((w.preis || 0) - Math.max(0, b.rest))}. Trotzdem schenken?`)) return;
+          }
           // Reservierung (geheim, mit "von") + Markierung "vergeben" (ohne Namen) zusammen speichern
           const batch = writeBatch(db);
           batch.set(doc(db, "reservierungen", id), {
@@ -1593,9 +2263,16 @@
             batch.delete(doc(db, "reservierungen", id));
             batch.delete(doc(db, "vergeben", id));
           }
-          kartenEl.classList.add("weg");
-          await warte(400);
-          return await schreiben(batch.commit());
+          pause = true;
+          try {
+            await schreiben(batch.commit());
+            await schmelzen(kartenEl);
+          } finally {
+            pause = false;
+            nachholen = false;
+            zeichnen(false);
+          }
+          return;
         }
       }
     } catch {
@@ -1608,6 +2285,48 @@
     batch.delete(doc(db, "reservierungen", id));
     batch.delete(doc(db, "vergeben", id));
     return schreiben(batch.commit());
+  }
+
+  // Abgelehnt von den Regeln: Wunsch wurde schon gekauft (ohne zu verraten, von wem)
+  function gesperrtMelden(f, kartenEl) {
+    console.error(f);
+    if (f && f.code === "permission-denied") {
+      if (kartenEl) kartenEl.animate([{ transform: "translateX(0)" }, { transform: "translateX(-10px)" }, { transform: "translateX(10px)" }, { transform: "translateX(-6px)" }, { transform: "translateX(0)" }], { duration: 420 });
+      alert("🔒 Dieser Wunsch ist fixiert und kann nicht mehr zurückgezogen oder gelöscht werden. 🎄");
+    } else {
+      alert("Speichern fehlgeschlagen: " + fehlerText(f));
+    }
+  }
+
+  // Karte schmilzt wie Schnee: sackt zusammen, tropft und hinterlässt eine Pfütze
+  async function schmelzen(kartenEl) {
+    if (!kartenEl || !kartenEl.isConnected) return;
+    if (!animiert()) { kartenEl.classList.add("weg"); await warte(400); return; }
+    const r = kartenEl.getBoundingClientRect();
+    const pfuetze = document.createElement("div");
+    pfuetze.className = "pfuetze";
+    pfuetze.style.left = `${r.left - 10}px`;
+    pfuetze.style.width = `${r.width + 20}px`;
+    pfuetze.style.top = `${r.bottom - 6}px`;
+    document.body.appendChild(pfuetze);
+    kartenEl.classList.add("schmilzt");
+
+    // Tropfen fallen vom unteren Rand, während die Karte zusammensackt
+    const tropfen = setInterval(() => {
+      for (let i = 0; i < 3; i++) {
+        flocken.push({ art: "tropfen", x: r.left + Math.random() * r.width, y: r.bottom - 4 - Math.random() * 10, vx: 0, vy: .5 + Math.random(), r: 2 + Math.random() * 3, leben: 1 });
+      }
+      starten();
+    }, 70);
+    pfuetze.animate([
+      { transform: "scaleX(0)", opacity: 0 },
+      { transform: "scaleX(.7)", opacity: 1, offset: .5 },
+      { transform: "scaleX(1)", opacity: 1 }
+    ], { duration: 1600, easing: "ease-out", fill: "forwards" });
+    await warte(1500);
+    clearInterval(tropfen);
+    await pfuetze.animate([{ opacity: 1, transform: "scaleX(1)" }, { opacity: 0, transform: "scaleX(1.25) scaleY(.4)" }], { duration: 900, easing: "ease-in", fill: "forwards" }).finished;
+    pfuetze.remove();
   }
 
   function ploppen(id) {
@@ -1629,6 +2348,8 @@
     $("eingabeLink").value = w ? w.link || "" : "";
     neuesBild = w ? sicheresBild(w.bild) : "";
     bildVorschau();
+    sterneSetzen(w ? w.wichtig || 0 : 0);
+    linkStatus("");
     document.querySelectorAll(".fenster .feld.fehler").forEach(f => f.classList.remove("fehler"));
     $("huelle").classList.add("offen");
     setTimeout(() => $("eingabeName").focus(), 150);
@@ -1674,6 +2395,176 @@
     });
   }
 
+  // ---------- Wichtigkeit ----------
+  const STERNE_TEXT = ["Keine Angabe", "Wäre schön", "Wünsche ich mir sehr", "Mein Herzenswunsch ❤"];
+  let neueWichtigkeit = 0;
+  function sterneSetzen(n) {
+    neueWichtigkeit = n;
+    $("sterneWahl").querySelectorAll("button").forEach(b => b.classList.toggle("an", Number(b.dataset.stern) <= n));
+    $("sterneText").textContent = STERNE_TEXT[n];
+  }
+  $("sterneWahl").addEventListener("click", e => {
+    const b = e.target.closest("button[data-stern]");
+    if (!b) return;
+    const n = Number(b.dataset.stern);
+    sterneSetzen(n === neueWichtigkeit ? 0 : n);
+    $("sterneWahl").querySelectorAll("button.an").forEach((s, i) => {
+      s.classList.remove("hupf");
+      void s.offsetWidth;
+      s.style.animationDelay = `${i * 70}ms`;
+      s.classList.add("hupf");
+    });
+  });
+
+  // ---------- Link einfügen → Name, Bild und Preis vom Shop holen ----------
+  // Shops lassen sich vom Browser aus nicht direkt lesen (CORS), darum über öffentliche Dienste:
+  // microlink.io liest die Produktseite (gratis: 50 Abfragen pro Tag und Internetanschluss),
+  // images.weserv.nl liefert das Bild, allorigins.win ist die Reserve.
+  async function holenText(url) {
+    try {
+      const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(8000) });
+      if (r.ok) return await r.text();
+    } catch {}
+    return null;
+  }
+  async function bildHolen(url) {
+    const wege = [
+      `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=600&h=600&fit=inside&output=jpg`,
+      url
+    ];
+    for (const w of wege) {
+      try {
+        const r = await fetch(w, { signal: AbortSignal.timeout(10000) });
+        if (r.ok) return await verkleinern(await r.blob());
+      } catch {}
+    }
+    return "";
+  }
+  // Produkt in strukturierten Daten (JSON-LD) suchen – auch verschachtelt in @graph
+  function produktSuchen(o) {
+    if (!o || typeof o !== "object") return null;
+    if (Array.isArray(o)) { for (const x of o) { const t = produktSuchen(x); if (t) return t; } return null; }
+    if ([].concat(o["@type"] || []).includes("Product")) return o;
+    return produktSuchen(o["@graph"]);
+  }
+  function ausProdukt(p) {
+    const b = [].concat(p.image || [])[0];
+    const angebot = [].concat(p.offers || [])[0] || {};
+    const unter = [].concat(angebot.offers || [])[0] || {};
+    return {
+      name: p.name || "",
+      bild: typeof b === "string" ? b : (b && (b.url || b.contentUrl)) || "",
+      preis: preisAus(angebot.price ?? angebot.lowPrice ?? unter.price ?? (angebot.priceSpecification || {}).price)
+    };
+  }
+  async function vonMicrolink(link) {
+    const sel = encodeURIComponent;
+    const url = `https://api.microlink.io/?url=${sel(link)}`
+      + `&data.preisMeta.selector=${sel('meta[property="product:price:amount"],meta[property="og:price:amount"],meta[itemprop="price"]')}&data.preisMeta.attr=content`
+      + `&data.preisItem.selector=${sel('[itemprop="price"]')}`
+      + `&data.ld.selectorAll=${sel('script[type="application/ld+json"]')}`;
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      const j = await r.json();
+      if (j.status !== "success" || !j.data) return null;
+      const d = j.data;
+      let ld = [].concat(d.ld || []).map(x => { if (typeof x !== "string") return x; try { return JSON.parse(x); } catch { return null; } });
+      const p = produktSuchen(ld);
+      const aus = p ? ausProdukt(p) : { name: "", bild: "", preis: null };
+      return {
+        name: aus.name || d.title || "",
+        bild: (d.image && d.image.url) || aus.bild || "",
+        preis: preisAus(d.preisMeta) ?? preisAus(d.preisItem) ?? aus.preis
+      };
+    } catch { return null; }
+  }
+  function preisAus(wert) {
+    if (wert == null) return null;
+    let t = String(wert).replace(/[^\d.,']/g, "").replace(/'/g, "");
+    if (t.includes(",") && t.includes(".")) t = t.lastIndexOf(",") > t.lastIndexOf(".") ? t.replace(/\./g, "").replace(",", ".") : t.replace(/,/g, "");
+    else if (t.includes(",")) t = /,\d{1,2}$/.test(t) ? t.replace(",", ".") : t.replace(/,/g, "");
+    const n = parseFloat(t);
+    return isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : null;
+  }
+  function produktAus(html, basis) {
+    const d = new DOMParser().parseFromString(html, "text/html");
+    const meta = (...namen) => {
+      for (const n of namen) {
+        const el = d.querySelector(`meta[property="${n}"], meta[name="${n}"], meta[itemprop="${n}"]`);
+        if (el && el.getAttribute("content")) return el.getAttribute("content").trim();
+      }
+      return "";
+    };
+    let name = meta("og:title", "twitter:title");
+    let bild = meta("og:image:secure_url", "og:image", "twitter:image");
+    let preis = preisAus(meta("product:price:amount", "og:price:amount", "price"));
+    // Strukturierte Produktdaten (JSON-LD), die viele Shops mitliefern
+    for (const s of d.querySelectorAll('script[type="application/ld+json"]')) {
+      try {
+        const p = produktSuchen(JSON.parse(s.textContent));
+        if (!p) continue;
+        const aus = ausProdukt(p);
+        name = name || aus.name;
+        bild = bild || aus.bild;
+        preis = preis ?? aus.preis;
+        break;
+      } catch {}
+    }
+    if (preis == null) {
+      const el = d.querySelector('[itemprop="price"]');
+      if (el) preis = preisAus(el.getAttribute("content") || el.textContent);
+    }
+    name = (name || d.title || "").replace(/\s+/g, " ").trim();
+    try { bild = bild ? new URL(bild, basis).href : ""; } catch { bild = ""; }
+    return { name, bild, preis };
+  }
+  function linkStatus(text, art = "") {
+    const s = $("linkStatus");
+    s.textContent = text;
+    s.className = `link-status ${art}`;
+  }
+  async function linkHolen() {
+    const link = $("eingabeLink").value.trim();
+    if (!sichererLink(link)) { wackeln("feldLink"); linkStatus("Bitte zuerst einen Link einfügen (https://…)", "fehler"); return; }
+    const knopf = $("linkHolen");
+    if (knopf.disabled) return;
+    knopf.disabled = true;
+    knopf.classList.add("laedt");
+    linkStatus("Schaue im Shop nach …");
+    try {
+      // Manche Shops zeigen statt des Produkts eine Roboter-Sperre – die ignorieren
+      const sperre = /robot|captcha|access denied|just a moment|attention required|zugriff verweigert|blocked|forbidden|security check/i;
+      const nichts = { name: "", bild: "", preis: null };
+      let info = await vonMicrolink(link) || nichts;
+      if (sperre.test(info.name)) info = { ...nichts };
+      // Reserve: Seite selbst lesen, falls noch etwas fehlt
+      if (!info.name || !info.bild || info.preis == null) {
+        const html = await holenText(link);
+        const roh = html ? produktAus(html, link) : nichts;
+        if (!sperre.test(roh.name)) info = { name: info.name || roh.name, bild: info.bild || roh.bild, preis: info.preis ?? roh.preis };
+      }
+      const gefunden = [];
+      if (info.name && !$("eingabeName").value.trim()) { $("eingabeName").value = info.name.slice(0, 80); gefunden.push("Name"); }
+      if (info.preis != null && $("eingabePreis").value === "") { $("eingabePreis").value = info.preis; gefunden.push("Preis"); }
+      if (info.bild && !neuesBild) {
+        const b = await bildHolen(info.bild);
+        if (b) { neuesBild = b; bildVorschau(); gefunden.push("Bild"); }
+      }
+      if (gefunden.length) {
+        linkStatus(`✓ ${gefunden.join(", ")} übernommen${info.preis == null ? " – Preis bitte selbst eintragen" : ""}`, "ok");
+        if (animiert()) { const r = knopf.getBoundingClientRect(); splat(r.left + r.width / 2, r.top + r.height / 2); }
+      } else {
+        linkStatus("Dieser Shop gibt leider nichts heraus – bitte selbst ausfüllen.", "fehler");
+      }
+    } finally {
+      knopf.disabled = false;
+      knopf.classList.remove("laedt");
+    }
+  }
+  $("linkHolen").addEventListener("click", linkHolen);
+  // Beim Einfügen eines Links gleich automatisch nachschauen
+  $("eingabeLink").addEventListener("paste", () => setTimeout(() => { if (sichererLink($("eingabeLink").value.trim())) linkHolen(); }, 60));
+
   function wackeln(id) {
     const f = $(id);
     f.classList.remove("fehler");
@@ -1691,7 +2582,7 @@
     if (link && !sichererLink(link)) { wackeln("feldLink"); ok = false; }
     if (!ok) return null;
 
-    const felder = { name, link, bild: neuesBild, status, preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
+    const felder = { name, link, bild: neuesBild, status, wichtig: neueWichtigkeit, preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
     const alt = bearbeiteId && eigene.find(w => w.id === bearbeiteId);
     if (status === "freigegeben" && !(alt && alt.status === "freigegeben")) felder.freigegebenAm = Date.now();
 
@@ -1905,6 +2796,19 @@
         f.x += Math.sin(f.phase) * 0.8;
         f.y += f.vy;
         if (t > schneeBis) f.leben -= 0.01;
+      } else if (f.art === "tropfen") {
+        f.vy += 0.28;
+        f.y += f.vy;
+        f.leben -= 0.03;
+        // Tropfen: länglich, eisblau
+        ctx.globalAlpha = Math.max(0, f.leben);
+        ctx.beginPath();
+        ctx.ellipse(f.x, f.y, f.r * .7, f.r * (1.2 + Math.min(f.vy, 8) * .15), 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#c1e8ff";
+        ctx.shadowColor = "rgba(5,38,89,.35)";
+        ctx.shadowBlur = 3;
+        ctx.fill();
+        return f.leben > 0 && f.y < innerHeight + 20;
       } else {
         f.vy += 0.35;
         f.vx *= 0.97;
