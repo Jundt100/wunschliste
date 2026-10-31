@@ -219,6 +219,7 @@
     box-shadow: var(--aussen-klein);
   }
   .avatar.gross { width: 72px; height: 72px; font-size: 38px; }
+  .schnee-mobil { display: none; }
 
   #inhalt { display: flex; flex-direction: column; gap: 24px; }
 
@@ -353,11 +354,25 @@
   /* fliegendes Paket */
   .paket-flug {
     position: fixed; left: 0; top: 0;
-    z-index: 61;
-    font-size: 96px; line-height: 1;
+    z-index: 62;
+    width: 96px; height: 96px;
+    font-size: 96px; line-height: 1; text-align: center;
     pointer-events: none;
     filter: drop-shadow(0 12px 18px rgba(2, 16, 36, .35));
   }
+  /* das Geschenk-Bild, das ins Paket fliegt */
+  .flug-bild {
+    position: fixed; left: 0; top: 0;
+    z-index: 61;
+    border-radius: 16px;
+    overflow: hidden;
+    display: grid; place-items: center;
+    font-size: 34px;
+    background: var(--zart);
+    box-shadow: 0 10px 22px rgba(2, 16, 36, .3);
+    pointer-events: none;
+  }
+  .flug-bild img { width: 100%; height: 100%; object-fit: cover; }
 
   .leer { padding: 40px 20px; text-align: center; color: var(--leise); box-shadow: var(--innen); }
   .leer .emoji { font-size: 50px; animation: wippen 2.4s ease-in-out infinite; }
@@ -592,6 +607,7 @@
     .suche input { width: 100%; }
     .profil span { display: none; }
     .profil { padding: 5px; }
+    .schnee-mobil { display: inline-flex; flex: none; width: 50px; height: 50px; font-size: 22px; }
 
     .rechts { grid-column: 1; order: -1; display: block; }
     .rechts .panel, .tacho h3, .tacho svg, .tacho-mitte { display: none; }
@@ -711,6 +727,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           <input id="suche" type="search" placeholder="Wunsch suchen …">
         </label>
+        <button class="knopf rund schnee-mobil" id="schneeMobil" title="Schnee" aria-label="Schnee">❄</button>
         <a class="profil" id="profil" href="#einstellungen" title="Profil"></a>
       </div>
     </header>
@@ -892,7 +909,11 @@
   const listeAus = schnappschuss => schnappschuss.docs.map(d => ({ id: d.id, ...d.data() }));
   const nachDatum = liste => liste.sort((a, b) => (b.erstellt || 0) - (a.erstellt || 0));
 
+  // Während einer Animation nicht neu zeichnen, sonst verschwindet die Karte mittendrin
+  let pause = false;
+  let nachholen = false;
   function spaeterZeichnen() {
+    if (pause) { nachholen = true; return; }
     if (zeichnenGeplant) return;
     zeichnenGeplant = true;
     requestAnimationFrame(() => { zeichnenGeplant = false; zeichnen(false); });
@@ -1442,13 +1463,21 @@
             name: w.name, preis: w.preis ?? null, erstellt: Date.now()
           });
           batch.set(doc(db, "vergeben", id), { besitzer: w.besitzer });
-          try { await batch.commit(); }
-          catch (f) {
-            alert(f.code === "permission-denied" ? "Zu spät – dieses Geschenk hat schon jemand anderes genommen." : fehlerText(f));
-            return zeichnen(false);
+          pause = true;
+          knopf.disabled = true;
+          try {
+            try { await batch.commit(); }
+            catch (f) {
+              alert(f.code === "permission-denied" ? "Zu spät – dieses Geschenk hat schon jemand anderes genommen." : fehlerText(f));
+              return;
+            }
+            await paketFliegen(kartenEl, knopf);
+          } finally {
+            pause = false;
+            nachholen = false;
+            zeichnen(false);
           }
-          await paketFliegen(kartenEl);
-          return zeichnen(false);
+          return;
         }
 
         case "zurueckgeben": {
@@ -1731,44 +1760,92 @@
   // ============================================================
   //  Grosses Paket: Wunsch springt in die Schenkung
   // ============================================================
-  async function paketFliegen(kartenEl) {
+  function navPop(ziel) {
+    ziel.classList.remove("pop");
+    void ziel.offsetWidth;
+    ziel.classList.add("pop");
+  }
+
+  async function paketFliegen(kartenEl, knopf) {
     const ziel = document.querySelector('.nav-punkt[data-seite="schenkung"]');
-    if (!animiert() || !kartenEl || !kartenEl.isConnected) { ziel.classList.add("pop"); return; }
-    const von = mitte(kartenEl);
-    const nach = mitte(ziel);
-    kartenEl.classList.add("einpacken");
+    if (!animiert() || !kartenEl || !kartenEl.isConnected) { navPop(ziel); return; }
+    await insBild(kartenEl);
+    const dauer = ms => wenigBewegung ? 1 : ms;
+
+    const start = mitte(knopf);
+    const karte = kartenEl.getBoundingClientRect();
+    // Hier wartet das grosse Paket: über der Mitte der Karte
+    const sack = { x: karte.left + karte.width / 2, y: Math.max(70, karte.top - 30) };
 
     const paket = document.createElement("div");
     paket.className = "paket-flug";
     paket.textContent = "🎁";
     document.body.appendChild(paket);
     const halb = 48;
-    const pos = (x, y, s, r) => `translate(${x - halb}px, ${y - halb}px) scale(${s}) rotate(${r}deg)`;
+    const pos = (x, y, sx, sy = sx, r = 0) => `translate(${x - halb}px, ${y - halb}px) scale(${sx}, ${sy}) rotate(${r}deg)`;
 
-    // 1. Paket federt aus der Karte heraus und wackelt
+    // 1. Das Paket springt aus dem Knopf heraus und federt nach
+    knopf.animate([{ transform: "scale(1)" }, { transform: "scale(.75)" }, { transform: "scale(1.15)" }, { transform: "scale(1)" }],
+      { duration: dauer(450), easing: "ease-out" });
+    const sprung = [];
+    for (let i = 0; i <= 16; i++) {
+      const p = i / 16;
+      const x = start.x + (sack.x - start.x) * p;
+      const y = start.y + (sack.y - start.y) * p - Math.sin(Math.PI * p) * 110;
+      sprung.push({ transform: pos(x, y, .15 + 1.1 * p, .15 + 1.1 * p, (1 - p) * -40), offset: p * .65 });
+    }
+    sprung.push(
+      { transform: pos(sack.x, sack.y, .9, 1.1), offset: .78 },
+      { transform: pos(sack.x, sack.y, 1.06, .95), offset: .9 },
+      { transform: pos(sack.x, sack.y, 1), offset: 1 }
+    );
+    await paket.animate(sprung, { duration: dauer(800), easing: "linear", fill: "forwards" }).finished;
+
+    // 2. Das Geschenk fliegt aus der Karte ins Paket
+    const bildEl = kartenEl.querySelector(".wk-bild");
+    const b = bildEl.getBoundingClientRect();
+    const flug = document.createElement("div");
+    flug.className = "flug-bild";
+    flug.innerHTML = bildEl.innerHTML;
+    flug.style.width = `${b.width}px`;
+    flug.style.height = `${b.height}px`;
+    document.body.appendChild(flug);
+    kartenEl.classList.add("einpacken");
+    const dx = sack.x - (b.left + b.width / 2);
+    const dy = sack.y - (b.top + b.height / 2);
+    const rein = [];
+    for (let i = 0; i <= 16; i++) {
+      const p = i / 16;
+      const x = b.left + dx * p;
+      const y = b.top + dy * p - Math.sin(Math.PI * p) * 90;
+      rein.push({ transform: `translate(${x}px, ${y}px) scale(${1 - .85 * p}) rotate(${p * -30}deg)`, opacity: p > .85 ? (1 - p) / .15 : 1 });
+    }
+    await flug.animate(rein, { duration: dauer(650), easing: "ease-in", fill: "forwards" }).finished;
+    flug.remove();
+
+    // Das Paket "schluckt" das Geschenk
+    splat(sack.x, sack.y - 20);
     await paket.animate([
-      { transform: pos(von.x, von.y, 0, -30) },
-      { transform: pos(von.x, von.y - 20, 1.35, 12), offset: .45 },
-      { transform: pos(von.x, von.y - 10, .95, -8), offset: .7 },
-      { transform: pos(von.x, von.y - 14, 1.05, 4), offset: .85 },
-      { transform: pos(von.x, von.y - 12, 1, 0) }
-    ], { duration: wenigBewegung ? 1 : 750, easing: "ease-out", fill: "forwards" }).finished;
-    splat(von.x, von.y - 12);
+      { transform: pos(sack.x, sack.y, 1) },
+      { transform: pos(sack.x, sack.y + 8, 1.3, .72) },
+      { transform: pos(sack.x, sack.y - 12, .85, 1.2) },
+      { transform: pos(sack.x, sack.y, 1.07, .94) },
+      { transform: pos(sack.x, sack.y, 1) }
+    ], { duration: dauer(550), easing: "ease-out", fill: "forwards" }).finished;
 
-    // 2. Paket fliegt im Bogen zur Schenkung
-    const schritte = [];
+    // 3. Das Paket fliegt im Bogen zur Schenkung
+    const nach = mitte(ziel);
+    const flugBahn = [];
     for (let i = 0; i <= 24; i++) {
       const p = i / 24;
-      const x = von.x + (nach.x - von.x) * p;
-      const y = von.y - 12 + (nach.y - von.y + 12) * p - Math.sin(Math.PI * p) * 160;
-      schritte.push({ transform: pos(x, y, 1 - .75 * p, p * 360) });
+      const x = sack.x + (nach.x - sack.x) * p;
+      const y = sack.y + (nach.y - sack.y) * p - Math.sin(Math.PI * p) * 160;
+      flugBahn.push({ transform: pos(x, y, 1 - .75 * p, 1 - .75 * p, p * 360) });
     }
-    await paket.animate(schritte, { duration: wenigBewegung ? 1 : 800, easing: "ease-in", fill: "forwards" }).finished;
+    await paket.animate(flugBahn, { duration: dauer(800), easing: "ease-in", fill: "forwards" }).finished;
     paket.remove();
 
-    ziel.classList.remove("pop");
-    void ziel.offsetWidth;
-    ziel.classList.add("pop");
+    navPop(ziel);
     splat(nach.x, nach.y);
     schneien(3000);
   }
@@ -1870,13 +1947,17 @@
     });
   }
 
-  $("schneeKnopf").addEventListener("click", e => {
+  // Schnee-Knopf (Seitenleiste am Computer, oben neben dem Profil auf dem Handy) – schneit immer
+  function schneeLos(e) {
+    const r = e.currentTarget.getBoundingClientRect();
     const vorher = lokal.animationen;
     lokal.animationen = true;
-    splat(e.clientX, e.clientY);
+    splat(r.left + r.width / 2, r.top + r.height / 2);
     schneien(5000);
     lokal.animationen = vorher;
-  });
+  }
+  $("schneeKnopf").addEventListener("click", schneeLos);
+  $("schneeMobil").addEventListener("click", schneeLos);
 
   // ============================================================
   //  Seitenleiste einklappen, Suche, Navigation
