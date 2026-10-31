@@ -445,7 +445,149 @@
   .tuer-rahmen.offen .tuer { transform: rotateY(-105deg); box-shadow: none; }
   .tuer-rahmen.offen .tuer-emoji { transform: none; opacity: 1; }
   .tuer-rahmen.offen .tuer-innen small { opacity: 1; }
+  .tuer-rahmen .tuer-innen .kranz { font-size: 6px; opacity: 0; transition: opacity .4s .3s; }
+  .tuer-rahmen.gross .tuer-innen .kranz { font-size: 10px; }
+  .tuer-rahmen.offen .tuer-innen .kranz { opacity: 1; }
+  /* heute dran: goldenes Leuchten */
+  .tuer-rahmen.heute .tuer { animation: tuerLeuchten 1.8s ease-in-out infinite; }
+  @keyframes tuerLeuchten {
+    50% { box-shadow: 0 0 0 3px #f3c969, 0 0 26px 6px rgba(243, 201, 105, .75); }
+  }
+  /* noch nicht dran: etwas blasser, wackelt beim Antippen */
+  .tuer-rahmen.zu-frueh .tuer { filter: saturate(.55) brightness(1.08); }
+  .tuer-rahmen.zu-frueh:hover .tuer { transform: rotateY(-4deg); }
+  .tuer-rahmen.wackeln { animation: wackeln .5s ease; }
+  @keyframes wackeln { 20%, 60% { transform: translateX(-6px) rotate(-2deg); } 40%, 80% { transform: translateX(6px) rotate(2deg); } }
+  .tuer-rahmen.landet { animation: ploppen .7s var(--feder); }
+  .kalender-kopf { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .kalender-kopf .kranz { font-size: 9px; }
+  .vorschau-zeile { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; margin-left: auto; }
+  .vorschau-zeile select { border: 0; padding: 8px 10px; border-radius: 12px; font: inherit; color: var(--text); background: var(--flaeche); }
   @media (max-width: 760px) { .kalender { grid-template-columns: repeat(4, 1fr); gap: 10px; } .tuer-emoji { font-size: 26px; } .tuer-innen small { display: none; } .tuer-rahmen.gross .tuer-innen small { display: block; } }
+
+  /* Adventskranz – alles in em, damit er klein (im Türchen) und gross (Vollbild) passt */
+  .kranz { position: relative; display: inline-flex; align-items: flex-end; justify-content: center; gap: 1.1em; width: 10em; height: 6.2em; padding-bottom: .9em; }
+  .kranz-gruen {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 1.9em; border-radius: 50%;
+    background:
+      radial-gradient(circle at 14% 40%, #d23b3b .32em, transparent .36em),
+      radial-gradient(circle at 38% 72%, #d23b3b .3em, transparent .34em),
+      radial-gradient(circle at 63% 30%, #d23b3b .32em, transparent .36em),
+      radial-gradient(circle at 87% 62%, #d23b3b .3em, transparent .34em),
+      radial-gradient(ellipse at 50% 30%, #4f9a6b, #1f5a3a 70%);
+    box-shadow: inset 0 -.25em .4em rgba(0, 0, 0, .3), 0 .2em .5em rgba(2, 16, 36, .35);
+  }
+  .kerze { position: relative; z-index: 1; width: 1.05em; height: 3.3em; border-radius: .25em .25em .1em .1em;
+    background: linear-gradient(90deg, #a92f3a, #e05864 45%, #9c2733); box-shadow: inset 0 .3em .2em rgba(255, 255, 255, .25); }
+  .kerze::before { content: ""; position: absolute; left: 50%; top: -.45em; width: .12em; height: .5em; background: #3a2a1a; transform: translateX(-50%); }
+  .flamme {
+    position: absolute; left: 50%; bottom: calc(100% + .3em); width: .8em; height: 1.35em; margin-left: -.4em;
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: radial-gradient(ellipse at 50% 72%, #fff 0 18%, #ffe27a 34%, #ff9d2e 70%, rgba(255, 120, 30, 0) 72%);
+    box-shadow: 0 0 .8em .35em rgba(255, 196, 80, .55), 0 0 2.4em 1em rgba(255, 170, 60, .25);
+    transform-origin: 50% 90%; transform: scale(0); opacity: 0;
+    transition: transform .9s var(--feder), opacity .3s;
+  }
+  .kerze.an .flamme { transform: scale(1); opacity: 1; animation: flackern 1.6s ease-in-out infinite .9s; }
+  @keyframes flackern {
+    25% { transform: scale(.94, 1.06) rotate(-3deg); } 50% { transform: scale(1.04, .95) rotate(2deg); }
+    75% { transform: scale(.97, 1.04) rotate(-1deg); }
+  }
+
+  /* Startseite: heutiges Türchen wartet */
+  .tuerchen-knopf {
+    display: flex; align-items: center; gap: 16px; width: 100%; padding: 14px 20px; border: 0; cursor: pointer;
+    border-radius: var(--radius); font: inherit; text-align: left; color: #fff;
+    background: linear-gradient(120deg, #021024, #052659 55%, #5483b3);
+    box-shadow: 6px 6px 16px rgba(5, 38, 89, .35), -6px -6px 14px var(--schatten-hell);
+    transition: transform .7s var(--feder);
+  }
+  .tuerchen-knopf:hover { transform: translateY(-3px) scale(1.01); }
+  .tuerchen-knopf:active { transform: scale(.97); }
+  .tk-tuer {
+    flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 14px;
+    background: linear-gradient(145deg, #7da0ca, #052659); border: 2px solid #f3c969;
+    animation: tuerLeuchten 1.8s ease-in-out infinite, wippen 2.6s ease-in-out infinite;
+  }
+  .tk-tuer b { font-size: 24px; }
+  .tuerchen-knopf strong { display: block; font-size: 16px; }
+  .tuerchen-knopf small { font-size: 13px; opacity: .85; }
+  .tk-pfeil { margin-left: auto; font-size: 22px; animation: stupsen 1.2s ease-in-out infinite; }
+  @keyframes stupsen { 50% { transform: translateX(6px); } }
+
+  /* Vollbild-Türchen */
+  .tuer-buehne {
+    position: fixed; inset: 0; z-index: 55; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 20px;
+    background: radial-gradient(ellipse at 50% 40%, rgba(5, 38, 89, .92), rgba(2, 16, 36, .97) 70%);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    color: #fff; text-align: center;
+  }
+  .tuer-buehne.nacht { background: radial-gradient(ellipse at 50% 30%, #0b1d3d, #010812 75%); }
+  .tuer-buehne .sterne-himmel { position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 28% 72%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 44% 12%, #fff, transparent), radial-gradient(1px 1px at 63% 64%, #fff, transparent),
+      radial-gradient(2px 2px at 78% 22%, #fff, transparent), radial-gradient(1px 1px at 88% 82%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 6% 88%, #fff, transparent), radial-gradient(1px 1px at 52% 90%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 94% 48%, #fff, transparent), radial-gradient(1px 1px at 35% 40%, #fff, transparent);
+    animation: funkeln 3s ease-in-out infinite alternate; }
+  @keyframes funkeln { from { opacity: .35; } to { opacity: 1; } }
+  .strahlen {
+    position: absolute; left: 50%; top: 42%; width: 190vmax; height: 190vmax; margin: -95vmax 0 0 -95vmax; pointer-events: none;
+    background: repeating-conic-gradient(rgba(255, 226, 150, .22) 0 6deg, transparent 6deg 18deg);
+    -webkit-mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .6) 22%, transparent 55%);
+    mask: radial-gradient(circle, #000 0, rgba(0, 0, 0, .6) 22%, transparent 55%);
+    opacity: 0; animation: drehen 40s linear infinite;
+  }
+  @keyframes drehen { to { transform: rotate(360deg); } }
+  .gross-tuer {
+    --g: min(74vw, 52vh, 420px);
+    position: relative; flex: none; width: var(--g); height: var(--g); perspective: 1400px; cursor: pointer;
+    border-radius: 26px; background: radial-gradient(circle at 50% 45%, #fff6dc, #f3c969 45%, #b9832a);
+    box-shadow: inset 0 0 40px rgba(120, 70, 0, .45), 0 30px 60px rgba(0, 0, 0, .45);
+  }
+  .gross-tuer.offen { cursor: default; }
+  .gt-innen { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text); }
+  .gt-emoji { font-size: calc(var(--g) * .42); line-height: 1; filter: drop-shadow(0 10px 18px rgba(120, 70, 0, .45)); }
+  .gross-tuer .kranz { font-size: calc(var(--g) / 15); }
+  .fluegel {
+    position: absolute; top: 0; bottom: 0; width: 50%;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .22) 0 3px, transparent 4px) 0 0 / 46px 46px,
+      radial-gradient(circle at 70% 70%, rgba(193, 232, 255, .2) 0 2px, transparent 3px) 0 0 / 34px 34px,
+      linear-gradient(160deg, #7da0ca, #052659 75%);
+    border: 3px solid #f3c969; box-shadow: inset 0 0 30px rgba(2, 16, 36, .5);
+    z-index: 2; transition: box-shadow .4s;
+  }
+  .fluegel.fl-links { left: 0; border-radius: 26px 4px 4px 26px; transform-origin: 0 50%; }
+  .fluegel.fl-rechts { right: 0; border-radius: 4px 26px 26px 4px; transform-origin: 100% 50%; }
+  .fluegel::after { content: ""; position: absolute; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; background: #f3c969; box-shadow: 0 2px 4px rgba(0, 0, 0, .4); }
+  .fluegel.fl-links::after { right: 18px; }
+  .fluegel.fl-rechts::after { left: 18px; }
+  /* Licht schimmert durch den Spalt */
+  .gross-tuer.leuchtet .fluegel.fl-links { box-shadow: inset 0 0 30px rgba(2, 16, 36, .5), 14px 0 40px rgba(255, 220, 130, .95); }
+  .gross-tuer.leuchtet .fluegel.fl-rechts { box-shadow: inset 0 0 30px rgba(2, 16, 36, .5), -14px 0 40px rgba(255, 220, 130, .95); }
+  .siegel {
+    position: absolute; left: 50%; top: 50%; width: calc(var(--g) * .34); height: calc(var(--g) * .34);
+    margin: calc(var(--g) * -.17) 0 0 calc(var(--g) * -.17); border-radius: 50%; display: grid; place-items: center; z-index: 3;
+    background: radial-gradient(circle at 35% 30%, #ffe9a8, #e0a526 55%, #9a6a12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .45), inset 0 0 0 5px rgba(255, 255, 255, .35), inset 0 0 0 10px rgba(154, 106, 18, .35);
+  }
+  .siegel b { font-size: calc(var(--g) * .16); font-weight: 700; color: #5a3a00; text-shadow: 0 1px 0 rgba(255, 255, 255, .5); }
+  .gt-text { position: relative; max-width: 520px; opacity: 0; transform: translateY(20px); }
+  .gt-text h2 { margin: 0 0 6px; font-size: clamp(22px, 5vw, 34px); color: #f3c969; text-shadow: 0 0 18px rgba(243, 201, 105, .6); }
+  .gt-text p { margin: 0 0 16px; font-size: 16px; opacity: .92; }
+  .gt-tipp { position: relative; font-size: 15px; opacity: .85; animation: funkeln 1.1s ease-in-out infinite alternate; }
+  .blitz { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 42%, #fff, rgba(255, 240, 200, .6) 30%, transparent 65%); opacity: 0; }
+  .spezial-ebene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .spezial-ebene .figur { position: absolute; left: 0; top: 0; line-height: 1; will-change: transform; }
+  .sprechblase {
+    position: absolute; padding: 10px 16px; border-radius: 18px; background: #fff; color: var(--text);
+    font-size: 17px; font-weight: 600; white-space: nowrap; box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+  }
+  .sprechblase::after { content: ""; position: absolute; left: 30px; bottom: -10px; border: 10px solid transparent; border-bottom: 0; border-top-color: #fff; }
+  .festtext span { display: inline-block; }
 
   /* Rückblick */
   .rueckblick details { border-radius: 18px; box-shadow: var(--aussen-klein); padding: 12px 16px; }
@@ -1134,7 +1276,7 @@
 
   // Einstellungen nur für dieses Gerät
   const LOKAL = "wunschliste-lokal";
-  const LOKAL_START = { animationen: true, seiteZu: false, ausgepackt: [], tuerchen: [] };
+  const LOKAL_START = { animationen: true, seiteZu: false, ausgepackt: [], tuerchen: [], kalenderVorschau: 0 };
   const lokal = (() => { try { return { ...LOKAL_START, ...JSON.parse(localStorage.getItem(LOKAL)) }; } catch { return { ...LOKAL_START }; } })();
   const lokalSpeichern = () => { try { localStorage.setItem(LOKAL, JSON.stringify(lokal)); } catch {} };
   const animiert = () => lokal.animationen;
@@ -1364,8 +1506,8 @@
   let ansichtSchenkung = "pakete"; // "pakete" oder "liste" (Einkaufsliste)
   const offeneDetails = new Set();
 
-  // Der Adventskalender ist noch in Bearbeitung: nur der Admin sieht ihn
-  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] && (h !== "kalender" || istAdmin()) ? h : "alle"; };
+  // Der Adventskalender ist noch in Bearbeitung: nur der Admin sieht ihn (siehe KALENDER_FUER_ALLE)
+  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] && (h !== "kalender" || kalenderSichtbar()) ? h : "alle"; };
 
   function zeichnen(mitAnimation = true) {
     if ($("app").hidden) return;
@@ -1374,7 +1516,8 @@
     $("untertitel").textContent = SEITEN[seite][1];
     document.title = `${SEITEN[seite][0]} · Wunschliste`;
     document.querySelectorAll(".nav-punkt").forEach(a => a.classList.toggle("aktiv", a.dataset.seite === seite));
-    document.querySelector('.nav-punkt[data-seite="kalender"]').hidden = !istAdmin();
+    document.querySelector('.nav-punkt[data-seite="kalender"]').hidden = !kalenderSichtbar();
+    $("untertitel").textContent = seite === "kalender" && KALENDER_FUER_ALLE ? "Jeden Tag ein Türchen bis Weihnachten" : SEITEN[seite][1];
     $("sucheBox").style.display = seite === "alle" || seite === "meine" ? "" : "none";
     const m = ich();
     $("profil").innerHTML = `<div class="avatar">${esc(m.avatar)}</div><span>${esc(m.name)}</span>`;
@@ -1440,7 +1583,7 @@
   function seiteAlle() {
     const andere = mitglieder.filter(m => m.id !== uid);
     if (!andere.length) {
-      return leer("👥", "Noch keine anderen Mitglieder", "Sobald sich die Familie anmeldet, erscheinen hier ihre Wünsche.");
+      return tuerchenKnopf() + leer("👥", "Noch keine anderen Mitglieder", "Sobald sich die Familie anmeldet, erscheinen hier ihre Wünsche.");
     }
     if (!andere.some(m => m.id === filterPerson)) filterPerson = "alle";
 
@@ -1482,7 +1625,7 @@
       }).join("");
 
     const legende = `<p class="notiz sterne-legende">Wichtigkeit: <span class="gelb">★★★</span> = Priorität 1 (Herzenswunsch) · <span class="gelb">★★</span> = Priorität 2 · <span class="gelb">★</span> = Priorität 3 – Herzenswünsche stehen zuoberst.<br>🤝 Mit „Ich schenke das“ kannst du den ganzen Betrag oder nur einen Teil übernehmen.</p>`;
-    return budgetLeiste() + chips + legende + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
+    return tuerchenKnopf() + budgetLeiste() + chips + legende + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
   }
 
   // ---------- Meine Wünsche ----------
@@ -2058,31 +2201,416 @@
   // ---------- Adventskalender (in Bearbeitung, nur Admin) ----------
   const TUERCHEN = [
     ["⛄", "Heute ist ein guter Tag für heissen Punsch."], ["🍪", "Back heute eine Runde Guetzli!"], ["🎶", "Leg dein liebstes Weihnachtslied auf."],
-    ["🕯️", "Zünd eine Kerze an und mach es dir gemütlich."], ["❄", "Schau mal aus dem Fenster – vielleicht schneit es?"], ["🎅", "Samichlaus-Tag! Stell die Stiefel raus."],
+    ["🕯️", "Zünd eine Kerze an und mach es dir gemütlich."], ["❄", "Schau mal aus dem Fenster – vielleicht schneit es?"], ["🎅", "Der Samichlaus war da – schau in deine Stiefel!"],
     ["📮", "Schreib jemandem eine liebe Karte."], ["🧦", "Zeit für die dicksten Socken."], ["🌟", "Du bist ein Stern – einfach so."],
     ["🎄", "Hast du den Baum schon ausgesucht?"], ["☕", "Heisse Schokolade mit extra Schaum!"], ["🦌", "Wie hiessen nochmal alle Rentiere?"],
     ["🎁", "Schon an alle Geschenke gedacht?"], ["🧣", "Ein Spaziergang in der Kälte tut gut."], ["📖", "Lies heute eine Weihnachtsgeschichte."],
     ["🍊", "Mandarinen und Nüsse – ganz klassisch."], ["✨", "Noch eine Woche – die Vorfreude steigt!"], ["🎨", "Bastle einen Stern fürs Fenster."],
     ["🔔", "Hörst du schon die Glöckchen?"], ["🧁", "Gönn dir heute etwas Süsses."], ["🌙", "Die längste Nacht – Zeit für Kerzenlicht."],
-    ["🤗", "Umarme heute jemanden aus der Familie."], ["🎀", "Letzte Geschenke einpacken!"], ["🎉", "Frohe Weihnachten! Schön, dass es euch gibt."]
+    ["🤗", "Umarme heute jemanden aus der Familie."], ["🎀", "Letzte Geschenke einpacken!"], ["🎉", "Schön, dass es euch gibt – wunderschöne Festtage!"]
   ];
   // Fixe, gemischte Reihenfolge wie bei einem echten Kalender
   const KALENDER_REIHE = [7, 15, 1, 22, 10, 4, 18, 12, 24, 3, 20, 9, 14, 6, 17, 2, 11, 23, 5, 19, 13, 8, 21, 16];
+  const KALENDER_FUER_ALLE = false; // noch in Bearbeitung: auf true setzen, dann sehen ihn alle
+  const kalenderSichtbar = () => KALENDER_FUER_ALLE || istAdmin();
+  const kalenderJahr = () => new Date().getFullYear();
+  // Admin-Vorschau: einen Tag im Dezember simulieren (nur auf diesem Gerät, geöffnete Türchen bleiben lokal)
+  const vorschau = () => istAdmin() && lokal.kalenderVorschau > 0;
+  // Welches Türchen ist heute dran? 0 = noch nicht Dezember, 25 = nach Weihnachten
+  function kalenderTag() {
+    if (vorschau()) return lokal.kalenderVorschau;
+    const j = new Date();
+    return j.getMonth() === 11 ? Math.min(25, j.getDate()) : 0;
+  }
+  // Geöffnete Türchen: im eigenen Mitglieder-Dokument, damit sie auf Handy und Computer gleich sind
+  function offeneTuerchen() {
+    if (vorschau()) return lokal.tuerchen;
+    const t = ich().tuerchen;
+    return (t && t[kalenderJahr()]) || [];
+  }
+  async function tuerchenMerken(n) {
+    const neu = [...new Set([...offeneTuerchen(), n])].sort((a, b) => a - b);
+    if (vorschau()) { lokal.tuerchen = neu; lokalSpeichern(); return; }
+    const me = mitglieder.find(m => m.id === uid);
+    if (me) me.tuerchen = { ...(me.tuerchen || {}), [kalenderJahr()]: neu };
+    await updateDoc(doc(db, "mitglieder", uid), { [`tuerchen.${kalenderJahr()}`]: neu }).catch(f => console.error(f));
+  }
+
+  // Adventssonntage: der 4. Advent ist der letzte Sonntag vor dem 25. Dezember
+  function adventSonntage(jahr = kalenderJahr()) {
+    const vierter = 24 - new Date(jahr, 11, 24).getDay();
+    return [3, 2, 1, 0].map(k => new Date(jahr, 11, vierter - k * 7)); // ein Tag ≤ 0 landet im November
+  }
+  // Hinter welchem Türchen wird die k-te Kerze angezündet? (1. Advent im November → Türchen 1)
+  const kerzenTuere = () => adventSonntage().map(d => d.getMonth() === 11 ? d.getDate() : 1);
+  const neueKerze = n => kerzenTuere().indexOf(n) + 1;             // 0 = an diesem Tag keine neue Kerze
+  const kerzenAm = n => kerzenTuere().filter(t => t <= n).length;  // so viele brennen an Tag n
+  function kerzenHeute() {
+    const n = kalenderTag();
+    if (n) return kerzenAm(Math.min(24, n));
+    const erster = adventSonntage()[0];
+    return new Date() >= erster && erster.getMonth() === 10 ? 1 : 0;
+  }
+  const KERZE_TEXT = ["die erste", "die zweite", "die dritte", "die vierte"];
+  function kranz(an, neu = 0) {
+    return `<span class="kranz" aria-label="${an} ${an === 1 ? "Kerze brennt" : "Kerzen brennen"}">${[1, 2, 3, 4].map(k =>
+      `<span class="kerze ${k <= an && k !== neu ? "an" : ""}" data-kerze="${k}"><i class="flamme"></i></span>`).join("")}<span class="kranz-gruen"></span></span>`;
+  }
+  // Was steckt hinter Türchen n?
+  function tuerInhalt(n) {
+    const [emoji, text] = TUERCHEN[n - 1];
+    const k = neueKerze(n);
+    const titel = n === 24 ? "Frohe Weihnachten!" : n === 6 ? "Samichlaus-Tag!" : k ? `${k}. Advent` : `Türchen ${n}`;
+    const kerzeText = k ? `${k}. Advent – ${KERZE_TEXT[k - 1]} Kerze brennt. 🕯️` : "";
+    return { emoji, titel, kerze: k, text: n === 6 && k ? `${text} ${kerzeText}` : k ? kerzeText : text, spezial: n === 6 ? "chlaus" : n === 24 ? "weihnacht" : "" };
+  }
+
   function seiteKalender() {
-    if (!istAdmin()) return "";
-    return `<section class="bescherung-banner kalender-banner">
-        <div class="baum">🚧</div>
-        <div><h2>Noch in Bearbeitung</h2><p>Nur du als Admin siehst den Kalender. Im Moment lassen sich zur Vorschau alle Türchen öffnen – später jedes erst an seinem Tag.</p></div>
-        <button class="knopf" data-aktion="kalender-zu">Alle schliessen</button>
+    if (!kalenderSichtbar()) return "";
+    const heute = kalenderTag();
+    const offen = offeneTuerchen();
+    const kopfText = heute === 0 ? "Ab dem 1. Dezember öffnet sich jeden Tag ein Türchen – immer erst an seinem Tag."
+      : heute > 24 ? "Alle Türchen sind offen – frohe Festtage! 🎄"
+      : offen.includes(heute) ? `Türchen ${heute} ist offen. Morgen wartet das nächste!`
+      : `Heute ist Türchen ${heute} dran – es leuchtet!`;
+    const vorschauTeil = istAdmin() ? `<div class="vorschau-zeile">
+        <label>🔧 Vorschau-Tag
+          <select data-aktion="vorschau-tag">
+            <option value="0" ${!vorschau() ? "selected" : ""}>Echt (heute)</option>
+            ${Array.from({ length: 25 }, (_, i) => i + 1).map(t => `<option value="${t}" ${lokal.kalenderVorschau === t ? "selected" : ""}>${t === 25 ? "nach Weihnachten" : `${t}. Dezember`}</option>`).join("")}
+          </select></label>
+        ${vorschau() ? `<button class="knopf klein" data-aktion="kalender-zu">Vorschau-Türchen schliessen</button>` : ""}
+      </div>` : "";
+    return `<section class="bescherung-banner kalender-banner kalender-kopf">
+        ${kranz(kerzenHeute())}
+        <div><h2>${KALENDER_FUER_ALLE ? "Adventskalender" : "🚧 Noch in Bearbeitung"}</h2><p>${kopfText}</p></div>
+        ${vorschauTeil}
       </section>
       <section class="kalender">${KALENDER_REIHE.map(n => {
-        const [emoji, text] = TUERCHEN[n - 1];
-        const offen = lokal.tuerchen.includes(n);
-        return `<button class="tuer-rahmen ${offen ? "offen" : ""} ${n === 24 ? "gross" : ""}" data-aktion="tuerchen" data-tag="${n}" aria-label="Türchen ${n}">
-          <span class="tuer-innen"><span class="tuer-emoji">${emoji}</span><small>${esc(text)}</small></span>
+        const { emoji, text, kerze } = tuerInhalt(n);
+        const auf = offen.includes(n);
+        const zustand = auf ? "offen" : n > heute ? "zu-frueh" : n === heute ? "heute" : "";
+        return `<button class="tuer-rahmen ${zustand} ${n === 24 ? "gross" : ""}" data-aktion="tuerchen" data-tag="${n}" aria-label="Türchen ${n}${n > heute ? " (noch zu)" : ""}">
+          <span class="tuer-innen">${kerze ? kranz(kerzenAm(n)) : `<span class="tuer-emoji">${emoji}</span>`}<small>${esc(text)}</small></span>
           <span class="tuer"><b>${n}</b></span>
         </button>`;
       }).join("")}</section>`;
+  }
+
+  // Startseite: Knopf, solange das heutige Türchen noch zu ist
+  function tuerchenKnopf() {
+    if (!kalenderSichtbar()) return "";
+    const n = kalenderTag();
+    if (n < 1 || n > 24 || offeneTuerchen().includes(n)) return "";
+    const zusatz = n === 24 ? "Heute ist Heiligabend – das grösste Türchen! 🎄" : n === 6 ? "Der Samichlaus war da … 🎅"
+      : neueKerze(n) ? `${neueKerze(n)}. Advent – eine neue Kerze wartet. 🕯️` : "Tippe hier, um es zu öffnen.";
+    return `<button class="tuerchen-knopf neu" data-aktion="tuerchen-heute" data-tag="${n}">
+      <span class="tk-tuer"><b>${n}</b></span>
+      <span><strong>Dein Türchen ${n} wartet!</strong><small>${zusatz}</small></span>
+      <span class="tk-pfeil">→</span>
+    </button>`;
+  }
+
+  // ---------- Das Türchen im Vollbild ----------
+  let buehneOffen = false;
+  async function tuerBuehne(n, vonEl) {
+    if (buehneOffen) return;
+    buehneOffen = true;
+    pause = true;
+    const schonOffen = offeneTuerchen().includes(n);
+    const info = tuerInhalt(n);
+    const anim = animiert() && !wenigBewegung;
+    const b = document.createElement("div");
+    b.className = "tuer-buehne";
+    b.setAttribute("role", "dialog");
+    b.setAttribute("aria-label", `Türchen ${n}`);
+    b.innerHTML = `<div class="sterne-himmel"></div><div class="strahlen"></div><div class="blitz"></div><div class="spezial-ebene"></div>
+      <div class="gross-tuer ${schonOffen ? "offen" : ""}" tabindex="0" aria-label="Türchen ${n} öffnen">
+        <div class="gt-innen">${info.kerze ? kranz(kerzenAm(n), schonOffen ? 0 : info.kerze) : `<span class="gt-emoji">${info.emoji}</span>`}</div>
+        ${schonOffen ? "" : `<div class="fluegel fl-links"></div><div class="fluegel fl-rechts"></div><div class="siegel"><b>${n}</b></div>`}
+      </div>
+      <div class="gt-text"><h2 class="festtext">${esc(info.titel)}</h2><p>${esc(info.text)}</p><button class="knopf" data-zu>Zum Kalender</button></div>
+      ${schonOffen ? "" : `<div class="gt-tipp">✨ Tippe aufs Türchen, um es zu öffnen</div>`}`;
+    document.body.appendChild(b);
+    const tuer = b.querySelector(".gross-tuer");
+    const textEl = b.querySelector(".gt-text");
+    const strahlen = b.querySelector(".strahlen");
+
+    // 1. Das Türchen fliegt von seinem Platz in die Mitte und wird gross
+    if (anim) {
+      b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, easing: "ease-out" });
+      const ziel = tuer.getBoundingClientRect();
+      const von = vonEl && vonEl.isConnected ? vonEl.getBoundingClientRect() : null;
+      const start = von
+        ? `translate(${von.left + von.width / 2 - (ziel.left + ziel.width / 2)}px, ${von.top + von.height / 2 - (ziel.top + ziel.height / 2)}px) scale(${von.width / ziel.width})`
+        : "translateY(60vh) scale(.2)";
+      await tuer.animate([
+        { transform: `${start} rotate(0deg)` },
+        { transform: "translate(0, -30px) scale(1.08) rotate(-4deg)", offset: .6 },
+        { transform: "translate(0, 6px) scale(.97) rotate(2deg)", offset: .8 },
+        { transform: "none" }
+      ], { duration: 1000, easing: "cubic-bezier(.3, .7, .3, 1)" }).finished;
+    }
+
+    if (schonOffen) {
+      strahlen.style.opacity = ".6";
+      textEl.style.cssText = "opacity: 1; transform: none";
+    } else {
+      // 2. Warten, bis man draufdrückt
+      await new Promise(fertig => {
+        const los = () => { tuer.removeEventListener("click", los); tuer.removeEventListener("keydown", taste); fertig(); };
+        const taste = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); los(); } };
+        tuer.addEventListener("click", los);
+        tuer.addEventListener("keydown", taste);
+        tuer.focus({ preventScroll: true });
+      });
+      tuerchenMerken(n);
+      await tuerOeffnen(b, info, anim);
+    }
+
+    // 3. Zurück zum Kalender: das Türchen wird wieder klein und landet an seinem Platz
+    await new Promise(fertig => {
+      const zu = () => { document.removeEventListener("keydown", taste); fertig(); };
+      const taste = e => { if (e.key === "Escape") zu(); };
+      b.querySelector("[data-zu]").addEventListener("click", zu, { once: true });
+      document.addEventListener("keydown", taste);
+    });
+    pause = false;
+    nachholen = false;
+    if (location.hash !== "#kalender") { history.pushState(null, "", "#kalender"); }
+    zeichnen(false);
+    const platz = document.querySelector(`.tuer-rahmen[data-tag="${n}"]`);
+    if (platz) platz.scrollIntoView({ block: "center" });
+    if (anim && platz) {
+      b.querySelector(".spezial-ebene").innerHTML = "";
+      textEl.animate([{ opacity: 1 }, { opacity: 0, transform: "translateY(20px)" }], { duration: 250, fill: "forwards" });
+      strahlen.animate([{ opacity: getComputedStyle(strahlen).opacity }, { opacity: 0 }], { duration: 300, fill: "forwards" });
+      const von = tuer.getBoundingClientRect();
+      const nach = platz.getBoundingClientRect();
+      const ende = `translate(${nach.left + nach.width / 2 - (von.left + von.width / 2)}px, ${nach.top + nach.height / 2 - (von.top + von.height / 2)}px) scale(${nach.width / von.width})`;
+      b.animate([{ opacity: 1 }, { opacity: 1, offset: .55 }, { opacity: 0 }], { duration: 750, fill: "forwards" });
+      const klein = tuer.animate([
+        { transform: "none" },
+        { transform: "translateY(-24px) scale(1.05) rotate(3deg)", offset: .25 },
+        { transform: `${ende} rotate(0deg)` }
+      ], { duration: 750, easing: "cubic-bezier(.5, 0, .3, 1)", fill: "forwards" });
+      await Promise.race([klein.finished, warte(1200)]); // falls der Browser Animationen anhält: trotzdem schliessen
+      platz.classList.add("landet");
+      splat(nach.left + nach.width / 2, nach.top + nach.height / 2);
+    }
+    b.remove();
+    buehneOffen = false;
+  }
+
+  // Die grosse Öffnen-Show: rütteln, Licht im Spalt, Siegel springt, Flügel auf, Lichtblitz, Funkenregen
+  async function tuerOeffnen(b, info, anim) {
+    const tuer = b.querySelector(".gross-tuer");
+    const siegel = b.querySelector(".siegel");
+    const fluegel = [...b.querySelectorAll(".fluegel")];
+    const textEl = b.querySelector(".gt-text");
+    const tipp = b.querySelector(".gt-tipp");
+    const strahlen = b.querySelector(".strahlen");
+    tuer.classList.add("offen");
+    if (!anim) {
+      [siegel, ...fluegel, tipp].forEach(el => el && el.remove());
+      textEl.style.cssText = "opacity: 1; transform: none";
+      strahlen.style.opacity = ".6";
+      b.querySelectorAll(".kerze").forEach(k => { if (Number(k.dataset.kerze) <= info.kerze) k.classList.add("an"); });
+      return;
+    }
+    const m = mitte(tuer);
+    const GOLD = ["#fff6dc", "#f3c969", "#e0a526", "#ffffff"];
+    const BUNT = ["#f3c969", "#c94a4a", "#c1e8ff", "#7da0ca", "#4f9a6b", "#ffffff"];
+    tipp.animate([{ opacity: .85 }, { opacity: 0 }], { duration: 250, fill: "forwards" });
+
+    // Rütteln – immer stärker, Licht dringt durch den Spalt
+    tuer.classList.add("leuchtet");
+    await tuer.animate([
+      { transform: "none" }, { transform: "rotate(-1.5deg) translateX(-5px)" }, { transform: "rotate(1.5deg) translateX(5px)" },
+      { transform: "rotate(-2.5deg) translateX(-8px) scale(1.02)" }, { transform: "rotate(2.5deg) translateX(8px) scale(1.03)" },
+      { transform: "rotate(-3.5deg) translateX(-10px) scale(1.04)" }, { transform: "rotate(3deg) translateX(9px) scale(1.05)" },
+      { transform: "scale(.94)" }
+    ], { duration: 900, easing: "ease-in" }).finished;
+
+    // Siegel springt weg
+    siegel.animate([
+      { transform: "none", opacity: 1 }, { transform: "scale(1.35) rotate(-20deg)", opacity: 1, offset: .35 },
+      { transform: "translateY(-30vh) scale(.2) rotate(260deg)", opacity: 0 }
+    ], { duration: 650, easing: "cubic-bezier(.4, 0, .6, 1)", fill: "forwards" });
+    funken(m.x, m.y, 70, GOLD, 10);
+
+    // Flügel schwingen auf, Lichtblitz, Strahlen, Funkenregen
+    tuer.animate([{ transform: "scale(.94)" }, { transform: "scale(1.06)", offset: .3 }, { transform: "none" }], { duration: 900, easing: "ease-out" });
+    const auf = [
+      fluegel[0].animate([{ transform: "rotateY(0)" }, { transform: "rotateY(-128deg)", offset: .55 }, { transform: "rotateY(-104deg)", offset: .8 }, { transform: "rotateY(-112deg)" }],
+        { duration: 1300, easing: "cubic-bezier(.2, .8, .3, 1)", fill: "forwards" }),
+      fluegel[1].animate([{ transform: "rotateY(0)" }, { transform: "rotateY(128deg)", offset: .55 }, { transform: "rotateY(104deg)", offset: .8 }, { transform: "rotateY(112deg)" }],
+        { duration: 1300, easing: "cubic-bezier(.2, .8, .3, 1)", fill: "forwards" })
+    ];
+    b.querySelector(".blitz").animate([{ opacity: 0 }, { opacity: .95, offset: .2 }, { opacity: 0 }], { duration: 900, easing: "ease-out" });
+    strahlen.animate([{ opacity: 0, transform: "scale(.4)" }, { opacity: .8, transform: "scale(1)" }], { duration: 1200, easing: "ease-out", fill: "forwards" });
+    funken(m.x, m.y, 160, BUNT, 14);
+    setTimeout(() => funken(m.x, m.y - 40, 90, GOLD, 9), 250);
+    schneien(5000);
+    if (navigator.vibrate) navigator.vibrate([30, 40, 60]);
+
+    // Der Inhalt springt heraus
+    const inhalt = b.querySelector(".gt-emoji, .kranz");
+    inhalt.animate([
+      { transform: "scale(.1) rotate(-40deg)", opacity: 0 }, { transform: "scale(1.35) rotate(10deg)", opacity: 1, offset: .55 },
+      { transform: "scale(.92) rotate(-4deg)", offset: .78 }, { transform: "none" }
+    ], { duration: 1100, easing: "ease-out", delay: 150, fill: "backwards" });
+    await Promise.all(auf.map(a => a.finished));
+    tuer.classList.remove("leuchtet");
+
+    // Adventskerze anzünden
+    if (info.kerze) {
+      await warte(200);
+      const k = b.querySelector(`.kerze[data-kerze="${info.kerze}"]`);
+      const flamme = k.querySelector(".flamme").getBoundingClientRect();
+      funken(flamme.left + flamme.width / 2, flamme.top + flamme.height, 40, ["#fff6dc", "#ffe27a", "#ff9d2e"], 5);
+      k.classList.add("an");
+      await warte(500);
+    }
+
+    // Text erscheint – bei Samichlaus und Weihnachten Buchstabe für Buchstabe
+    if (info.spezial) {
+      const h = textEl.querySelector("h2");
+      h.innerHTML = [...h.textContent].map((z, i) => `<span style="animation: ploppen .7s var(--feder) both ${i * 45}ms">${z === " " ? "&nbsp;" : esc(z)}</span>`).join("");
+    }
+    textEl.animate([{ opacity: 0, transform: "translateY(20px)" }, { opacity: 1, transform: "none" }], { duration: 600, easing: "cubic-bezier(.34, 1.56, .5, 1)", fill: "forwards" });
+
+    // Spezial-Shows laufen weiter, während man schon "Zum Kalender" drücken kann
+    if (info.spezial === "chlaus") samichlausShow(b);
+    if (info.spezial === "weihnacht") weihnachtsShow(b);
+  }
+
+  // Ein Emoji als Figur auf der Bühne
+  function figur(ebene, zeichen, groesse) {
+    const f = document.createElement("div");
+    f.className = "figur";
+    f.textContent = zeichen;
+    f.style.fontSize = `${groesse}px`;
+    ebene.appendChild(f);
+    return f;
+  }
+
+  // 6. Dezember: Samichlaus kommt mit dem Esel, verteilt Mandarinen, Nüsse und Schoggi
+  async function samichlausShow(b) {
+    const ebene = b.querySelector(".spezial-ebene");
+    const W = innerWidth, H = innerHeight;
+    const gr = Math.min(120, W / 5);
+    const boden = H - gr - 10;
+    const chlaus = figur(ebene, "🎅", gr);
+    const esel = figur(ebene, "🐴", gr * .8);
+    const glocke = figur(ebene, "🔔", gr * .4);
+    // Hereinlaufen (mit Wippen)
+    const laufen = (el, von, nach, y, dauer, versatz = 0) => {
+      const schritte = [];
+      for (let i = 0; i <= 20; i++) {
+        const p = i / 20;
+        schritte.push({ transform: `translate(${von + (nach - von) * p}px, ${y - Math.abs(Math.sin(p * Math.PI * 6)) * 14}px) rotate(${Math.sin(p * Math.PI * 6) * 5}deg)` });
+      }
+      return el.animate(schritte, { duration: dauer, delay: versatz, easing: "linear", fill: "forwards" }).finished;
+    };
+    const mitteX = W / 2 - gr / 2;
+    laufen(esel, -gr * 2.4, mitteX - gr * 1.1, boden + gr * .2, 2200);
+    glocke.animate([{ transform: `translate(${mitteX + gr * .9}px, ${boden - gr * .1}px) rotate(-25deg)` }, { transform: `translate(${mitteX + gr * .9}px, ${boden - gr * .1}px) rotate(25deg)` }],
+      { duration: 280, iterations: 30, direction: "alternate", easing: "ease-in-out", delay: 1800, fill: "both" });
+    glocke.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 1800, fill: "both" });
+    await laufen(chlaus, -gr * 1.2, mitteX, boden, 2200);
+    // Sprechblase
+    const blase = document.createElement("div");
+    blase.className = "sprechblase";
+    blase.textContent = "Hoi zäme! Händ er brav gsi? 🎅";
+    ebene.appendChild(blase);
+    blase.style.left = `${Math.max(10, Math.min(W - blase.offsetWidth - 10, mitteX))}px`;
+    blase.style.top = `${boden - 70}px`;
+    blase.animate([{ transform: "scale(0)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 600, easing: "cubic-bezier(.34, 1.7, .5, 1)", fill: "both" });
+    // Chlaussack: es regnet Leckereien
+    const LECKER = ["🍊", "🥜", "🍫", "🍪", "🌰", "🍬", "🍊", "🥜"];
+    const fallen = [];
+    for (let i = 0; i < (wenigBewegung ? 8 : 40); i++) {
+      const el = figur(ebene, LECKER[i % LECKER.length], 26 + Math.random() * 22);
+      const x = Math.random() * (W - 40);
+      const unten = H - 40 - Math.random() * 30;
+      const dreh = (Math.random() - .5) * 720;
+      fallen.push(el.animate([
+        { transform: `translate(${x}px, -60px) rotate(0deg)` },
+        { transform: `translate(${x}px, ${unten}px) rotate(${dreh}deg)`, offset: .55, easing: "ease-out" },
+        { transform: `translate(${x + 10}px, ${unten - 50}px) rotate(${dreh * 1.1}deg)`, offset: .68, easing: "ease-in" },
+        { transform: `translate(${x + 18}px, ${unten}px) rotate(${dreh * 1.2}deg)`, offset: .8 },
+        { transform: `translate(${x + 18}px, ${unten}px) rotate(${dreh * 1.2}deg)`, opacity: 1, offset: .92 },
+        { transform: `translate(${x + 18}px, ${unten}px) rotate(${dreh * 1.2}deg)`, opacity: 0 }
+      ], { duration: 3200, delay: i * 90, easing: "cubic-bezier(.5, 0, 1, 1)", fill: "both" }).finished);
+    }
+    funken(W / 2, boden, 60, ["#c94a4a", "#f3c969", "#ffffff"], 8);
+    await Promise.all(fallen);
+    if (!b.isConnected) return;
+    blase.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
+    // und weiter geht's zum nächsten Haus
+    laufen(esel, mitteX - gr * 1.1, W + gr, boden + gr * .2, 2200);
+    glocke.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
+    await laufen(chlaus, mitteX, W + gr * 2.2, boden, 2200);
+  }
+
+  // 24. Dezember: Sternschnuppe, Tannenbäume wachsen, Feuerwerk, Geschenke hüpfen
+  async function weihnachtsShow(b) {
+    const ebene = b.querySelector(".spezial-ebene");
+    const W = innerWidth, H = innerHeight;
+    b.classList.add("nacht");
+    schneien(12000);
+    // Sternschnuppe quer über den Himmel – mit Funkenschweif
+    const stern = figur(ebene, "⭐", 46);
+    const bahn = [];
+    for (let i = 0; i <= 30; i++) {
+      const p = i / 30;
+      bahn.push({ transform: `translate(${W + 40 - (W + 120) * p}px, ${H * .05 + Math.sin(p * Math.PI) * H * .12}px) rotate(${-p * 540}deg) scale(${1 + Math.sin(p * Math.PI) * .5})` });
+    }
+    const sternAnim = stern.animate(bahn, { duration: 2200, easing: "ease-in-out", fill: "forwards" });
+    const schweif = setInterval(() => { if (!b.isConnected) return clearInterval(schweif); const r = stern.getBoundingClientRect(); funken(r.left + r.width / 2, r.top + r.height / 2, 8, ["#fff6dc", "#f3c969"], 2.5); }, 60);
+    // Tannenbäume wachsen links und rechts aus dem Boden
+    const baumGr = Math.min(170, W / 4);
+    [[W * .03, 1], [W * .97 - baumGr, 1.15], [W * .18, .7], [W * .82 - baumGr * .7, .75]].forEach(([x, s], i) => {
+      const baum = figur(ebene, "🎄", baumGr * s);
+      baum.style.transformOrigin = "50% 100%";
+      baum.animate([
+        { transform: `translate(${x}px, ${H - baumGr * s}px) scale(0)` },
+        { transform: `translate(${x}px, ${H - baumGr * s}px) scale(1.15, .9)`, offset: .6 },
+        { transform: `translate(${x}px, ${H - baumGr * s}px) scale(.95, 1.05)`, offset: .8 },
+        { transform: `translate(${x}px, ${H - baumGr * s}px) scale(1)` }
+      ], { duration: 1200, delay: 300 + i * 250, easing: "ease-out", fill: "both" });
+    });
+    await sternAnim.finished;
+    clearInterval(schweif);
+    stern.remove();
+    // Feuerwerk
+    const FARBEN = [["#f3c969", "#fff6dc"], ["#c94a4a", "#ff9d9d"], ["#c1e8ff", "#7da0ca"], ["#4f9a6b", "#b6f2c8"], ["#ffffff", "#f3c969"]];
+    for (let i = 0; i < (wenigBewegung ? 2 : 9); i++) {
+      if (!b.isConnected) return;
+      const x = W * (.15 + Math.random() * .7);
+      const y = H * (.12 + Math.random() * .3);
+      // Rakete steigt auf
+      const r = figur(ebene, "✦", 18);
+      r.style.color = "#fff6dc";
+      await r.animate([{ transform: `translate(${x}px, ${H}px)` }, { transform: `translate(${x}px, ${y}px)` }], { duration: 450, easing: "ease-out" }).finished;
+      r.remove();
+      funken(x, y, 110, FARBEN[i % FARBEN.length], 7);
+      b.querySelector(".blitz").animate([{ opacity: 0 }, { opacity: .25 }, { opacity: 0 }], { duration: 400 });
+      await warte(180);
+    }
+    // Geschenke hüpfen herein
+    const hupfen = [];
+    for (let i = 0; i < 6; i++) {
+      const g = figur(ebene, "🎁", 40 + Math.random() * 20);
+      const x = W * (.1 + i * .15);
+      hupfen.push(g.animate([
+        { transform: `translate(${x}px, ${H + 60}px)` }, { transform: `translate(${x}px, ${H - 170}px) rotate(-12deg)`, offset: .45 },
+        { transform: `translate(${x}px, ${H - 70}px) rotate(8deg)`, offset: .75 }, { transform: `translate(${x}px, ${H - 100}px)`, offset: .87 }, { transform: `translate(${x}px, ${H - 70}px)` }
+      ], { duration: 1300, delay: i * 120, easing: "ease-in-out", fill: "both" }).finished);
+    }
+    await Promise.all(hupfen);
+    if (b.isConnected) funken(W / 2, H * .3, 200, ["#f3c969", "#c94a4a", "#c1e8ff", "#4f9a6b", "#ffffff"], 16);
   }
 
   // ---------- Als App installieren ----------
@@ -2284,6 +2812,13 @@
 
   // Limite pro Person speichern (beim Verlassen des Feldes oder Enter)
   $("inhalt").addEventListener("change", async e => {
+    // Admin: Vorschau-Tag im Adventskalender
+    if (e.target.matches && e.target.matches('select[data-aktion="vorschau-tag"]')) {
+      lokal.kalenderVorschau = Number(e.target.value);
+      lokal.tuerchen = [];
+      lokalSpeichern();
+      return zeichnen(false);
+    }
     const feld = e.target.closest && e.target.closest("input[data-limite]");
     if (!feld) return;
     const neu = { ...limiten };
@@ -2332,19 +2867,22 @@
         case "jahr-abschliessen": return await jahrAbschliessen();
 
         case "tuerchen": {
+          // Jedes Türchen erst an seinem Tag (verpasste dürfen nachgeholt werden)
           const tag = Number(knopf.dataset.tag);
-          const auf = !lokal.tuerchen.includes(tag);
-          lokal.tuerchen = auf ? [...lokal.tuerchen, tag] : lokal.tuerchen.filter(t => t !== tag);
-          lokalSpeichern();
-          knopf.classList.toggle("offen", auf);
-          if (auf && animiert()) { const r = knopf.getBoundingClientRect(); splat(r.left + r.width / 2, r.top + r.height / 2); if (tag === 24) schneien(5000); }
-          return;
+          if (tag > kalenderTag()) {
+            knopf.classList.remove("wackeln");
+            void knopf.offsetWidth;
+            knopf.classList.add("wackeln");
+            return toast(`🔒 Türchen ${tag} lässt sich erst am <b>${tag}. Dezember</b> öffnen.`, 3500);
+          }
+          return await tuerBuehne(tag, knopf.querySelector(".tuer") || knopf);
         }
+        case "tuerchen-heute":
+          return await tuerBuehne(Number(knopf.dataset.tag), knopf.querySelector(".tk-tuer"));
         case "kalender-zu":
           lokal.tuerchen = [];
           lokalSpeichern();
-          document.querySelectorAll(".tuer-rahmen.offen").forEach(t => t.classList.remove("offen"));
-          return;
+          return zeichnen(false);
         case "app-installieren":
           if (installHinweis) { installHinweis.prompt(); await installHinweis.userChoice; installHinweis = null; zeichnen(false); }
           return;
@@ -3078,6 +3616,19 @@
     starten();
   }
 
+  // Funken / Konfetti in Farbe (Adventskalender, Feuerwerk)
+  function funken(x, y, anzahl = 60, farben = ["#f3c969"], tempo = 9) {
+    if (!animiert()) return;
+    const n = wenigBewegung ? Math.ceil(anzahl / 5) : anzahl;
+    for (let i = 0; i < n; i++) {
+      const winkel = Math.random() * Math.PI * 2;
+      const v = (.25 + Math.random() * .75) * tempo;
+      flocken.push({ art: "funke", x, y, vx: Math.cos(winkel) * v, vy: Math.sin(winkel) * v, r: 1.5 + Math.random() * 3,
+        leben: 1, farbe: farben[i % farben.length], eckig: Math.random() < .45, dreh: Math.random() * 6.28 });
+    }
+    starten();
+  }
+
   function starten() {
     if (laeuft) return;
     laeuft = true;
@@ -3109,6 +3660,30 @@
         ctx.shadowColor = "rgba(5,38,89,.35)";
         ctx.shadowBlur = 3;
         ctx.fill();
+        return f.leben > 0 && f.y < innerHeight + 20;
+      } else if (f.art === "funke") {
+        f.vx *= 0.975;
+        f.vy = f.vy * 0.975 + 0.11;
+        f.x += f.vx;
+        f.y += f.vy;
+        f.dreh += 0.2;
+        f.leben -= 0.011;
+        // leuchtend und leicht flackernd; eckige als drehendes Konfetti
+        ctx.globalAlpha = Math.max(0, f.leben) * (.75 + Math.random() * .25);
+        ctx.fillStyle = f.farbe;
+        ctx.shadowColor = f.farbe;
+        ctx.shadowBlur = 10;
+        if (f.eckig) {
+          ctx.save();
+          ctx.translate(f.x, f.y);
+          ctx.rotate(f.dreh);
+          ctx.fillRect(-f.r, -f.r * .5 * Math.abs(Math.cos(f.dreh * 1.7)) - .5, f.r * 2, f.r * Math.abs(Math.cos(f.dreh * 1.7)) + 1);
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r * .8, 0, Math.PI * 2);
+          ctx.fill();
+        }
         return f.leben > 0 && f.y < innerHeight + 20;
       } else {
         f.vy += 0.35;
