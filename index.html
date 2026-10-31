@@ -653,6 +653,7 @@
     <div class="logo-bild">🔒</div>
     <h1>Noch kein Zugang</h1>
     <p>Für <b id="keinZugangMail"></b> gibt es noch keine Einladung. Bitte frag Nicola.</p>
+    <p class="notiz" id="keinZugangGrund"></p>
     <button type="button" class="knopf breit" id="keinZugangAbmelden">Abmelden</button>
   </div>
 </div>
@@ -962,17 +963,34 @@
     // Beim ersten Anmelden: Einladung (E-Mail → Name + Rolle) einlösen
     if (!profil) {
       const mail = (nutzer.email || "").toLowerCase();
+      let grund = "";
+      let einl = null;
       try {
-        const einl = await getDoc(doc(db, "einladungen", mail));
-        if (einl.exists()) {
-          const { name, rolle: r } = einl.data();
-          profil = { name, rolle: r, avatar: startAvatar(name), erstellt: Date.now() };
+        einl = await getDoc(doc(db, "einladungen", mail));
+      } catch (f) {
+        console.error(f);
+        grund = f.code === "permission-denied"
+          ? "Technischer Grund: Firestore verweigert den Zugriff. Sind die Regeln aus firestore.rules eingefügt und veröffentlicht?"
+          : `Technischer Grund: Datenbank nicht erreichbar (${f.code || f.message}). Ist die Firestore-Datenbank erstellt?`;
+      }
+      if (einl && !einl.exists()) {
+        grund = `Technischer Grund: In der Sammlung „einladungen“ gibt es kein Dokument mit der ID „${mail}“.`;
+      }
+      if (einl && einl.exists()) {
+        const { name, rolle: r } = einl.data();
+        profil = { name, rolle: r, avatar: startAvatar(String(name || "")), erstellt: Date.now() };
+        try {
           await setDoc(doc(db, "mitglieder", uid), profil);
           setTimeout(() => schneien(4000), 600);
+        } catch (f) {
+          console.error(f);
+          profil = null;
+          grund = `Technischer Grund: Einladung gefunden (name: „${name}“, rolle: „${r}“), aber der Beitritt wurde verweigert (${f.code}). Beide Felder müssen vom Typ „string“ sein.`;
         }
-      } catch (f) { console.error(f); profil = null; }
+      }
       if (!profil) {
         $("keinZugangMail").textContent = mail ? anzeigeMail(mail) : "dieses Konto";
+        $("keinZugangGrund").textContent = grund;
         zeige("keinZugang");
         return;
       }
