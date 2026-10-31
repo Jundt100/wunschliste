@@ -2211,7 +2211,7 @@
   ];
   // Fixe, gemischte Reihenfolge wie bei einem echten Kalender
   const KALENDER_REIHE = [7, 15, 1, 22, 10, 4, 18, 12, 24, 3, 20, 9, 14, 6, 17, 2, 11, 23, 5, 19, 13, 8, 21, 16];
-  const KALENDER_FUER_ALLE = false; // noch in Bearbeitung: auf true setzen, dann sehen ihn alle
+  const KALENDER_FUER_ALLE = true; // false = nur der Admin sieht den Kalender
   const kalenderSichtbar = () => KALENDER_FUER_ALLE || istAdmin();
   const kalenderJahr = () => new Date().getFullYear();
   // Admin-Vorschau: einen Tag im Dezember simulieren (nur auf diesem Gerät, geöffnete Türchen bleiben lokal)
@@ -2274,12 +2274,12 @@
       : offen.includes(heute) ? `Türchen ${heute} ist offen. Morgen wartet das nächste!`
       : `Heute ist Türchen ${heute} dran – es leuchtet!`;
     const vorschauTeil = istAdmin() ? `<div class="vorschau-zeile">
-        <label>🔧 Vorschau-Tag
+        <label title="Nur du siehst die Vorschau – bei den anderen bleibt alles, wie es ist">🔧 Test-Tag (nur du)
           <select data-aktion="vorschau-tag">
             <option value="0" ${!vorschau() ? "selected" : ""}>Echt (heute)</option>
             ${Array.from({ length: 25 }, (_, i) => i + 1).map(t => `<option value="${t}" ${lokal.kalenderVorschau === t ? "selected" : ""}>${t === 25 ? "nach Weihnachten" : `${t}. Dezember`}</option>`).join("")}
           </select></label>
-        ${vorschau() ? `<button class="knopf klein" data-aktion="kalender-zu">Vorschau-Türchen schliessen</button>` : ""}
+        ${vorschau() ? `<button class="knopf klein" data-aktion="kalender-zu">Test-Türchen schliessen</button>` : ""}
       </div>` : "";
     return `<section class="bescherung-banner kalender-banner kalender-kopf">
         ${kranz(kerzenHeute())}
