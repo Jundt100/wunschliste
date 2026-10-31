@@ -633,7 +633,7 @@
     <div class="logo-bild">🎄</div>
     <h1>Wunschliste</h1>
     <p>Weihnachten 2026 – bitte melde dich an</p>
-    <label class="feld"><span>E-Mail</span><input id="loginMail" type="email" autocomplete="email" placeholder="name@beispiel.ch"></label>
+    <label class="feld"><span>Name</span><input id="loginMail" autocomplete="username" autocapitalize="words" placeholder="z.B. Roland"></label>
     <label class="feld"><span>Passwort</span><input id="loginPass" type="password" autocomplete="current-password"></label>
     <button type="submit" class="knopf blau breit" id="emailLogin">Anmelden</button>
     <button type="button" class="link-knopf" id="passVergessen">Passwort vergessen?</button>
@@ -642,7 +642,7 @@
       <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
       Mit Google anmelden
     </button>
-    <p class="notiz">Dein Zugang wird von Nicola eingerichtet.</p>
+    <p class="notiz">Name und Passwort bekommst du von Nicola.</p>
     <p class="fehler-text" id="loginFehler"></p>
   </form>
 </div>
@@ -782,7 +782,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import {
     getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
-    signInWithEmailAndPassword, sendPasswordResetEmail, signOut
+    signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updatePassword
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
   import {
     getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, onSnapshot, writeBatch
@@ -824,6 +824,13 @@
   const esc = s => String(s ?? "").replace(/[&<>"']/g, z => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[z]));
   const sichererLink = l => /^https?:\/\//i.test(l || "") ? l : "";
   const sicheresBild = b => /^data:image\//.test(b || "") ? b : "";
+  // Anmeldung mit Namen: aus "Roland" wird intern "roland@wunschliste-5c094.firebaseapp.com"
+  const NAMEN_DOMAIN = "wunschliste-5c094.firebaseapp.com";
+  const mailAus = eingabe => {
+    const t = eingabe.trim().toLowerCase();
+    return t.includes("@") ? t : `${t.replace(/\s+/g, ".")}@${NAMEN_DOMAIN}`;
+  };
+  const anzeigeMail = mail => mail.endsWith("@" + NAMEN_DOMAIN) ? `Anmeldename: ${mail.split("@")[0]}` : mail;
   const startAvatar = name => AVATARE[[...name].reduce((s, z) => s + z.charCodeAt(0), 0) % AVATARE.length];
 
   // Einstellungen nur für dieses Gerät
@@ -839,11 +846,13 @@
   function fehlerText(f) {
     const code = f && f.code || "";
     const texte = {
-      "auth/invalid-credential": "E-Mail oder Passwort ist falsch.",
-      "auth/invalid-email": "Diese E-Mail-Adresse ist ungültig.",
-      "auth/user-not-found": "Zu dieser E-Mail gibt es kein Konto.",
+      "auth/invalid-credential": "Name oder Passwort ist falsch.",
+      "auth/invalid-email": "Bitte deinen Namen eingeben.",
+      "auth/user-not-found": "Zu diesem Namen gibt es kein Konto.",
       "auth/wrong-password": "Das Passwort ist falsch.",
       "auth/missing-password": "Bitte ein Passwort eingeben.",
+      "auth/weak-password": "Das Passwort braucht mindestens 6 Zeichen.",
+      "auth/requires-recent-login": "Bitte einmal ab- und wieder anmelden, dann nochmals versuchen.",
       "auth/user-disabled": "Dieses Konto ist gesperrt.",
       "auth/too-many-requests": "Zu viele Versuche. Bitte kurz warten.",
       "auth/network-request-failed": "Keine Internetverbindung.",
@@ -920,7 +929,8 @@
   $("anmeldeForm").addEventListener("submit", async e => {
     e.preventDefault();
     $("loginFehler").textContent = "";
-    try { await signInWithEmailAndPassword(auth, $("loginMail").value.trim(), $("loginPass").value); }
+    if (!$("loginMail").value.trim()) { $("loginFehler").textContent = "Bitte deinen Namen eingeben."; return; }
+    try { await signInWithEmailAndPassword(auth, mailAus($("loginMail").value), $("loginPass").value); }
     catch (f) { $("loginFehler").textContent = fehlerText(f); }
   });
   $("googleLogin").addEventListener("click", async () => {
@@ -930,7 +940,8 @@
   });
   $("passVergessen").addEventListener("click", async () => {
     const mail = $("loginMail").value.trim();
-    if (!mail) { $("loginFehler").textContent = "Bitte zuerst die E-Mail eingeben."; return; }
+    // Konten mit Namen haben kein echtes Postfach – dort setzt Nicola das Passwort zurück
+    if (!mail.includes("@")) { $("loginFehler").textContent = "Frag Nicola – er kann dir ein neues Passwort geben."; return; }
     try { await sendPasswordResetEmail(auth, mail); $("loginFehler").textContent = "📧 E-Mail zum Zurücksetzen wurde gesendet."; }
     catch (f) { $("loginFehler").textContent = fehlerText(f); }
   });
@@ -961,7 +972,7 @@
         }
       } catch (f) { console.error(f); profil = null; }
       if (!profil) {
-        $("keinZugangMail").textContent = mail || "dieses Konto";
+        $("keinZugangMail").textContent = mail ? anzeigeMail(mail) : "dieses Konto";
         zeige("keinZugang");
         return;
       }
@@ -1189,7 +1200,8 @@
     const zeilen = einladungen.map(e => {
       const dabei = mitglieder.some(m => m.name === e.name);
       return `<div class="einladung">
-        <div><b>${esc(e.name)} ${e.rolle === "admin" ? `<span class="admin-marke">Admin</span>` : ""}</b><small>${esc(e.id)}</small></div>
+        <div><b>${esc(e.name)} ${e.rolle === "admin" ? `<span class="admin-marke">Admin</span>` : ""}</b><small>${esc(anzeigeMail(e.id))}</small>${
+          !dabei && e.id.endsWith("@" + NAMEN_DOMAIN) ? `<small style="display:block">In Firebase anlegen als: <b>${esc(e.id)}</b></small>` : ""}</div>
         ${dabei ? `<span class="status-ok">✓ angemeldet</span>` : `<span class="status-offen">wartet</span>`}
         <button class="knopf rund gefahr" data-aktion="einladung-loeschen" data-mail="${esc(e.id)}" title="Einladung löschen" aria-label="Einladung löschen">✕</button>
       </div>`;
@@ -1197,11 +1209,11 @@
 
     return `<section class="formular-karte neu">
       <h2>Zugänge verwalten <span class="admin-marke">Admin</span></h2>
-      <p class="notiz">Lege das Konto zuerst in Firebase an (Authentication → Nutzer hinzufügen), dann hier Name und dieselbe E-Mail eintragen.</p>
+      <p class="notiz">Name antippen und freischalten. Danach in Firebase unter Authentication → Nutzer hinzufügen die angezeigte Adresse mit einem Passwort anlegen. Die Person meldet sich dann einfach mit Name + Passwort an.</p>
       ${vorschlaege.length ? `<div class="chips">${vorschlaege.map(n => `<button class="knopf chip" data-aktion="name-vorschlag" data-wert="${n}">${n}</button>`).join("")}</div>` : ""}
       <div class="formular-zeile">
         <label class="feld" id="feldEinlName"><span>Name</span><input id="einlName" maxlength="40" autocomplete="off"></label>
-        <label class="feld" id="feldEinlMail"><span>E-Mail</span><input id="einlMail" type="email" autocomplete="off"></label>
+        <label class="feld" id="feldEinlMail"><span>Google-Adresse (nur bei Google-Anmeldung)</span><input id="einlMail" type="email" autocomplete="off" placeholder="leer lassen = Name + Passwort"></label>
       </div>
       <div class="formular-zeile" style="align-items:center">
         <div class="chips">
@@ -1267,7 +1279,12 @@
       </section>
       <section class="formular-karte neu">
         <h2>Konto</h2>
-        <p class="notiz">Angemeldet als ${esc(m.name)} (${esc(auth.currentUser?.email || "")})${istAdmin() ? " · Admin" : ""}</p>
+        <p class="notiz">Angemeldet als ${esc(m.name)} (${esc(anzeigeMail(auth.currentUser?.email || ""))})${istAdmin() ? " · Admin" : ""}</p>
+        ${auth.currentUser?.providerData.some(p => p.providerId === "password") ? `
+        <div class="formular-zeile">
+          <label class="feld" id="feldNeuPass"><span>Neues Passwort</span><input id="neuPass" type="password" autocomplete="new-password" placeholder="mind. 6 Zeichen"></label>
+          <button class="knopf" data-aktion="passwort">🔑 Passwort ändern</button>
+        </div>` : ""}
         <div class="wk-aktionen" style="justify-content:flex-start">
           <button class="knopf" data-aktion="export">⬇ Meine Wünsche sichern</button>
           <button class="knopf gefahr" data-aktion="abmelden">Abmelden</button>
@@ -1465,6 +1482,20 @@
           if (confirm("Wirklich abmelden?")) await signOut(auth);
           return;
 
+        case "passwort": {
+          const neu = $("neuPass").value;
+          if (neu.length < 6) return wackeln("feldNeuPass");
+          try {
+            await updatePassword(auth.currentUser, neu);
+            $("neuPass").value = "";
+            knopf.textContent = "✓ Geändert!";
+            if (animiert()) { const r = knopf.getBoundingClientRect(); splat(r.left + r.width / 2, r.top); }
+          } catch (f) {
+            alert(fehlerText(f));
+          }
+          return;
+        }
+
         // ----- Admin -----
         case "name-vorschlag":
           $("einlName").value = knopf.dataset.wert;
@@ -1479,9 +1510,10 @@
 
         case "einladen": {
           const name = $("einlName").value.trim();
-          const mail = $("einlMail").value.trim().toLowerCase();
+          const google = $("einlMail").value.trim();
           if (!name) return wackeln("feldEinlName");
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return wackeln("feldEinlMail");
+          if (google && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(google)) return wackeln("feldEinlMail");
+          const mail = mailAus(google || name);
           await schreiben(setDoc(doc(db, "einladungen", mail), { name, rolle: einladungRolle, erstellt: Date.now() }));
           $("einlName").value = "";
           $("einlMail").value = "";
@@ -1494,7 +1526,7 @@
 
         case "einladung-loeschen": {
           const mail = knopf.dataset.mail;
-          if (!confirm(`Einladung für ${mail} löschen? Wer schon angemeldet ist, bleibt Mitglied.`)) return;
+          if (!confirm(`Zugang für ${anzeigeMail(mail)} löschen? Wer schon angemeldet ist, bleibt Mitglied.`)) return;
           return await schreiben(deleteDoc(doc(db, "einladungen", mail)));
         }
 
