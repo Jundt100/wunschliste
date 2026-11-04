@@ -835,6 +835,8 @@
   .schenk-option small { color: var(--leise); font-size: 12px; }
   .schenk-option .formular-zeile { margin-top: 10px; }
   .schenk-option .feld { min-width: 140px; }
+  .stichtag-leiste { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 18px; border-radius: 20px; font-size: 13px; background: var(--flaeche); box-shadow: var(--aussen-klein); }
+  .stichtag-leiste > span { flex: 1 1 220px; }
   .sterne-legende { line-height: 1.6; }
   .sterne-legende .gelb { color: #e0a526; letter-spacing: 1px; }
   .wk-text .info.mit { color: var(--text); font-weight: 400; line-height: 1.5; }
@@ -1338,6 +1340,13 @@
   let archivGeschenkt = []; // Rückblick: was ich verschenkt habe
   // Bescherung: vom 24. bis 31. Dezember (die Regeln in firestore.rules prüfen dasselbe)
   const istBescherung = () => { const j = new Date(); return j.getMonth() === 11 && j.getDate() >= 24; };
+  // Stichtag 30. November (die Regeln in firestore.rules prüfen dasselbe):
+  // bis dahin erfassen alle ihre Wünsche, ab dann kann geschenkt werden und nur noch der Admin ändert die Liste
+  const stichtagDatum = () => new Date(new Date().getFullYear(), 10, 30);
+  const stichtagErreicht = () => new Date() >= stichtagDatum();
+  const erfassenOffen = () => !stichtagErreicht() || istAdmin();
+  const SCHENKEN_ZU = "🔒 Geschenkt werden kann erst ab dem <b>30. November</b>.";
+  const ERFASSEN_ZU = "🔒 Die Wunschliste ist seit dem 30. November geschlossen. Für Änderungen wende dich an Nicola.";
   let zeichnenGeplant = false;
 
   const istAdmin = () => rolle === "admin";
@@ -1617,7 +1626,8 @@
             const kosten = a ? (offen ?? 0) : (w.preis || 0);
             const zuTeuer = !dabei && b.limite != null && kosten > Math.max(0, b.rest);
             return karte(w, dabei ? `<span class="abzeichen zart">Du bist dabei</span>` : "",
-              `<button class="knopf blau klein" data-aktion="schenken">${knopfText}</button>`,
+              stichtagErreicht() ? `<button class="knopf blau klein" data-aktion="schenken">${knopfText}</button>`
+                : `<button class="knopf klein" disabled title="Geschenkt werden kann erst ab dem 30. November">🔒 Ab 30.11.</button>`,
               zuTeuer ? "ueber-limite" : "",
               zuTeuer ? `⚠ Übersteigt deine Limite um ${chf.format(kosten - Math.max(0, b.rest))}` : "", info);
           }).join("")}</div>
@@ -1625,7 +1635,18 @@
       }).join("");
 
     const legende = `<p class="notiz sterne-legende">Wichtigkeit: <span class="gelb">★★★</span> = Priorität 1 (Herzenswunsch) · <span class="gelb">★★</span> = Priorität 2 · <span class="gelb">★</span> = Priorität 3 – Herzenswünsche stehen zuoberst.<br>🤝 Mit „Ich schenke das“ kannst du den ganzen Betrag oder nur einen Teil übernehmen.</p>`;
-    return tuerchenKnopf() + budgetLeiste() + chips + legende + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
+    return tuerchenKnopf() + stichtagLeiste() + budgetLeiste() + chips + legende + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
+  }
+
+  // Hinweis zum Stichtag – der Admin bekommt hier auch seinen Knopf zum Bearbeiten aller Wünsche
+  function stichtagLeiste() {
+    const tage = Math.ceil((stichtagDatum() - new Date()) / 86400000);
+    const text = !stichtagErreicht()
+      ? `🗓️ Noch ${tage} ${tage === 1 ? "Tag" : "Tage"}: Bis und mit 29. November erfassen alle ihre Wünsche. Ab dem 30. November kann geschenkt werden.`
+      : istAdmin() ? "🔒 Die Wunschliste ist für die anderen geschlossen. Nur du kannst noch Wünsche ändern oder hinzufügen."
+      : seite === "meine" ? ERFASSEN_ZU : "";
+    const knopf = istAdmin() ? `<button class="knopf klein" data-aktion="admin-verwalten">🔧 Alle Wünsche bearbeiten</button>` : "";
+    return text ? `<div class="stichtag-leiste neu"><span>${text}</span>${knopf}</div>` : "";
   }
 
   // ---------- Meine Wünsche ----------
@@ -1637,7 +1658,8 @@
 
     return `
       ${bescherungBanner()}
-      ${plusBalken("Neuen Wunsch hinzufügen", "Name, Preis, Link und Bild – dann freigeben")}
+      ${stichtagLeiste()}
+      ${erfassenOffen() ? plusBalken("Neuen Wunsch hinzufügen", "Name, Preis, Link und Bild – dann freigeben") : ""}
       <section class="zahlen">
         ${ringKarte("Wünsche", Math.min(1, eigene.length / 10), `<span data-zahl="${eigene.length}">0</span>`, "insgesamt erfasst")}
         ${ringKarte("Freigegeben", eigene.length ? frei / eigene.length : 0, `<span data-zahl="${frei}">0</span>`, `${eigene.length ? Math.round(frei / eigene.length * 100) : 0} % sichtbar`)}
@@ -1651,15 +1673,15 @@
         </div>
       </div>
       ${liste.length ? `<div class="karten">${liste.map(karteMeine).join("")}</div>`
-        : leer("🎁", eigene.length ? "Keine passenden Wünsche" : "Noch keine Wünsche", eigene.length ? "" : "Drück auf das grosse Plus!")}`;
+        : leer("🎁", eigene.length ? "Keine passenden Wünsche" : "Noch keine Wünsche", eigene.length || !erfassenOffen() ? "" : "Drück auf das grosse Plus!")}`;
   }
 
   function karteMeine(w) {
-    const bearbeiten = `<button class="knopf klein" data-aktion="bearbeiten">✏️ Bearbeiten</button>`;
+    const bearbeiten = erfassenOffen() ? `<button class="knopf klein" data-aktion="bearbeiten">✏️ Bearbeiten</button>` : "";
     const loeschen = `<button class="knopf rund gefahr" data-aktion="loeschen" title="Löschen" aria-label="Löschen">✕</button>`;
     if (w.status === "entwurf") {
       return karte(w, `<span class="abzeichen hell">Entwurf</span>`,
-        `${bearbeiten}<button class="knopf blau klein" data-aktion="freigeben">❄ Freigeben</button>${loeschen}`, "entwurf");
+        `${bearbeiten}${erfassenOffen() ? `<button class="knopf blau klein" data-aktion="freigeben">❄ Freigeben</button>` : ""}${loeschen}`, "entwurf");
     }
     // Bescherung: ab Heiligabend sehe ich, wer mir was schenkt
     const von = istBescherung() ? schenkerVon(w.id) : [];
@@ -2135,7 +2157,8 @@
           : a ? `🤝 Gemeinsam:<br>${anteileText(mitschenker(a))}${a.gekauft ? "<br>gekauft" : ""}` : "";
         return karte(w,
           w.status === "entwurf" ? `<span class="abzeichen hell">Entwurf</span>` : `<span class="abzeichen">Freigegeben</span>`,
-          `${(r || a) && !versteckt ? `<button class="knopf klein" data-aktion="admin-loesen">Reservierung lösen</button>` : ""}
+          `<button class="knopf klein" data-aktion="admin-bearbeiten">✏️ Bearbeiten</button>
+           ${(r || a) && !versteckt ? `<button class="knopf klein" data-aktion="admin-loesen">Reservierung lösen</button>` : ""}
            <button class="knopf rund gefahr" data-aktion="admin-loeschen" title="Wunsch löschen" aria-label="Wunsch löschen">✕</button>`,
           "", "", info);
       }).join("");
@@ -2149,10 +2172,14 @@
       </details>`;
     }).join("");
 
-    return `<section class="formular-karte neu">
+    return `<section class="formular-karte neu" id="verwaltung">
       <div class="einstellung">
-        <div><strong>Alle Wünsche verwalten <span class="admin-marke">Admin</span></strong><span>Sieh, wer was schenkt. Deine eigenen Überraschungen bleiben verborgen, ausser du schaltest sie ein.</span></div>
+        <div><strong>Alle Wünsche verwalten <span class="admin-marke">Admin</span></strong><span>Sieh, wer was schenkt, und bearbeite jeden Wunsch – auch nach dem Stichtag. Deine eigenen Überraschungen bleiben verborgen, ausser du schaltest sie ein.</span></div>
         <button class="schalter ${spoiler ? "an" : ""}" data-aktion="spoiler" role="switch" aria-checked="${spoiler}" aria-label="Eigene Überraschungen anzeigen"></button>
+      </div>
+      <div>
+        <p class="notiz">➕ Wunsch hinzufügen für:</p>
+        <div class="chips">${mitglieder.map(m => `<button class="knopf chip" data-aktion="admin-neu" data-fuer="${esc(m.id)}">${esc(m.avatar)} ${esc(m.name)}</button>`).join("")}</div>
       </div>
     </section>
     ${bloecke}`;
@@ -2843,8 +2870,20 @@
 
     try {
       switch (aktion) {
-        case "neu": return oeffnen();
-        case "bearbeiten": return w && oeffnen(w);
+        case "neu":
+          if (!erfassenOffen()) return toast(ERFASSEN_ZU);
+          return oeffnen();
+        case "bearbeiten":
+          if (!erfassenOffen()) return toast(ERFASSEN_ZU);
+          return w && oeffnen(w);
+        case "admin-bearbeiten": return w && oeffnen(w);
+        case "admin-neu": return oeffnen(null, knopf.dataset.fuer);
+        case "admin-verwalten":
+          // Zur Verwaltung springen, alle Personen aufgeklappt
+          mitglieder.forEach(m => offeneDetails.add(m.id));
+          if (location.hash !== "#mitglieder") history.pushState(null, "", "#mitglieder");
+          zeichnen(false);
+          return $("verwaltung").scrollIntoView({ behavior: "smooth", block: "start" });
         case "filter": filterMeine = knopf.dataset.wert; return zeichnen();
         case "person": filterPerson = knopf.dataset.wert; return zeichnen();
         case "ansicht": ansichtSchenkung = knopf.dataset.wert; return zeichnen();
@@ -2888,6 +2927,7 @@
           return;
 
         case "freigeben":
+          if (!erfassenOffen()) return toast(ERFASSEN_ZU);
           await schneeballAuf(kartenEl);
           await schreiben(updateDoc(doc(db, "wuensche", id), { status: "freigegeben", freigegebenAm: Date.now() }));
           zeichnen(false);
@@ -2917,6 +2957,7 @@
         }
 
         case "schenken": {
+          if (!stichtagErreicht()) return toast(SCHENKEN_ZU);
           // Erst fragen: ganzer Betrag oder eigener Anteil?
           const a = anteilVon(id);
           const wahl = await schenkDialog(w, a);
@@ -3178,10 +3219,14 @@
   // ============================================================
   let bearbeiteId = null;
   let neuesBild = "";
+  let bearbeiteFuer = null; // wem der Wunsch gehört (der Admin kann auch für andere erfassen)
 
-  function oeffnen(w) {
+  function oeffnen(w, fuer) {
     bearbeiteId = w ? w.id : null;
-    $("fensterTitel").textContent = w ? "Wunsch bearbeiten ✏️" : "Neuer Wunsch 🎁";
+    bearbeiteFuer = w ? w.besitzer : fuer || uid;
+    const fremd = bearbeiteFuer !== uid ? (mitglied(bearbeiteFuer) || { name: "?" }).name : "";
+    $("fensterTitel").textContent = w ? (fremd ? `Wunsch von ${fremd} bearbeiten ✏️` : "Wunsch bearbeiten ✏️")
+      : (fremd ? `Neuer Wunsch für ${fremd} 🎁` : "Neuer Wunsch 🎁");
     $("eingabeName").value = w ? w.name : "";
     $("eingabePreis").value = w && w.preis != null ? w.preis : "";
     $("eingabeLink").value = w ? w.link || "" : "";
@@ -3422,7 +3467,7 @@
     if (!ok) return null;
 
     const felder = { name, link, bild: neuesBild, status, wichtig: neueWichtigkeit, preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
-    const alt = bearbeiteId && eigene.find(w => w.id === bearbeiteId);
+    const alt = bearbeiteId && wunsch(bearbeiteId);
     if (status === "freigegeben" && !(alt && alt.status === "freigegeben")) felder.freigegebenAm = Date.now();
 
     if (alt) {
@@ -3430,11 +3475,13 @@
       return alt.id;
     }
     const ref = doc(collection(db, "wuensche"));
-    schreiben(setDoc(ref, { ...felder, besitzer: uid, erstellt: Date.now() })).catch(() => {});
+    schreiben(setDoc(ref, { ...felder, besitzer: bearbeiteFuer, erstellt: Date.now() })).catch(() => {});
     return ref.id;
   }
 
   function nachMeine() {
+    // Admin bearbeitet für jemand anderen: in der Verwaltung bleiben, Person aufgeklappt
+    if (bearbeiteFuer !== uid) { offeneDetails.add(bearbeiteFuer); return; }
     filterMeine = "alle";
     if (location.hash !== "#meine") history.replaceState(null, "", "#meine");
   }
