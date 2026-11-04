@@ -56,7 +56,7 @@
     min-height: 100vh;
     -webkit-tap-highlight-color: transparent;
   }
-  button, input { font: inherit; color: inherit; }
+  button, input, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; border: 0; background: none; }
   a { color: var(--akzent); }
   img { display: block; }
@@ -237,6 +237,12 @@
   }
   .avatar.gross { width: 72px; height: 72px; font-size: 38px; }
   .schnee-mobil { display: none; }
+  /* Schalter zu den privaten Wünschen */
+  .umschalter { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--text); box-shadow: var(--aussen-klein); flex: none; }
+  .us-spur { width: 36px; height: 20px; padding: 2px; border-radius: 999px; box-shadow: var(--innen); background: var(--flaeche); transition: background .2s; }
+  .us-griff { display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--akzent-hell); transition: transform .5s var(--feder), background .2s; }
+  .umschalter[aria-checked="true"] .us-griff { transform: translateX(16px); background: #fff; }
+  .umschalter[aria-checked="true"] .us-spur { background: var(--akzent); box-shadow: none; }
 
   #inhalt { display: flex; flex-direction: column; gap: 24px; }
 
@@ -923,7 +929,7 @@
   .meldung-liste li span { margin-left: auto; color: var(--leise); font-size: 12px; text-align: right; }
   .feld { display: block; margin-bottom: 16px; }
   .feld > span { display: block; font-size: 12px; font-weight: 500; margin: 0 0 6px 6px; }
-  .feld input {
+  .feld input, .feld textarea {
     width: 100%;
     border: 0; outline: 0;
     padding: 12px 16px;
@@ -932,7 +938,8 @@
     box-shadow: var(--innen);
     transition: box-shadow .2s;
   }
-  .feld input:focus { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
+  .feld textarea { display: block; resize: vertical; min-height: 72px; }
+  .feld input:focus, .feld textarea:focus { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
   .feld.fehler { animation: schuetteln .5s; }
 
   /* Wichtigkeit (Sterne) */
@@ -1044,6 +1051,7 @@
     .profil span { display: none; }
     .profil { padding: 5px; }
     .schnee-mobil { display: inline-flex; flex: none; width: 50px; height: 50px; font-size: 22px; }
+    .umschalter { flex-direction: column; gap: 3px; padding: 6px 10px; font-size: 10px; border-radius: 16px; }
 
     .rechts { grid-column: 1; order: -1; display: block; }
     .rechts .panel, .tacho h3, .tacho svg, .tacho-mitte { display: none; }
@@ -1068,6 +1076,47 @@
     .einladung .knopf { grid-column: 2; grid-row: 1 / span 2; }
     .fenster { padding: 22px 18px; }
   }
+
+  /* ---------- Private Wünsche: schlicht und ohne Weihnachten ---------- */
+  :root[data-modus="privat"] {
+    color-scheme: light;
+    --bg: #f5f6f8;
+    --flaeche: #ffffff;
+    --text: #1f2933;
+    --leise: #6b7280;
+    --akzent: #1f2933;
+    --akzent-hell: #4b5563;
+    --mittel: #9ca3af;
+    --zart: #eef0f3;
+    --rot: #b42318;
+    --schatten-hell: transparent;
+    --schatten-dunkel: #d9dce1;
+    --aussen: 0 1px 3px rgba(17, 24, 39, .1);
+    --aussen-klein: 0 1px 2px rgba(17, 24, 39, .12);
+    --innen: inset 0 0 0 1px #d1d5db;
+    --radius: 12px;
+    --feder: ease;
+    --feder-sanft: ease;
+  }
+  :root[data-modus="privat"] body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  /* Alles Weihnachtliche bleibt draussen */
+  :root[data-modus="privat"] :is(.seite, .rechts, #himmel, #schnee, #toast, #profil, #schneeMobil, .schlitten, .schlitten-paket) { display: none; }
+  :root[data-modus="privat"] .app { display: block; max-width: 820px; padding: 28px 16px 60px; }
+  :root[data-modus="privat"] .reinfedern { animation: none; }
+  :root[data-modus="privat"] .knopf { border-radius: 8px; }
+  :root[data-modus="privat"] .knopf:hover, :root[data-modus="privat"] .wunsch-karte:hover, :root[data-modus="privat"] .plus-balken:hover { transform: none; }
+  :root[data-modus="privat"] .knopf.blau { background: var(--akzent); box-shadow: none; }
+  :root[data-modus="privat"] .umschalter { border-radius: 8px; }
+  :root[data-modus="privat"] .wk-bild { border-radius: 8px; box-shadow: none; color: var(--mittel); }
+  :root[data-modus="privat"] .wk-bild svg { width: 30px; height: 30px; }
+  :root[data-modus="privat"] .plus-rund { background: var(--akzent); box-shadow: none; }
+  :root[data-modus="privat"] .suche, :root[data-modus="privat"] .feld input, :root[data-modus="privat"] .feld textarea { border-radius: 8px; }
+  :root[data-modus="privat"] .huelle { background: rgba(17, 24, 39, .35); backdrop-filter: none; }
+  :root[data-modus="privat"] .fenster { transform: none; transition: none; }
+  .privat-liste { display: flex; flex-direction: column; gap: 16px; }
+  .privat-summe { margin: 0; color: var(--leise); font-size: 13px; }
+  .wunsch-karte.p-gekauft { opacity: .65; }
+  .wunsch-karte.p-gekauft h3 { text-decoration: line-through; }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -1167,6 +1216,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
           <input id="suche" type="search" placeholder="Wunsch suchen …">
         </label>
+        <button class="umschalter neu" id="privatSchalter" role="switch" aria-checked="false" title="Zu meinen privaten Wünschen wechseln">
+          <span class="us-spur"><span class="us-griff"></span></span><span>Privat</span>
+        </button>
         <button class="knopf rund schnee-mobil" id="schneeMobil" title="Schnee" aria-label="Schnee">❄</button>
         <a class="profil" id="profil" href="#einstellungen" title="Profil"></a>
       </div>
@@ -1208,7 +1260,7 @@
 <div class="huelle" id="huelle">
   <form class="fenster neu" id="formular" novalidate>
     <h2 id="fensterTitel">Neuer Wunsch 🎁</h2>
-    <p>Fülle die Angaben aus und gib den Wunsch frei.</p>
+    <p id="fensterText">Fülle die Angaben aus und gib den Wunsch frei.</p>
     <label class="feld" id="feldName">
       <span>Name *</span>
       <input id="eingabeName" maxlength="80" placeholder="z.B. Kopfhörer" autocomplete="off">
@@ -1217,7 +1269,7 @@
       <span>Preis (CHF)</span>
       <input id="eingabePreis" type="number" min="0" step="0.05" inputmode="decimal" placeholder="z.B. 49.90">
     </label>
-    <div class="feld">
+    <div class="feld" id="feldWichtig">
       <span>Wie wichtig ist dir das?</span>
       <div class="sterne-wahl" id="sterneWahl">
         <button type="button" data-stern="1" aria-label="1 Stern">★</button>
@@ -1234,6 +1286,10 @@
       </div>
       <small class="link-status" id="linkStatus"></small>
     </div>
+    <label class="feld" id="feldNotiz" hidden>
+      <span>Notiz</span>
+      <textarea id="eingabeNotiz" maxlength="500" placeholder="z.B. Kaufen, wenn das alte kaputt ist"></textarea>
+    </label>
     <div class="feld">
       <span>Bild</span>
       <div class="bild-feld" id="bildFeld" tabindex="0" role="button" aria-label="Bild auswählen"></div>
@@ -1337,7 +1393,8 @@
     schenkung: ["Schenkung", "Dein grosses Geschenk-Paket – das siehst nur du"],
     mitglieder: ["Mitglieder", "Familie & Freunde auf der Wunschliste"],
     kalender: ["Adventskalender", "🚧 In Bearbeitung – nur für dich sichtbar"],
-    einstellungen: ["Einstellungen", "Profil, Animationen und Konto"]
+    einstellungen: ["Einstellungen", "Profil, Animationen und Konto"],
+    privat: ["Private Wünsche", "Nur für dich – niemand sonst sieht diese Liste"]
   };
   const $ = id => document.getElementById(id);
   const warte = ms => new Promise(r => setTimeout(r, ms));
@@ -1416,6 +1473,7 @@
   let bescherungGemeldet = false;
   let archivBekommen = [];  // Rückblick: was ich in früheren Jahren bekommen habe
   let archivGeschenkt = []; // Rückblick: was ich verschenkt habe
+  let privatWuensche = [];  // private Merkliste: gibt es nur für den Admin
   // Bescherung: vom 24. bis 31. Dezember (die Regeln in firestore.rules prüfen dasselbe)
   const istBescherung = () => { const j = new Date(); return j.getMonth() === 11 && j.getDate() >= 24; };
   // Stichtag 30. November (die Regeln in firestore.rules prüfen dasselbe):
@@ -1469,6 +1527,8 @@
     anteileListe = []; adminAnteile = []; bescherungAnteile = [];
     avatarGeprueft = false;
     archivBekommen = []; archivGeschenkt = [];
+    privatWuensche = [];
+    delete document.documentElement.dataset.modus;
     $("meldungHuelle").classList.remove("offen");
   }
 
@@ -1493,6 +1553,7 @@
       hoeren(collection(db, "reservierungen"), s => { adminRes = listeAus(s); });
       hoeren(collection(db, "anteile"), s => { adminAnteile = listeAus(s); });
       hoeren(collection(db, "einladungen"), s => { einladungen = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); });
+      hoeren(query(collection(db, "privat"), where("besitzer", "==", uid)), s => { privatWuensche = nachDatum(listeAus(s)); });
     }
   }
 
@@ -1594,7 +1655,8 @@
   const offeneDetails = new Set();
 
   // Der Adventskalender ist noch in Bearbeitung: nur der Admin sieht ihn (siehe KALENDER_FUER_ALLE)
-  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] && (h !== "kalender" || kalenderSichtbar()) ? h : "alle"; };
+  // Die privaten Wünsche gibt es nur für den Admin
+  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] && (h !== "kalender" || kalenderSichtbar()) && (h !== "privat" || istAdmin()) ? h : "alle"; };
 
   function zeichnen(mitAnimation = true) {
     if ($("app").hidden) return;
@@ -1606,7 +1668,7 @@
     document.querySelectorAll(".nav-punkt").forEach(a => a.classList.toggle("aktiv", a.dataset.seite === seite));
     document.querySelector('.nav-punkt[data-seite="kalender"]').hidden = !kalenderSichtbar();
     $("untertitel").textContent = seite === "kalender" && KALENDER_FUER_ALLE ? "Jeden Tag ein Türchen bis Weihnachten" : SEITEN[seite][1];
-    $("sucheBox").style.display = seite === "alle" || seite === "meine" ? "" : "none";
+    $("sucheBox").style.display = seite === "alle" || seite === "meine" || seite === "privat" ? "" : "none";
     const m = ich();
     $("profil").innerHTML = `<div class="avatar">${esc(m.avatar)}</div><span>${esc(m.name)}</span>`;
     seitenleisteRechts();
@@ -1616,7 +1678,7 @@
     if (!mitAnimation && aktiv && aktiv.closest && aktiv.closest("#inhalt") && aktiv.tagName === "INPUT") return;
 
     const inhalt = $("inhalt");
-    inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, kalender: seiteKalender, einstellungen: seiteEinstellungen }[seite]();
+    inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, kalender: seiteKalender, einstellungen: seiteEinstellungen, privat: seitePrivat }[seite]();
 
     if (mitAnimation) {
       [...inhalt.querySelectorAll(":scope > *, .karten > *, .mitglieder-raster > *")].forEach((el, i) => {
@@ -1632,8 +1694,8 @@
   function leer(emoji, titel, text) {
     return `<div class="leer neu"><div class="emoji">${emoji}</div><strong>${titel}</strong>${text}</div>`;
   }
-  function plusBalken(titel, text) {
-    return `<button class="plus-balken neu" data-aktion="neu">
+  function plusBalken(titel, text, aktion = "neu") {
+    return `<button class="plus-balken neu" data-aktion="${aktion}">
       <div class="plus-rund"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
       <div><strong>${titel}</strong><span>${text}</span></div>
     </button>`;
@@ -1665,6 +1727,44 @@
   }
   const passt = w => (w.name || "").toLowerCase().includes(suchtext);
   const summe = liste => liste.reduce((s, w) => s + (w.preis || 0), 0);
+
+  // ---------- Private Wünsche ----------
+  // Eigene Merkliste für später, hat nichts mit Weihnachten zu tun (kein Stichtag, kein Schenken)
+  function privatKarte(w) {
+    const bild = sicheresBild(w.bild);
+    const link = sichererLink(w.link);
+    return `<article class="wunsch-karte neu ${w.gekauft ? "p-gekauft" : ""}" data-id="${esc(w.id)}">
+      <div class="wk-bild">${bild ? `<img src="${bild}" alt="">` : `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>`}</div>
+      <div class="wk-text">
+        <h3>${esc(w.name)}</h3>
+        ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : ""}
+        ${w.notiz ? `<span class="info mit">${esc(w.notiz)}</span>` : ""}
+      </div>
+      <div class="wk-rechts">
+        <span class="preis">${w.preis != null ? chf.format(w.preis) : "–"}</span>
+        <div class="wk-aktionen">
+          <button class="knopf klein" data-aktion="privat-gekauft">${w.gekauft ? "Wieder offen" : "Gekauft"}</button>
+          <button class="knopf klein" data-aktion="privat-bearbeiten">Bearbeiten</button>
+          <button class="knopf klein gefahr" data-aktion="privat-loeschen">Löschen</button>
+        </div>
+      </div>
+    </article>`;
+  }
+  function seitePrivat() {
+    const liste = privatWuensche.filter(passt);
+    const offen = liste.filter(w => !w.gekauft);
+    const gekauft = liste.filter(w => w.gekauft);
+    const zaehlung = offen.length ? `<p class="privat-summe">${offen.length} ${offen.length === 1 ? "Wunsch" : "Wünsche"} offen · zusammen ${chf.format(summe(offen))}</p>` : "";
+    const hauptteil = offen.length ? `<div class="karten">${offen.map(privatKarte).join("")}</div>`
+      : suchtext ? `<p class="privat-summe">Nichts gefunden.</p>`
+      : privatWuensche.length ? ""
+      : `<p class="privat-summe">Noch nichts notiert. Halte hier fest, was du vielleicht einmal kaufen möchtest.</p>`;
+    const erledigt = gekauft.length ? `<details class="uebersicht neu" data-mitglied="privat-gekauft" ${offeneDetails.has("privat-gekauft") ? "open" : ""}>
+        <summary><h3>Gekauft</h3><span>${gekauft.length}</span><span class="pfeil">›</span></summary>
+        <div class="karten">${gekauft.map(privatKarte).join("")}</div>
+      </details>` : "";
+    return `<div class="privat-liste">${plusBalken("Wunsch notieren", "Name, Preis, Link, Bild und Notiz", "privat-neu")}${zaehlung}${hauptteil}${erledigt}</div>`;
+  }
 
   // ---------- Alle Wünsche ----------
   // Zeigt nur Wünsche der anderen, die noch niemand schenkt. Wer etwas genommen hat, ist hier nie sichtbar.
@@ -2963,6 +3063,8 @@
 
   // ---------- Rechte Spalte ----------
   function seitenleisteRechts() {
+    // Im privaten Bereich keine Geschenk-Meldungen: die kommen beim Zurückschalten
+    if (seite === "privat") return;
     const geschenke = meineGeschenke();
     const z = $("zaehlerSchenkung");
     z.hidden = !geschenke.length;
@@ -3096,6 +3198,20 @@
           return w && oeffnen(w);
         case "admin-bearbeiten": return w && oeffnen(w);
         case "admin-neu": return oeffnen(null, knopf.dataset.fuer);
+        case "privat-neu": return oeffnen();
+        case "privat-bearbeiten": {
+          const p = privatWuensche.find(x => x.id === id);
+          return p && oeffnen(p);
+        }
+        case "privat-gekauft": {
+          const p = privatWuensche.find(x => x.id === id);
+          return p && await schreiben(updateDoc(doc(db, "privat", id), { gekauft: !p.gekauft }));
+        }
+        case "privat-loeschen": {
+          const p = privatWuensche.find(x => x.id === id);
+          if (!p || !confirm(`„${p.name}“ wirklich löschen?`)) return;
+          return await schreiben(deleteDoc(doc(db, "privat", id)));
+        }
         case "admin-verwalten":
           // Zur Verwaltung springen, alle Personen aufgeklappt
           mitglieder.forEach(m => offeneDetails.add(m.id));
@@ -3450,13 +3566,22 @@
   let bearbeiteId = null;
   let neuesBild = "";
   let bearbeiteFuer = null; // wem der Wunsch gehört (der Admin kann auch für andere erfassen)
+  let formularPrivat = false; // dasselbe Fenster dient auch für die privaten Wünsche
 
   function oeffnen(w, fuer) {
     bearbeiteId = w ? w.id : null;
     bearbeiteFuer = w ? w.besitzer : fuer || uid;
+    formularPrivat = seite === "privat";
     const fremd = bearbeiteFuer !== uid ? (mitglied(bearbeiteFuer) || { name: "?" }).name : "";
-    $("fensterTitel").textContent = w ? (fremd ? `Wunsch von ${fremd} bearbeiten ✏️` : "Wunsch bearbeiten ✏️")
+    $("fensterTitel").textContent = formularPrivat ? (w ? "Wunsch bearbeiten" : "Wunsch notieren")
+      : w ? (fremd ? `Wunsch von ${fremd} bearbeiten ✏️` : "Wunsch bearbeiten ✏️")
       : (fremd ? `Neuer Wunsch für ${fremd} 🎁` : "Neuer Wunsch 🎁");
+    $("fensterText").textContent = formularPrivat ? "Nur für dich sichtbar." : "Fülle die Angaben aus und gib den Wunsch frei.";
+    $("feldWichtig").hidden = formularPrivat;
+    $("feldNotiz").hidden = !formularPrivat;
+    $("alsEntwurf").hidden = formularPrivat;
+    $("freigeben").textContent = formularPrivat ? "Speichern" : "❄ Freigeben";
+    $("eingabeNotiz").value = w ? w.notiz || "" : "";
     $("eingabeName").value = w ? w.name : "";
     $("eingabePreis").value = w && w.preis != null ? w.preis : "";
     $("eingabeLink").value = w ? w.link || "" : "";
@@ -3696,6 +3821,17 @@
     if (link && !sichererLink(link)) { wackeln("feldLink"); ok = false; }
     if (!ok) return null;
 
+    if (formularPrivat) {
+      const privatFelder = { name, link, bild: neuesBild, notiz: $("eingabeNotiz").value.trim(), preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
+      if (bearbeiteId) {
+        schreiben(updateDoc(doc(db, "privat", bearbeiteId), privatFelder)).catch(() => {});
+        return bearbeiteId;
+      }
+      const neu = doc(collection(db, "privat"));
+      schreiben(setDoc(neu, { ...privatFelder, besitzer: uid, gekauft: false, erstellt: Date.now() })).catch(() => {});
+      return neu.id;
+    }
+
     const felder = { name, link, bild: neuesBild, status, wichtig: neueWichtigkeit, preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
     const alt = bearbeiteId && wunsch(bearbeiteId);
     if (status === "freigegeben" && !(alt && alt.status === "freigegeben")) felder.freigegebenAm = Date.now();
@@ -3730,6 +3866,7 @@
     e.preventDefault();
     const id = eingabenSpeichern("freigegeben");
     if (!id) return;
+    if (formularPrivat) return schliessen();
     const r = $("freigeben").getBoundingClientRect();
     const start = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     schliessen();
@@ -4007,8 +4144,20 @@
   // Immer festlicher: 1.–8. Dez. / 9.–16. / 17.–23. / ab Heiligabend Nacht mit Sternen und Polarlicht
   // (folgt dem Test-Tag des Admins)
   function festSetzen() {
+    const wurzel = document.documentElement;
+    const privat = seiteAusHash() === "privat";
+    // Private Wünsche: normales Aussehen statt Weihnachten
+    $("privatSchalter").hidden = !istAdmin();
+    $("privatSchalter").setAttribute("aria-checked", privat);
+    document.querySelector('meta[name="theme-color"]').content = privat ? "#f5f6f8" : "#d5e8f7";
+    if (privat) {
+      wurzel.dataset.modus = "privat";
+      delete wurzel.dataset.fest;
+      return;
+    }
+    delete wurzel.dataset.modus;
     const t = kalenderTag();
-    document.documentElement.dataset.fest = t < 1 ? 0 : t <= 8 ? 1 : t <= 16 ? 2 : t <= 23 ? 3 : 4;
+    wurzel.dataset.fest = t < 1 ? 0 : t <= 8 ? 1 : t <= 16 ? 2 : t <= 23 ? 3 : 4;
   }
 
   // Schlitten am Himmel: fliegt im November und Dezember ab und zu vorbei.
@@ -4071,6 +4220,13 @@
     lokal.seiteZu = !lokal.seiteZu;
     lokalSpeichern();
     leisteSetzen();
+  });
+  // Schalter: hin zu den privaten Wünschen und zurück auf die Seite, von der man kam
+  let seiteVorPrivat = "alle";
+  $("privatSchalter").addEventListener("click", () => {
+    if (seite === "privat") { location.hash = "#" + seiteVorPrivat; return; }
+    seiteVorPrivat = seite;
+    location.hash = "#privat";
   });
   $("suche").addEventListener("input", e => { suchtext = e.target.value.trim().toLowerCase(); zeichnen(false); });
   addEventListener("hashchange", () => { suchtext = ""; $("suche").value = ""; avatarProfil = ""; zeichnen(); scrollTo({ top: 0, behavior: "smooth" }); });
