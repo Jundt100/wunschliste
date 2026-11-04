@@ -583,11 +583,98 @@
   .spezial-ebene { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
   .spezial-ebene .figur { position: absolute; left: 0; top: 0; line-height: 1; will-change: transform; }
   .sprechblase {
-    position: absolute; padding: 10px 16px; border-radius: 18px; background: #fff; color: var(--text);
+    position: absolute; padding: 10px 16px; border-radius: 18px; background: #fff; color: #021024;
     font-size: 17px; font-weight: 600; white-space: nowrap; box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
   }
   .sprechblase::after { content: ""; position: absolute; left: 30px; bottom: -10px; border: 10px solid transparent; border-bottom: 0; border-top-color: #fff; }
   .festtext span { display: inline-block; }
+
+  /* Immer festlicher: je näher Weihnachten, desto dunkler der Himmel (Stufe nach Tag im Dezember) */
+  :root[data-fest="1"] { --bg: #c9dff2; --flaeche: #cfe4f5; --schatten-dunkel: #9fb9d3; --schatten-hell: #eef7ff; }
+  :root[data-fest="2"] { --bg: #b4cde6; --flaeche: #bbd3ea; --leise: #3f6c9c; --schatten-dunkel: #8ea8c4; --schatten-hell: #d9e9f7; }
+  :root[data-fest="3"] { --bg: #7d9dc2; --flaeche: #86a5c9; --leise: #0a2e5e; --akzent: #021e4a; --akzent-hell: #2f5f94; --schatten-dunkel: #5f7ea3; --schatten-hell: #a3c0de; }
+  :root[data-fest="4"] { color-scheme: dark; --bg: #0e2140; --flaeche: #13294c; --text: #eaf5ff; --leise: #9dbbdc; --akzent: #5b93d6; --akzent-hell: #7da0ca; --zart: #24406b; --schatten-dunkel: #060f20; --schatten-hell: #1a335c; }
+  body { transition: background 1.2s ease; }
+  #himmel { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; opacity: 0; transition: opacity 1.5s; }
+  :root[data-fest="3"] #himmel { opacity: .45; }
+  :root[data-fest="4"] #himmel { opacity: 1; }
+  #himmel .sternenfeld { position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 28% 62%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 44% 12%, #fff, transparent), radial-gradient(1px 1px at 63% 44%, #fff, transparent),
+      radial-gradient(2px 2px at 78% 22%, #fff, transparent), radial-gradient(1px 1px at 88% 72%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 6% 78%, #fff, transparent), radial-gradient(1px 1px at 52% 80%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 94% 48%, #fff, transparent), radial-gradient(1px 1px at 35% 34%, #fff, transparent);
+    background-size: 420px 420px; animation: funkeln 4s ease-in-out infinite alternate; }
+  #himmel .polarlicht { position: absolute; left: -20%; right: -20%; top: -12%; height: 60%; opacity: 0; filter: blur(46px);
+    background: linear-gradient(100deg, transparent 8%, rgba(80, 230, 170, .38) 28%, rgba(120, 170, 255, .32) 52%, rgba(190, 120, 255, .28) 72%, transparent 92%);
+    animation: polarlicht 16s ease-in-out infinite alternate; }
+  :root[data-fest="4"] #himmel .polarlicht { opacity: 1; }
+  @keyframes polarlicht { from { transform: translateX(-6%) skewX(-10deg) scaleY(.85); } to { transform: translateX(6%) skewX(10deg) scaleY(1.15); } }
+
+  /* Liegender Schnee auf den Karten */
+  .wunsch-karte { position: relative; }
+  .wunsch-karte::after {
+    content: ""; position: absolute; left: 20px; right: 20px; top: -7px; height: 15px; pointer-events: none;
+    background: radial-gradient(circle at 11px 11px, #fff 10px, transparent 11px) 0 0 / 31px 15px repeat-x, linear-gradient(#fff, #fff) 0 100% / 100% 6px no-repeat;
+    filter: drop-shadow(0 2px 2px rgba(5, 38, 89, .22));
+    opacity: var(--schnee, 0); transform: scaleY(var(--schnee, 0)); transform-origin: 50% 100%; transition: opacity .35s, transform .35s;
+  }
+  .wunsch-karte.ohne-kappe::after { opacity: 0; transform: scaleY(0); }
+
+  /* Geschenk-Status */
+  .status-leiste { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .status-schritt {
+    display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border: 0; border-radius: 999px; cursor: pointer;
+    font: inherit; font-size: 11px; font-weight: 500; color: var(--leise); background: var(--flaeche); box-shadow: var(--aussen-klein);
+    transition: transform .6s var(--feder), background .2s, color .2s;
+  }
+  .status-schritt:hover { transform: translateY(-2px); }
+  .status-schritt.an { color: #fff; background: var(--akzent); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .2); }
+  .status-schritt.fertig { background: linear-gradient(135deg, #2f6d4f, #4f9a6b); }
+
+  /* Schneemann: wächst mit jedem gekauften Geschenk */
+  .schneemann { display: flex; align-items: center; gap: 18px; padding: 16px 22px; }
+  .schneemann svg { flex: none; width: 118px; height: 150px; overflow: visible; }
+  .schneemann h3 { margin: 0 0 4px; font-size: 16px; }
+  .schneemann p { margin: 0; font-size: 13px; color: var(--leise); }
+  .sm-teil.pop { transform-box: fill-box; transform-origin: 50% 100%; animation: smPop .9s var(--feder) both; }
+  @keyframes smPop { from { opacity: 0; transform: scale(.2) translateY(-30px); } }
+  .schneemann.fertig svg { animation: wippen 2.2s ease-in-out infinite; }
+
+  /* Schlitten am Himmel */
+  .schlitten { position: fixed; left: 0; top: 0; z-index: 45; padding: 6px; border: 0; background: none; cursor: pointer; font-size: 34px; line-height: 1; white-space: nowrap; filter: drop-shadow(0 4px 6px rgba(2, 16, 36, .35)); }
+  .schlitten:focus { outline: none; }
+
+  /* Bescherung: Pakete unter dem Baum */
+  .baum-szene {
+    position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; padding: 18px 16px 20px; border-radius: var(--radius);
+    background: radial-gradient(ellipse at 50% 30%, #1b3a68, #081a35 72%);
+    box-shadow: 6px 6px 16px rgba(5, 38, 89, .35), -6px -6px 14px var(--schatten-hell);
+  }
+  .baum-szene::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34%; background: linear-gradient(#e9f5ff, #bcd8f0); border-radius: 50% 50% 0 0 / 28px 28px 0 0; }
+  .baum-svg { position: relative; z-index: 1; width: min(68vw, 280px); height: auto; margin-bottom: -46px; filter: drop-shadow(0 0 22px rgba(255, 220, 130, .35)); }
+  .baum-svg .licht { animation: funkeln 1.2s ease-in-out infinite alternate; animation-delay: calc(var(--d) * 170ms); }
+  .baum-svg .baum-stern { transform-box: fill-box; transform-origin: center; animation: sternPuls 2s ease-in-out infinite; }
+  @keyframes sternPuls { 50% { transform: scale(1.18) rotate(10deg); } }
+  .baum-pakete { position: relative; z-index: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .baum-paket { position: relative; width: 76px; padding: 0; border: 0; background: none; cursor: pointer; font: inherit; color: #021024; transition: transform .6s var(--feder); }
+  .baum-paket:hover { transform: translateY(-5px) rotate(-3deg); }
+  .baum-paket:not(.auf) { animation: paketWippen 3s ease-in-out infinite; animation-delay: calc(var(--i) * 280ms); }
+  @keyframes paketWippen { 0%, 88%, 100% { transform: none; } 92% { transform: rotate(-6deg); } 96% { transform: rotate(6deg); } }
+  .bp-box { position: relative; display: block; height: 54px; margin-top: 16px; border-radius: 7px; background: linear-gradient(90deg, transparent 42%, var(--b) 42% 58%, transparent 58%), var(--f); box-shadow: 0 6px 10px rgba(2, 16, 36, .35); }
+  .bp-deckel { position: absolute; z-index: 1; left: -4px; right: -4px; top: 8px; height: 16px; border-radius: 5px; background: linear-gradient(90deg, transparent 42%, var(--b) 42% 58%, transparent 58%), var(--f); filter: brightness(1.12); box-shadow: 0 2px 4px rgba(2, 16, 36, .3); }
+  .bp-deckel::before, .bp-deckel::after { content: ""; position: absolute; bottom: 100%; width: 22px; height: 15px; border: 4px solid var(--b); border-radius: 50%; }
+  .bp-deckel::before { left: calc(50% - 22px); transform: rotate(18deg); }
+  .bp-deckel::after { right: calc(50% - 22px); transform: rotate(-18deg); }
+  .bp-inhalt { display: grid; place-items: center; width: 70px; height: 70px; margin: 0 auto; border-radius: 16px; overflow: hidden; font-size: 34px; background: #fff; box-shadow: 0 0 0 3px #f3c969, 0 6px 12px rgba(2, 16, 36, .3); }
+  .bp-inhalt img { width: 100%; height: 100%; object-fit: cover; }
+  .baum-paket small { display: block; margin-top: 7px; font-size: 11px; line-height: 1.2; font-weight: 600; overflow-wrap: anywhere; }
+  .geschenk-karte { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; width: min(88vw, 400px); padding: 26px; border-radius: 28px; color: #021024; background: linear-gradient(160deg, #fff, #dcecf9); box-shadow: 0 0 60px rgba(255, 220, 130, .55); }
+  .geschenk-karte .gk-bild { display: grid; place-items: center; width: 170px; height: 170px; border-radius: 24px; overflow: hidden; font-size: 92px; background: #eef6fd; }
+  .geschenk-karte .gk-bild img { width: 100%; height: 100%; object-fit: cover; }
+  .geschenk-karte h2 { margin: 4px 0 0; font-size: 22px; overflow-wrap: anywhere; }
+  .geschenk-karte p { margin: 0; font-size: 16px; color: #052659; font-weight: 500; }
 
   /* Rückblick */
   .rueckblick details { border-radius: 18px; box-shadow: var(--aussen-klein); padding: 12px 16px; }
@@ -1213,6 +1300,7 @@
 
 <div class="toast" id="toast" role="status" onclick="this.classList.remove('da')"></div>
 
+<div id="himmel" aria-hidden="true"><div class="sternenfeld"></div><div class="polarlicht"></div></div>
 <canvas id="schnee"></canvas>
 
 <script type="module">
@@ -1348,6 +1436,7 @@
   const SCHENKEN_ZU = "🔒 Geschenkt werden kann erst ab dem <b>30. November</b>.";
   const ERFASSEN_ZU = "🔒 Die Wunschliste ist seit dem 30. November geschlossen. Für Änderungen wende dich an Nicola.";
   let zeichnenGeplant = false;
+  const schneeWeg = new Set(); // Karten, von denen der Schnee weggewischt wurde
 
   const istAdmin = () => rolle === "admin";
   // Jeder Avatar nur einmal: gibt das Mitglied zurück, das ihn schon hat (ausser mir)
@@ -1520,6 +1609,8 @@
 
   function zeichnen(mitAnimation = true) {
     if ($("app").hidden) return;
+    festSetzen();
+    if (!animiert()) document.documentElement.style.setProperty("--schnee", 0);
     seite = seiteAusHash();
     $("titel").textContent = SEITEN[seite][0];
     $("untertitel").textContent = SEITEN[seite][1];
@@ -1569,7 +1660,7 @@
   function karte(w, abzeichen, aktionen, klasse = "", hinweis = "", info = "") {
     const bild = sicheresBild(w.bild);
     const link = sichererLink(w.link);
-    return `<article class="wunsch-karte neu ${klasse}" data-id="${esc(w.id)}">
+    return `<article class="wunsch-karte neu ${klasse} ${schneeWeg.has(w.id) ? "ohne-kappe" : ""}" data-id="${esc(w.id)}">
       <div class="wk-bild">${bild ? `<img src="${bild}" alt="">` : "🎁"}</div>
       <div class="wk-text">
         <h3>${esc(w.name)}${w.wichtig > 0 ? `<span class="sterne" title="${esc(STERNE_TEXT[Math.min(3, w.wichtig)])}">${"★".repeat(Math.min(3, w.wichtig))}</span>` : ""}</h3>
@@ -1658,6 +1749,7 @@
 
     return `
       ${bescherungBanner()}
+      ${baumSzene()}
       ${stichtagLeiste()}
       ${erfassenOffen() ? plusBalken("Neuen Wunsch hinzufügen", "Name, Preis, Link und Bild – dann freigeben") : ""}
       <section class="zahlen">
@@ -1718,6 +1810,95 @@
     </section>`;
   }
 
+  // Bescherung: der Baum mit den Paketen – antippen zum Auspacken, danach sieht man, von wem es ist
+  const PAKET_FARBEN = [["#c94a4a", "#f3c969"], ["#2f6d4f", "#f3c969"], ["#5483b3", "#ffffff"], ["#e0a526", "#c94a4a"], ["#7d5ba6", "#c1e8ff"]];
+  const BAUM_LICHTER = [[150, 62, "#ffe27a"], [128, 92, "#ff8f8f"], [172, 98, "#c1e8ff"], [110, 132, "#ffe27a"], [150, 126, "#9ff2c0"], [192, 136, "#ff8f8f"],
+    [92, 178, "#c1e8ff"], [132, 170, "#ffe27a"], [172, 176, "#ff8f8f"], [210, 182, "#ffe27a"], [74, 226, "#ff8f8f"], [116, 222, "#9ff2c0"], [158, 228, "#ffe27a"], [200, 220, "#c1e8ff"], [230, 230, "#ff8f8f"]];
+  function baumSzene() {
+    if (!istBescherung()) return "";
+    const pakete = eigene.filter(w => istBeschert(w.id));
+    if (!pakete.length) return "";
+    return `<section class="baum-szene neu">
+      <svg class="baum-svg" viewBox="0 0 300 300" aria-hidden="true">
+        <rect x="134" y="250" width="32" height="42" rx="4" fill="#6b4226"/>
+        <polygon points="150,70 232,170 68,170" fill="#2f7d54"/>
+        <polygon points="150,120 250,226 50,226" fill="#276b47"/>
+        <polygon points="150,172 268,264 32,264" fill="#1f5a3a"/>
+        ${BAUM_LICHTER.map(([x, y, f], i) => `<circle class="licht" style="--d:${i}" cx="${x}" cy="${y}" r="5" fill="${f}"/>`).join("")}
+        <polygon class="baum-stern" fill="#f3c969" points="150,18 158,42 184,42 163,57 171,82 150,67 129,82 137,57 116,42 142,42"/>
+      </svg>
+      <div class="baum-pakete">${pakete.map((w, i) => {
+        const auf = lokal.ausgepackt.includes(w.id);
+        const [f, b] = PAKET_FARBEN[i % PAKET_FARBEN.length];
+        const bild = sicheresBild(w.bild);
+        return `<button class="baum-paket ${auf ? "auf" : ""}" data-aktion="paket-auf" data-id="${esc(w.id)}" style="--f:${f};--b:${b};--i:${i}" aria-label="${auf ? `${esc(w.name)} ansehen` : "Geschenk auspacken"}">
+          ${auf ? `<span class="bp-inhalt">${bild ? `<img src="${bild}" alt="">` : "🎁"}</span><small>${esc(w.name)}</small>`
+            : `<span class="bp-deckel"></span><span class="bp-box"></span>`}
+        </button>`;
+      }).join("")}</div>
+    </section>`;
+  }
+
+  // Wartet auf eine Animation – aber nie länger als nötig, falls der Browser sie anhält
+  const animFertig = (a, ms) => Promise.race([a.finished, warte(ms + 250)]);
+
+  async function paketOeffnen(el, id) {
+    const w = eigene.find(x => x.id === id);
+    if (!w || buehneOffen) return;
+    buehneOffen = true;
+    pause = true;
+    const zu = !lokal.ausgepackt.includes(id);
+    if (zu) {
+      if (animiert() && !wenigBewegung && el.isConnected) {
+        el.style.animation = "none";
+        await animFertig(el.animate([
+          { transform: "none" }, { transform: "rotate(-9deg)" }, { transform: "rotate(9deg)" }, { transform: "rotate(-13deg) scale(1.08)" },
+          { transform: "rotate(13deg) scale(1.12)" }, { transform: "rotate(-6deg) scale(1.16)" }, { transform: "scale(.9, 1.12)" }
+        ], { duration: 950, easing: "ease-in", fill: "forwards" }), 950);
+        const m = mitte(el);
+        el.querySelector(".bp-deckel").animate([
+          { transform: "none", opacity: 1 }, { transform: "translateY(-150px) rotate(220deg)", opacity: 0 }
+        ], { duration: 650, easing: "ease-out", fill: "forwards" });
+        funken(m.x, m.y, 150, ["#f3c969", "#c94a4a", "#c1e8ff", "#4f9a6b", "#ffffff"], 13);
+        schneien(4000);
+        await warte(320);
+      }
+      lokal.ausgepackt.push(id);
+      lokalSpeichern();
+    }
+    const namen = schenkerVon(id).map(v => { const m = mitglied(v) || { name: "?", avatar: "🎅" }; return `${esc(m.name)} ${esc(m.avatar)}`; });
+    const bild = sicheresBild(w.bild);
+    const b = document.createElement("div");
+    b.className = "tuer-buehne";
+    b.setAttribute("role", "dialog");
+    b.setAttribute("aria-label", w.name);
+    b.innerHTML = `<div class="sterne-himmel"></div><div class="strahlen" style="opacity:.7"></div>
+      <div class="geschenk-karte">
+        <div class="gk-bild">${bild ? `<img src="${bild}" alt="">` : "🎁"}</div>
+        <h2>${esc(w.name)}</h2>
+        <p>Von ${namen.join(" & ")}</p>
+        <button class="knopf blau" data-zu>Zurück zum Baum</button>
+      </div>`;
+    document.body.appendChild(b);
+    if (animiert() && !wenigBewegung) {
+      b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+      b.querySelector(".geschenk-karte").animate([
+        { transform: "scale(.2) rotate(-14deg)", opacity: 0 }, { transform: "scale(1.08) rotate(3deg)", opacity: 1, offset: .65 }, { transform: "none" }
+      ], { duration: 750, easing: "ease-out" });
+    }
+    await new Promise(fertig => {
+      const taste = e => { if (e.key === "Escape") weg(); };
+      const weg = () => { document.removeEventListener("keydown", taste); fertig(); };
+      b.querySelector("[data-zu]").addEventListener("click", weg, { once: true });
+      document.addEventListener("keydown", taste);
+    });
+    b.remove();
+    buehneOffen = false;
+    pause = false;
+    nachholen = false;
+    zeichnen(false);
+  }
+
   // Geschenk-Animation: Paket wackelt, platzt auf, Schnee fliegt – dann sieht man, von wem es ist
   async function auspacken(kartenEl, id) {
     if (!lokal.ausgepackt.includes(id)) lokal.ausgepackt.push(id);
@@ -1744,12 +1925,61 @@
   }
 
   // ---------- Schenkung ----------
+  // Geschenk-Status: 0 noch kaufen · 1 gekauft · 2 eingepackt · 3 unter dem Baum
+  // "gekauft" bleibt daneben bestehen, weil die Regeln damit Zurückziehen und Löschen sperren
+  const stufeAus = r => r.stufe ?? (r.gekauft ? 1 : 0);
+  const STUFEN = [["🛒", "Gekauft"], ["🎀", "Eingepackt"], ["🎄", "Unter dem Baum"]];
+  const stufeAbzeichen = w => w.stufe > 0 ? `<span class="abzeichen">${STUFEN[w.stufe - 1][1]}</span>` : `<span class="abzeichen zart">Noch kaufen</span>`;
+  const statusLeiste = w => `<span class="status-leiste">${STUFEN.map(([e, t], i) =>
+    `<button class="status-schritt ${w.stufe > i ? "an" : ""} ${w.stufe === 3 && i === 2 ? "fertig" : ""}" data-aktion="status" data-wert="${i + 1}" aria-pressed="${w.stufe > i}">${e} ${t}</button>`).join("")}</span>`;
+  function stufeSetzen(id, neu) {
+    const gekauft = neu > 0;
+    const a = meineRes.some(r => r.id === id) ? null : anteilVon(id);
+    if (a) {
+      // "gekauft" oben im Dokument sperrt Zurückziehen/Löschen beim Beschenkten
+      const sonst = mitschenker(a, uid).some(t => t.gekauft);
+      return schreiben(updateDoc(doc(db, "anteile", id), { [`teile.${uid}.gekauft`]: gekauft, [`teile.${uid}.stufe`]: neu, gekauft: gekauft || sonst }));
+    }
+    return schreiben(updateDoc(doc(db, "reservierungen", id), { gekauft, stufe: neu }));
+  }
+
+  // Schneemann: wächst mit jedem gekauften Geschenk – das sieht nur der Schenker selbst
+  let schneemannVorher = null;
+  function schneemann(geschenke) {
+    const alle = geschenke.filter(g => !g.fehlt);
+    const gekauft = alle.filter(g => g.gekauft).length;
+    const fertig = alle.length > 0 && gekauft === alle.length;
+    // 0 Schneehaufen · 1 Bauch · 2 Brust · 3 Kopf · 4 Arme und Knöpfe · 5 Schal · 6 Hut und Rüebli (erst wenn alles gekauft ist)
+    const stufe = fertig ? 6 : Math.min(5, Math.ceil(alle.length ? gekauft / alle.length * 5 : 0));
+    const teil = (n, inhalt) => stufe < n ? "" : `<g class="sm-teil ${schneemannVorher !== null && n > schneemannVorher ? "pop" : ""}" style="animation-delay:${Math.max(0, n - (schneemannVorher ?? 0) - 1) * 180}ms">${inhalt}</g>`;
+    const kugel = "#fff", rand = "#b7d2ea";
+    if (fertig && schneemannVorher !== null && schneemannVorher < 6) {
+      setTimeout(() => { const s = document.querySelector(".schneemann svg"); if (s) { const m = mitte(s); funken(m.x, m.y, 130, ["#f3c969", "#c94a4a", "#ffffff", "#c1e8ff"], 11); schneien(3500); } }, 700);
+    }
+    schneemannVorher = stufe;
+    const text = !alle.length ? "Wähle Geschenke aus, dann baust du ihn mit jedem Kauf weiter."
+      : fertig ? "Alle Geschenke sind gekauft – dein Schneemann ist fertig! ⛄"
+      : `Noch ${alle.length - gekauft} ${alle.length - gekauft === 1 ? "Geschenk" : "Geschenke"} kaufen, dann ist er fertig.`;
+    return `<section class="schneemann formular-karte neu ${fertig ? "fertig" : ""}">
+      <svg viewBox="0 0 120 150" aria-hidden="true">
+        <ellipse cx="60" cy="142" rx="52" ry="8" fill="${kugel}" stroke="${rand}"/>
+        ${teil(1, `<circle cx="60" cy="116" r="27" fill="${kugel}" stroke="${rand}" stroke-width="1.5"/>`)}
+        ${teil(2, `<circle cx="60" cy="77" r="20" fill="${kugel}" stroke="${rand}" stroke-width="1.5"/>`)}
+        ${teil(3, `<circle cx="60" cy="46" r="15" fill="${kugel}" stroke="${rand}" stroke-width="1.5"/><circle cx="55" cy="43" r="2" fill="#021024"/><circle cx="65" cy="43" r="2" fill="#021024"/><path d="M53 51q7 5 14 0" fill="none" stroke="#021024" stroke-width="1.5" stroke-linecap="round"/>`)}
+        ${teil(4, `<path d="M42 72L18 56M18 56l-7 2M18 56l-2-7M78 72l24-16M102 56l7 2M102 56l2-7" stroke="#6b4226" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="60" cy="72" r="2.2" fill="#021024"/><circle cx="60" cy="83" r="2.2" fill="#021024"/><circle cx="60" cy="108" r="2.6" fill="#021024"/>`)}
+        ${teil(5, `<path d="M45 59q15 7 30 0l2 6q-17 8-34 0z" fill="#c94a4a"/><path d="M68 63l5 15-8 1-3-14z" fill="#a93a3a"/>`)}
+        ${teil(6, `<path d="M60 46l17 4-17 2z" fill="#e8872c"/><rect x="42" y="30" width="36" height="4" rx="2" fill="#021024"/><rect x="48" y="9" width="24" height="22" rx="2" fill="#021024"/><rect x="48" y="24" width="24" height="4" fill="#c94a4a"/>`)}
+      </svg>
+      <div><h3>⛄ Dein Schneemann</h3><p>${text}</p><p>${gekauft} von ${alle.length} gekauft – nur du siehst ihn.</p></div>
+    </section>`;
+  }
+
   function meineGeschenke() {
     const ganz = meineRes.map(r => {
       const w = fremde.find(x => x.id === r.id);
       return w
-        ? { ...w, gekauft: !!r.gekauft, genommen: r.erstellt, fehlt: false }
-        : { id: r.id, name: r.name, preis: r.preis, besitzer: r.besitzer, gekauft: !!r.gekauft, fehlt: geladen.has("fremde") && geladen.has("res") };
+        ? { ...w, gekauft: !!r.gekauft, stufe: stufeAus(r), genommen: r.erstellt, fehlt: false }
+        : { id: r.id, name: r.name, preis: r.preis, besitzer: r.besitzer, gekauft: !!r.gekauft, stufe: stufeAus(r), fehlt: geladen.has("fremde") && geladen.has("res") };
     });
     // Geteilte Geschenke: "preis" ist hier MEIN Anteil (zählt so auch in Limite und Summen)
     const geteilt = anteileListe.filter(a => a.teile && a.teile[uid]).map(a => {
@@ -1757,7 +1987,7 @@
       const w = fremde.find(x => x.id === a.id);
       const basis = w ? { ...w, fehlt: false }
         : { id: a.id, name: a.name, besitzer: a.besitzer, fehlt: geladen.has("fremde") && geladen.has("anteile") };
-      return { ...basis, vollpreis: w ? w.preis : a.preis, preis: mein.betrag, gekauft: !!mein.gekauft,
+      return { ...basis, vollpreis: w ? w.preis : a.preis, preis: mein.betrag, gekauft: !!mein.gekauft, stufe: stufeAus(mein),
         genommen: mein.erstellt, notiz: mein.notiz || "", geteilt: true, mit: mitschenker(a, uid) };
     });
     return [...ganz, ...geteilt];
@@ -2043,7 +2273,8 @@
       <div class="zahl-karte neu"><h3>Du verschenkst</h3><div class="zahl-gross">${chf.format(gesamt)}</div><p>Gesamtbetrag</p></div>
       ${ringKarte("Geschenke", Math.min(1, geschenke.length / 10), `<span data-zahl="${geschenke.length}">0</span>`, `für ${personen.length} ${personen.length === 1 ? "Person" : "Personen"}`)}
       ${ringKarte("Gekauft", geschenke.length ? gekauft / geschenke.length : 0, `<span data-zahl="${gekauft}">0</span>`, `von ${geschenke.length}`)}
-    </section>`;
+    </section>
+    ${schneemann(geschenke)}`;
 
     // Meine Limiten: wie viel möchte ich für wen ausgeben?
     const andere = mitglieder.filter(m => m.id !== uid);
@@ -2084,12 +2315,11 @@
           <span class="summe">${chf.format(summe(liste))}</span>
         </div>
         <div class="karten">${liste.map(w => karte(w,
-          w.gekauft ? `<span class="abzeichen">Gekauft</span>` : `<span class="abzeichen zart">Noch kaufen</span>`,
-          `<button class="haken ${w.gekauft ? "an" : ""}" data-aktion="gekauft" title="Als gekauft markieren" aria-label="Als gekauft markieren">✓</button>
-           <button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`,
+          stufeAbzeichen(w),
+          `<button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`,
           zuViel.has(w.id) ? "ueber-limite" : "",
           w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : zuViel.has(w.id) ? "⚠ Damit übersteigst du deine Limite" : "",
-          w.geteilt ? geteiltInfo(w) : "")).join("")}</div>
+          (w.geteilt ? geteiltInfo(w) : "") + (w.fehlt ? "" : statusLeiste(w)))).join("")}</div>
       </section>`;
     }).join("");
 
@@ -3028,13 +3258,25 @@
           const neu = !(r && r.gekauft);
           knopf.classList.toggle("an", neu);
           if (neu && animiert()) { const rect = knopf.getBoundingClientRect(); splat(rect.left + rect.width / 2, rect.top + rect.height / 2); }
-          if (a) {
-            // "gekauft" oben im Dokument sperrt Zurückziehen/Löschen beim Beschenkten
-            const sonst = mitschenker(a, uid).some(t => t.gekauft);
-            return await schreiben(updateDoc(doc(db, "anteile", id), { [`teile.${uid}.gekauft`]: neu, gekauft: neu || sonst }));
-          }
-          return await schreiben(updateDoc(doc(db, "reservierungen", id), { gekauft: neu }));
+          return await stufeSetzen(id, neu ? 1 : 0);
         }
+
+        case "status": {
+          // Schritt antippen = bis dorthin erledigt; den aktuellen nochmals antippen = einen zurück
+          const g = meineGeschenke().find(x => x.id === id);
+          if (!g) return;
+          const schritt = Number(knopf.dataset.wert);
+          const neu = g.stufe === schritt ? schritt - 1 : schritt;
+          if (neu > g.stufe && animiert()) {
+            const m = mitte(knopf);
+            funken(m.x, m.y, 45, neu === 3 ? ["#4f9a6b", "#f3c969", "#ffffff"] : ["#f3c969", "#c1e8ff", "#ffffff"], 6);
+            if (neu === 3) schneien(2500);
+          }
+          return await stufeSetzen(id, neu);
+        }
+
+        case "paket-auf":
+          return await paketOeffnen(knopf, knopf.dataset.id);
 
         case "avatar":
           avatarProfil = knopf.dataset.wert;
@@ -3637,18 +3879,99 @@
   let schneeBis = 0;
   let laeuft = false;
 
+  // Liegender Schnee: Höhe pro Spalte am unteren Bildschirmrand, dazu eine Schneekappe auf den Karten
+  const SPALTE = 6;
+  let haufen = [];
+  let haufenDa = false;
+  let kappe = 0;
+  const haufenMax = () => innerWidth < 760 ? 20 : 44;
+
   function groesse() {
     const dpr = window.devicePixelRatio || 1;
     leinwand.width = innerWidth * dpr;
     leinwand.height = innerHeight * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const neu = new Array(Math.ceil(innerWidth / SPALTE) + 1).fill(0);
+    haufen.forEach((h, i) => { const z = Math.floor(i * neu.length / haufen.length); neu[z] = Math.max(neu[z], h); });
+    haufen = neu;
+    haufenZeichnen();
   }
+
+  function schneeLandet(f) {
+    const c = Math.max(0, Math.min(haufen.length - 1, Math.floor(f.x / SPALTE)));
+    if (f.y + f.r < innerHeight - haufen[c]) return false;
+    const max = haufenMax();
+    [[0, .7], [-1, .45], [1, .45], [-2, .2], [2, .2], [-3, .08], [3, .08]].forEach(([d, teil]) => {
+      if (haufen[c + d] !== undefined) haufen[c + d] = Math.min(max, haufen[c + d] + f.r * teil);
+    });
+    haufenDa = true;
+    const vorher = Math.round(kappe * 20);
+    kappe = Math.min(1, kappe + .0015);
+    // Nur in kleinen Schritten setzen: die Variable gilt für die ganze Seite
+    if (Math.round(kappe * 20) !== vorher) document.documentElement.style.setProperty("--schnee", kappe.toFixed(2));
+    return true;
+  }
+
+  function haufenZeichnen() {
+    if (!haufenDa || !animiert()) return;
+    const H = innerHeight;
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(5,38,89,.4)";
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, H - haufen[0]);
+    for (let i = 1; i < haufen.length; i++) {
+      const x = i * SPALTE;
+      ctx.quadraticCurveTo(x - SPALTE, H - haufen[i - 1], x - SPALTE / 2, H - (haufen[i - 1] + haufen[i]) / 2);
+    }
+    ctx.lineTo(innerWidth, H);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Mit Finger oder Maus den Schnee wegwischen
+  function wischen(x, y) {
+    if (!animiert()) return;
+    let geaendert = false;
+    if (haufenDa) {
+      const c = Math.floor(x / SPALTE);
+      if (haufen[c] !== undefined && y >= innerHeight - haufen[c] - 14) {
+        for (let d = -6; d <= 6; d++) {
+          const h = haufen[c + d];
+          if (h > .3) { haufen[c + d] = h * (.15 + Math.abs(d) * .13 > 1 ? 1 : .15 + Math.abs(d) * .13); geaendert = true; }
+        }
+        if (geaendert) {
+          for (let i = 0; i < 3; i++) flocken.push({ art: "splat", x, y: y - 4, vx: (Math.random() - .5) * 6, vy: -2 - Math.random() * 4, r: 1.5 + Math.random() * 2, leben: .8 });
+          haufenDa = haufen.some(h => h > .3);
+          starten();
+        }
+      }
+    }
+    if (kappe > 0) {
+      const k = document.elementFromPoint(x, y)?.closest?.(".wunsch-karte");
+      if (k && !k.classList.contains("ohne-kappe") && y - k.getBoundingClientRect().top < 26) {
+        k.classList.add("ohne-kappe");
+        schneeWeg.add(k.dataset.id);
+        for (let i = 0; i < 8; i++) flocken.push({ art: "splat", x: x + (Math.random() - .5) * 40, y, vx: (Math.random() - .5) * 5, vy: -1 - Math.random() * 3, r: 1.5 + Math.random() * 2.5, leben: .8 });
+        starten();
+      }
+    }
+  }
+  addEventListener("pointermove", e => wischen(e.clientX, e.clientY), { passive: true });
+  addEventListener("touchmove", e => { const t = e.touches[0]; if (t) wischen(t.clientX, t.clientY); }, { passive: true });
   addEventListener("resize", groesse);
   groesse();
 
   function schneien(ms) {
     if (!animiert()) return;
     schneeBis = Math.max(schneeBis, performance.now() + (wenigBewegung ? 800 : ms));
+    // Neuer Schnee: auch die weggewischten Karten bekommen wieder eine Kappe
+    schneeWeg.clear();
+    document.querySelectorAll(".wunsch-karte.ohne-kappe").forEach(k => k.classList.remove("ohne-kappe"));
     starten();
   }
 
@@ -3684,6 +4007,7 @@
 
   function bild(t) {
     ctx.clearRect(0, 0, innerWidth, innerHeight);
+    haufenZeichnen();
     if (t < schneeBis) {
       for (let i = 0; i < 3; i++) {
         flocken.push({ art: "flocke", x: Math.random() * innerWidth, y: -10, vx: 0, vy: 1 + Math.random() * 2.2, r: 1.5 + Math.random() * 3.5, phase: Math.random() * 6.28, leben: 1 });
@@ -3694,7 +4018,7 @@
         f.phase += 0.03;
         f.x += Math.sin(f.phase) * 0.8;
         f.y += f.vy;
-        if (t > schneeBis) f.leben -= 0.01;
+        if (schneeLandet(f)) return false; // fällt zu Ende, bis sie liegen bleibt
       } else if (f.art === "tropfen") {
         f.vy += 0.28;
         f.y += f.vy;
@@ -3750,7 +4074,7 @@
     });
     ctx.globalAlpha = 1;
     if (flocken.length || t < schneeBis) requestAnimationFrame(bild);
-    else { laeuft = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+    else { laeuft = false; ctx.clearRect(0, 0, innerWidth, innerHeight); haufenZeichnen(); }
   }
 
   function schneeballWerfen(von, nach) {
@@ -3773,6 +4097,53 @@
       anim.onfinish = () => { ball.remove(); splat(nach.x, nach.y); fertig(); };
     });
   }
+
+  // Immer festlicher: 1.–8. Dez. / 9.–16. / 17.–23. / ab Heiligabend Nacht mit Sternen und Polarlicht
+  // (folgt dem Test-Tag des Admins)
+  function festSetzen() {
+    const t = kalenderTag();
+    document.documentElement.dataset.fest = t < 1 ? 0 : t <= 8 ? 1 : t <= 16 ? 2 : t <= 23 ? 3 : 4;
+  }
+
+  // Schlitten am Himmel: fliegt im November und Dezember ab und zu vorbei.
+  // Antippen = ein Geschenk fällt heraus (reine Deko, hat nichts mit echten Geschenken zu tun)
+  function schlittenFliegen() {
+    const monat = new Date().getMonth();
+    if (monat < 10 || !animiert() || wenigBewegung || $("app").hidden || document.visibilityState !== "visible") return;
+    if (buehneOffen || document.querySelector(".huelle.offen")) return;
+    const s = document.createElement("button");
+    s.className = "schlitten";
+    s.innerHTML = `🦌🦌<span style="position:relative;display:inline-block">🛷<span style="position:absolute;left:12%;top:-42%;font-size:.8em">🎅</span></span>`;
+    s.setAttribute("aria-label", "Schlitten des Samichlaus");
+    document.body.appendChild(s);
+    const breite = s.offsetWidth;
+    const basis = innerHeight * (.08 + Math.random() * .2);
+    const bahn = [];
+    for (let i = 0; i <= 30; i++) {
+      const p = i / 30;
+      bahn.push({ transform: `translate(${innerWidth + 20 - (innerWidth + breite + 40) * p}px, ${basis + Math.sin(p * Math.PI * 3) * 32}px) rotate(${Math.cos(p * Math.PI * 3) * 6}deg)` });
+    }
+    const flug = s.animate(bahn, { duration: 9000, easing: "linear" });
+    flug.onfinish = flug.oncancel = () => s.remove();
+    s.addEventListener("click", () => {
+      const r = s.getBoundingClientRect();
+      const g = document.createElement("div");
+      g.className = "schlitten-paket";
+      g.textContent = "🎁";
+      g.style.cssText = "position:fixed;left:0;top:0;z-index:45;font-size:34px;line-height:1;pointer-events:none";
+      document.body.appendChild(g);
+      const x = r.left + r.width / 2, unten = innerHeight - 40;
+      const fall = g.animate([
+        { transform: `translate(${x}px, ${r.bottom}px) rotate(0deg)` },
+        { transform: `translate(${x - 70}px, ${unten}px) rotate(540deg)` }
+      ], { duration: 1100, easing: "cubic-bezier(.45, 0, .9, .6)", fill: "forwards" });
+      fall.onfinish = () => { g.remove(); splat(x - 70, unten); funken(x - 70, unten, 50, ["#f3c969", "#c94a4a", "#ffffff"], 8); toast("🎅 Hoppla! Frohe Festtage!", 2500); };
+    }, { once: true });
+  }
+  function schlittenPlanen(ms) {
+    setTimeout(() => { schlittenFliegen(); schlittenPlanen(120000 + Math.random() * 240000); }, ms);
+  }
+  schlittenPlanen(15000 + Math.random() * 30000);
 
   // Schnee-Knopf (Seitenleiste am Computer, oben neben dem Profil auf dem Handy) – schneit immer
   function schneeLos(e) {
