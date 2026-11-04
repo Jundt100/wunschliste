@@ -612,16 +612,6 @@
   :root[data-fest="4"] #himmel .polarlicht { opacity: 1; }
   @keyframes polarlicht { from { transform: translateX(-6%) skewX(-10deg) scaleY(.85); } to { transform: translateX(6%) skewX(10deg) scaleY(1.15); } }
 
-  /* Liegender Schnee auf den Karten */
-  .wunsch-karte { position: relative; }
-  .wunsch-karte::after {
-    content: ""; position: absolute; left: 20px; right: 20px; top: -7px; height: 15px; pointer-events: none;
-    background: radial-gradient(circle at 11px 11px, #fff 10px, transparent 11px) 0 0 / 31px 15px repeat-x, linear-gradient(#fff, #fff) 0 100% / 100% 6px no-repeat;
-    filter: drop-shadow(0 2px 2px rgba(5, 38, 89, .22));
-    opacity: var(--schnee, 0); transform: scaleY(var(--schnee, 0)); transform-origin: 50% 100%; transition: opacity .35s, transform .35s;
-  }
-  .wunsch-karte.ohne-kappe::after { opacity: 0; transform: scaleY(0); }
-
   /* Geschenk-Status */
   .status-leiste { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .status-schritt {
@@ -1436,7 +1426,6 @@
   const SCHENKEN_ZU = "🔒 Geschenkt werden kann erst ab dem <b>30. November</b>.";
   const ERFASSEN_ZU = "🔒 Die Wunschliste ist seit dem 30. November geschlossen. Für Änderungen wende dich an Nicola.";
   let zeichnenGeplant = false;
-  const schneeWeg = new Set(); // Karten, von denen der Schnee weggewischt wurde
 
   const istAdmin = () => rolle === "admin";
   // Jeder Avatar nur einmal: gibt das Mitglied zurück, das ihn schon hat (ausser mir)
@@ -1610,7 +1599,6 @@
   function zeichnen(mitAnimation = true) {
     if ($("app").hidden) return;
     festSetzen();
-    if (!animiert()) document.documentElement.style.setProperty("--schnee", 0);
     seite = seiteAusHash();
     $("titel").textContent = SEITEN[seite][0];
     $("untertitel").textContent = SEITEN[seite][1];
@@ -1660,7 +1648,7 @@
   function karte(w, abzeichen, aktionen, klasse = "", hinweis = "", info = "") {
     const bild = sicheresBild(w.bild);
     const link = sichererLink(w.link);
-    return `<article class="wunsch-karte neu ${klasse} ${schneeWeg.has(w.id) ? "ohne-kappe" : ""}" data-id="${esc(w.id)}">
+    return `<article class="wunsch-karte neu ${klasse}" data-id="${esc(w.id)}">
       <div class="wk-bild">${bild ? `<img src="${bild}" alt="">` : "🎁"}</div>
       <div class="wk-text">
         <h3>${esc(w.name)}${w.wichtig > 0 ? `<span class="sterne" title="${esc(STERNE_TEXT[Math.min(3, w.wichtig)])}">${"★".repeat(Math.min(3, w.wichtig))}</span>` : ""}</h3>
@@ -3879,99 +3867,18 @@
   let schneeBis = 0;
   let laeuft = false;
 
-  // Liegender Schnee: Höhe pro Spalte am unteren Bildschirmrand, dazu eine Schneekappe auf den Karten
-  const SPALTE = 6;
-  let haufen = [];
-  let haufenDa = false;
-  let kappe = 0;
-  const haufenMax = () => innerWidth < 760 ? 20 : 44;
-
   function groesse() {
     const dpr = window.devicePixelRatio || 1;
     leinwand.width = innerWidth * dpr;
     leinwand.height = innerHeight * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const neu = new Array(Math.ceil(innerWidth / SPALTE) + 1).fill(0);
-    haufen.forEach((h, i) => { const z = Math.floor(i * neu.length / haufen.length); neu[z] = Math.max(neu[z], h); });
-    haufen = neu;
-    haufenZeichnen();
   }
-
-  function schneeLandet(f) {
-    const c = Math.max(0, Math.min(haufen.length - 1, Math.floor(f.x / SPALTE)));
-    if (f.y + f.r < innerHeight - haufen[c]) return false;
-    const max = haufenMax();
-    [[0, .7], [-1, .45], [1, .45], [-2, .2], [2, .2], [-3, .08], [3, .08]].forEach(([d, teil]) => {
-      if (haufen[c + d] !== undefined) haufen[c + d] = Math.min(max, haufen[c + d] + f.r * teil);
-    });
-    haufenDa = true;
-    const vorher = Math.round(kappe * 20);
-    kappe = Math.min(1, kappe + .0015);
-    // Nur in kleinen Schritten setzen: die Variable gilt für die ganze Seite
-    if (Math.round(kappe * 20) !== vorher) document.documentElement.style.setProperty("--schnee", kappe.toFixed(2));
-    return true;
-  }
-
-  function haufenZeichnen() {
-    if (!haufenDa || !animiert()) return;
-    const H = innerHeight;
-    ctx.save();
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#ffffff";
-    ctx.shadowColor = "rgba(5,38,89,.4)";
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    ctx.moveTo(0, H);
-    ctx.lineTo(0, H - haufen[0]);
-    for (let i = 1; i < haufen.length; i++) {
-      const x = i * SPALTE;
-      ctx.quadraticCurveTo(x - SPALTE, H - haufen[i - 1], x - SPALTE / 2, H - (haufen[i - 1] + haufen[i]) / 2);
-    }
-    ctx.lineTo(innerWidth, H);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // Mit Finger oder Maus den Schnee wegwischen
-  function wischen(x, y) {
-    if (!animiert()) return;
-    let geaendert = false;
-    if (haufenDa) {
-      const c = Math.floor(x / SPALTE);
-      if (haufen[c] !== undefined && y >= innerHeight - haufen[c] - 14) {
-        for (let d = -6; d <= 6; d++) {
-          const h = haufen[c + d];
-          if (h > .3) { haufen[c + d] = h * (.15 + Math.abs(d) * .13 > 1 ? 1 : .15 + Math.abs(d) * .13); geaendert = true; }
-        }
-        if (geaendert) {
-          for (let i = 0; i < 3; i++) flocken.push({ art: "splat", x, y: y - 4, vx: (Math.random() - .5) * 6, vy: -2 - Math.random() * 4, r: 1.5 + Math.random() * 2, leben: .8 });
-          haufenDa = haufen.some(h => h > .3);
-          starten();
-        }
-      }
-    }
-    if (kappe > 0) {
-      const k = document.elementFromPoint(x, y)?.closest?.(".wunsch-karte");
-      if (k && !k.classList.contains("ohne-kappe") && y - k.getBoundingClientRect().top < 26) {
-        k.classList.add("ohne-kappe");
-        schneeWeg.add(k.dataset.id);
-        for (let i = 0; i < 8; i++) flocken.push({ art: "splat", x: x + (Math.random() - .5) * 40, y, vx: (Math.random() - .5) * 5, vy: -1 - Math.random() * 3, r: 1.5 + Math.random() * 2.5, leben: .8 });
-        starten();
-      }
-    }
-  }
-  addEventListener("pointermove", e => wischen(e.clientX, e.clientY), { passive: true });
-  addEventListener("touchmove", e => { const t = e.touches[0]; if (t) wischen(t.clientX, t.clientY); }, { passive: true });
   addEventListener("resize", groesse);
   groesse();
 
   function schneien(ms) {
     if (!animiert()) return;
     schneeBis = Math.max(schneeBis, performance.now() + (wenigBewegung ? 800 : ms));
-    // Neuer Schnee: auch die weggewischten Karten bekommen wieder eine Kappe
-    schneeWeg.clear();
-    document.querySelectorAll(".wunsch-karte.ohne-kappe").forEach(k => k.classList.remove("ohne-kappe"));
     starten();
   }
 
@@ -4007,7 +3914,6 @@
 
   function bild(t) {
     ctx.clearRect(0, 0, innerWidth, innerHeight);
-    haufenZeichnen();
     if (t < schneeBis) {
       for (let i = 0; i < 3; i++) {
         flocken.push({ art: "flocke", x: Math.random() * innerWidth, y: -10, vx: 0, vy: 1 + Math.random() * 2.2, r: 1.5 + Math.random() * 3.5, phase: Math.random() * 6.28, leben: 1 });
@@ -4018,7 +3924,7 @@
         f.phase += 0.03;
         f.x += Math.sin(f.phase) * 0.8;
         f.y += f.vy;
-        if (schneeLandet(f)) return false; // fällt zu Ende, bis sie liegen bleibt
+        if (t > schneeBis) f.leben -= 0.01;
       } else if (f.art === "tropfen") {
         f.vy += 0.28;
         f.y += f.vy;
@@ -4074,7 +3980,7 @@
     });
     ctx.globalAlpha = 1;
     if (flocken.length || t < schneeBis) requestAnimationFrame(bild);
-    else { laeuft = false; ctx.clearRect(0, 0, innerWidth, innerHeight); haufenZeichnen(); }
+    else { laeuft = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
   }
 
   function schneeballWerfen(von, nach) {
