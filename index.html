@@ -1115,6 +1115,78 @@
   :root[data-modus="privat"] .fenster { transform: none; transition: none; }
   .privat-liste { display: flex; flex-direction: column; gap: 16px; }
   .privat-summe { margin: 0; color: var(--leise); font-size: 13px; }
+  :root[data-modus="privat"] .knopf.aktiv { background: var(--akzent); color: #fff; box-shadow: none; }
+  .prio-wahl { display: flex; gap: 8px; flex-wrap: wrap; }
+  .p-prio { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; vertical-align: middle; }
+  .p-prio-3 { background: #fde8e6; color: #b42318; }
+  .p-prio-2 { background: #fdf1d8; color: #92610a; }
+  .p-prio-1 { background: var(--zart); color: var(--leise); }
+  .wk-text .p-spar { display: block; margin-top: 8px; color: var(--leise); }
+  .p-balken { display: block; height: 6px; margin-bottom: 4px; border-radius: 3px; background: var(--zart); overflow: hidden; }
+  .p-balken i { display: block; height: 100%; border-radius: 3px; background: var(--akzent-hell); }
+  .p-balken i.voll { background: #2e7d4f; }
+  details.p-kategorie summary .p-kat-summe { margin-left: auto; }
+  details.p-kategorie summary .pfeil { margin-left: 8px; }
+  .wk-text .p-kaufinfo { display: block; margin-top: 4px; }
+  /* Sortieren, Filtern, Kategorien */
+  .p-werkzeug { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .p-werkzeug select { padding: 7px 10px; border: 0; border-radius: 8px; font: inherit; font-size: 12px; color: var(--text); background: var(--flaeche); box-shadow: var(--innen); }
+  .p-werkzeug .rechts-buendig { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .kat-liste { display: flex; flex-direction: column; gap: 10px; }
+  .kat-zeile { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; }
+  .kat-zeile input { width: 100%; border: 0; outline: 0; padding: 9px 12px; border-radius: 8px; background: var(--flaeche); box-shadow: var(--innen); }
+  .kat-zeile input:focus { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
+  .kat-zeile small { color: var(--leise); white-space: nowrap; min-width: 5.5em; text-align: right; }
+  /* Kachel „Meine Käufe“ */
+  .p-reiter { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #d9dce1; }
+  .p-reiter a { padding: 8px 12px; margin-bottom: -1px; border-bottom: 2px solid transparent; color: var(--leise); font-size: 14px; font-weight: 500; text-decoration: none; }
+  .p-reiter a:hover { color: var(--text); }
+  .p-reiter a[aria-current="page"] { color: var(--text); font-weight: 600; border-bottom-color: var(--akzent); }
+  .p-einstellungen { display: flex; flex-direction: column; gap: 16px; }
+  .p-einstellungen > section { padding: 18px; }
+  .p-einstellungen h2 { margin: 0 0 4px; font-size: 16px; }
+  .p-einstellungen h2 + p { margin: 0 0 14px; color: var(--leise); font-size: 13px; }
+  .kd-innen { padding: 18px; display: flex; flex-direction: column; gap: 20px; }
+  .kd-leer { margin: 0; color: var(--leise); font-size: 13px; }
+  .kd-held small { display: block; color: var(--leise); font-size: 13px; }
+  .kd-held b { display: block; font-size: 44px; line-height: 1.15; font-weight: 600; }
+  .kd-held span { display: block; margin-top: 2px; color: var(--leise); font-size: 13px; }
+  .kd-plot { position: relative; margin-top: 18px; padding-left: 46px; }
+  .kd-raster { position: absolute; left: 0; right: 0; top: 0; height: 180px; pointer-events: none; }
+  .kd-tick { position: absolute; left: 46px; right: 0; height: 1px; background: #e1e0d9; }
+  .kd-tick span { position: absolute; right: 100%; bottom: -7px; padding-right: 8px; font-size: 11px; line-height: 14px; color: #6f6d68; font-variant-numeric: tabular-nums; }
+  .kd-spalten { position: relative; display: flex; }
+  .kd-spalte { flex: 1 1 0; min-width: 0; padding: 0; display: flex; flex-direction: column; align-items: center; border-radius: 0; }
+  .kd-spalte:disabled { cursor: default; }
+  .kd-spalte:focus-visible { outline: 2px solid var(--akzent-hell); outline-offset: 1px; }
+  .kd-flaeche { position: relative; width: 100%; height: 180px; display: flex; align-items: flex-end; justify-content: center; border-bottom: 1px solid #c3c2b7; }
+  .kd-balken { position: relative; display: block; width: min(24px, 70%); border-radius: 4px 4px 0 0; background: #2a78d6; transition: filter .15s; }
+  .kd-spalte:not(:disabled):hover .kd-balken { filter: brightness(.88); }
+  .kd-spalte.gedimmt .kd-balken { opacity: .3; }
+  .kd-wert { position: absolute; left: 50%; bottom: 100%; margin-bottom: 3px; transform: translateX(-50%); font-size: 11px; font-style: normal; font-weight: 600; white-space: nowrap; color: var(--text); }
+  .kd-x { margin-top: 6px; font-size: 11px; color: #6f6d68; }
+  .kd-spalte.gewaehlt .kd-x { color: var(--text); font-weight: 600; }
+  .kd-tip { position: absolute; z-index: 5; left: 50%; bottom: calc(100% - 26px); transform: translateX(-50%); padding: 6px 10px; border-radius: 8px; background: #1f2933; color: #fff; font-size: 12px; line-height: 1.35; text-align: left; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .12s; }
+  .kd-spalte:nth-child(-n+2) .kd-tip { left: 0; transform: none; }
+  .kd-spalte:nth-last-child(-n+2) .kd-tip { left: auto; right: 0; transform: none; }
+  .kd-spalte:not(:disabled):hover .kd-tip, .kd-spalte:focus-visible .kd-tip { opacity: 1; }
+  .kd-titel { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
+  .kd-segmente { display: flex; gap: 2px; height: 28px; }
+  .kd-segment { min-width: 0; display: flex; align-items: center; border-radius: 4px; color: #fff; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: visible; }
+  .kd-segment.mit-text { padding-left: 6px; }
+  .kd-segment.dunkel { color: #0b0b0b; }
+  .kd-legende { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+  .kd-legende li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto 44px; align-items: center; gap: 8px; }
+  .kd-legende i { width: 10px; height: 10px; border-radius: 3px; }
+  .kd-legende span { overflow-wrap: anywhere; }
+  .kd-legende b { font-weight: 500; font-variant-numeric: tabular-nums; }
+  .kd-legende small { color: var(--leise); text-align: right; font-variant-numeric: tabular-nums; }
+  .kd-tabelle summary { cursor: pointer; font-size: 13px; font-weight: 600; }
+  .kd-tabelle table { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 13px; }
+  .kd-tabelle th { text-align: left; font-weight: 500; color: var(--leise); }
+  .kd-tabelle th, .kd-tabelle td { padding: 6px 8px 6px 0; border-bottom: 1px solid #e1e0d9; overflow-wrap: anywhere; }
+  .kd-tabelle .zahl { padding-right: 0; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .kd-tabelle .datum { white-space: nowrap; font-variant-numeric: tabular-nums; }
   .wunsch-karte.p-gekauft { opacity: .65; }
   .wunsch-karte.p-gekauft h3 { text-decoration: line-through; }
 
@@ -1286,6 +1358,19 @@
       </div>
       <small class="link-status" id="linkStatus"></small>
     </div>
+    <label class="feld" id="feldKategorie" hidden>
+      <span>Kategorie</span>
+      <input id="eingabeKategorie" list="kategorieListe" maxlength="40" placeholder="z.B. Werkzeug" autocomplete="off">
+      <datalist id="kategorieListe"></datalist>
+    </label>
+    <div class="feld" id="feldPrio" hidden>
+      <span>Priorität</span>
+      <div class="prio-wahl" id="prioWahl">
+        <button type="button" class="knopf klein" data-prio="3">Hoch</button>
+        <button type="button" class="knopf klein" data-prio="2">Mittel</button>
+        <button type="button" class="knopf klein" data-prio="1">Tief</button>
+      </div>
+    </div>
     <label class="feld" id="feldNotiz" hidden>
       <span>Notiz</span>
       <textarea id="eingabeNotiz" maxlength="500" placeholder="z.B. Kaufen, wenn das alte kaputt ist"></textarea>
@@ -1299,6 +1384,43 @@
       <button type="button" class="knopf" id="abbrechen">Abbrechen</button>
       <button type="button" class="knopf" id="alsEntwurf">Als Entwurf</button>
       <button type="submit" class="knopf blau" id="freigeben">❄ Freigeben</button>
+    </div>
+  </form>
+</div>
+
+<!-- ===== Fenster: Für einen privaten Wunsch sparen ===== -->
+<div class="huelle" id="sparHuelle">
+  <form class="fenster neu" id="sparForm" novalidate>
+    <h2 id="sparTitel"></h2>
+    <p id="sparInfo"></p>
+    <label class="feld" id="feldSpar">
+      <span>Betrag (CHF)</span>
+      <input id="eingabeSpar" type="number" min="0" step="0.05" inputmode="decimal" placeholder="z.B. 50">
+    </label>
+    <div class="fenster-knoepfe">
+      <button type="button" class="knopf" id="sparAbbrechen">Abbrechen</button>
+      <button type="button" class="knopf" id="sparRaus">Herausnehmen</button>
+      <button type="submit" class="knopf blau">Einzahlen</button>
+    </div>
+  </form>
+</div>
+
+<!-- ===== Fenster: Privater Wunsch gekauft ===== -->
+<div class="huelle" id="kaufHuelle">
+  <form class="fenster neu" id="kaufForm" novalidate>
+    <h2 id="kaufTitel"></h2>
+    <p>Datum und Betrag erscheinen in der Kachel „Meine Käufe“.</p>
+    <label class="feld" id="feldKaufDatum">
+      <span>Gekauft am *</span>
+      <input id="eingabeKaufDatum" type="date">
+    </label>
+    <label class="feld">
+      <span>Bezahlt (CHF)</span>
+      <input id="eingabeKaufBetrag" type="number" min="0" step="0.05" inputmode="decimal" placeholder="z.B. 49.90">
+    </label>
+    <div class="fenster-knoepfe">
+      <button type="button" class="knopf" id="kaufAbbrechen">Abbrechen</button>
+      <button type="submit" class="knopf blau">Speichern</button>
     </div>
   </form>
 </div>
@@ -1394,8 +1516,11 @@
     mitglieder: ["Mitglieder", "Familie & Freunde auf der Wunschliste"],
     kalender: ["Adventskalender", "🚧 In Bearbeitung – nur für dich sichtbar"],
     einstellungen: ["Einstellungen", "Profil, Animationen und Konto"],
-    privat: ["Private Wünsche", "Nur für dich – niemand sonst sieht diese Liste"]
+    privat: ["Private Wünsche", "Nur für dich – niemand sonst sieht diese Liste"],
+    "privat-kaeufe": ["Meine Käufe", "Was du wann gekauft hast – nur für dich"],
+    "privat-einstellungen": ["Einstellungen", "Für deine privaten Wünsche"]
   };
+  const istPrivatSeite = s => s.startsWith("privat");
   const $ = id => document.getElementById(id);
   const warte = ms => new Promise(r => setTimeout(r, ms));
   const chf = new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" });
@@ -1413,7 +1538,7 @@
 
   // Einstellungen nur für dieses Gerät
   const LOKAL = "wunschliste-lokal";
-  const LOKAL_START = { animationen: true, seiteZu: false, ausgepackt: [], tuerchen: [], kalenderVorschau: 0 };
+  const LOKAL_START = { animationen: true, seiteZu: false, ausgepackt: [], tuerchen: [], kalenderVorschau: 0, privatZu: [], privatSort: "prio", privatFilter: "alle", kaufAnimiert: true };
   const lokal = (() => { try { return { ...LOKAL_START, ...JSON.parse(localStorage.getItem(LOKAL)) }; } catch { return { ...LOKAL_START }; } })();
   const lokalSpeichern = () => { try { localStorage.setItem(LOKAL, JSON.stringify(lokal)); } catch {} };
   const animiert = () => lokal.animationen;
@@ -1656,7 +1781,7 @@
 
   // Der Adventskalender ist noch in Bearbeitung: nur der Admin sieht ihn (siehe KALENDER_FUER_ALLE)
   // Die privaten Wünsche gibt es nur für den Admin
-  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] && (h !== "kalender" || kalenderSichtbar()) && (h !== "privat" || istAdmin()) ? h : "alle"; };
+  const seiteAusHash = () => { const h = location.hash.slice(1); return SEITEN[h] && (h !== "kalender" || kalenderSichtbar()) && (!istPrivatSeite(h) || istAdmin()) ? h : "alle"; };
 
   function zeichnen(mitAnimation = true) {
     if ($("app").hidden) return;
@@ -1678,7 +1803,7 @@
     if (!mitAnimation && aktiv && aktiv.closest && aktiv.closest("#inhalt") && aktiv.tagName === "INPUT") return;
 
     const inhalt = $("inhalt");
-    inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, kalender: seiteKalender, einstellungen: seiteEinstellungen, privat: seitePrivat }[seite]();
+    inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, kalender: seiteKalender, einstellungen: seiteEinstellungen, privat: seitePrivat, "privat-kaeufe": seitePrivatKaeufe, "privat-einstellungen": seitePrivatEinstellungen }[seite]();
 
     if (mitAnimation) {
       [...inhalt.querySelectorAll(":scope > *, .karten > *, .mitglieder-raster > *")].forEach((el, i) => {
@@ -1688,6 +1813,7 @@
     }
     inhalt.querySelectorAll("[data-ring]").forEach(r => ring(r, Number(r.dataset.ring), mitAnimation));
     inhalt.querySelectorAll("[data-zahl]").forEach(z => hochzaehlen(z, Number(z.dataset.zahl), mitAnimation));
+    if (seite === "privat-kaeufe") kaeufeAnimieren(mitAnimation);
   }
 
   // ---------- Bausteine ----------
@@ -1730,19 +1856,35 @@
 
   // ---------- Private Wünsche ----------
   // Eigene Merkliste für später, hat nichts mit Weihnachten zu tun (kein Stichtag, kein Schenken)
+  const PRIO = { 3: "Hoch", 2: "Mittel", 1: "Tief" };
+  const OHNE_KATEGORIE = "Ohne Kategorie";
+  const gespartVon = liste => liste.reduce((s, w) => s + (w.gespart || 0), 0);
+  function privatSparstand(w) {
+    const gespart = w.gespart || 0;
+    if (!gespart) return "";
+    if (!w.preis) return `<span class="p-spar">${chf.format(gespart)} gespart</span>`;
+    const anteil = Math.min(100, Math.round(gespart / w.preis * 100));
+    const rest = w.preis - gespart;
+    return `<span class="p-spar">
+      <span class="p-balken"><i class="${rest <= 0 ? "voll" : ""}" style="width:${anteil}%"></i></span>
+      ${chf.format(gespart)} von ${chf.format(w.preis)} gespart · ${rest > 0 ? `noch ${chf.format(rest)}` : "Ziel erreicht"}
+    </span>`;
+  }
   function privatKarte(w) {
     const bild = sicheresBild(w.bild);
     const link = sichererLink(w.link);
     return `<article class="wunsch-karte neu ${w.gekauft ? "p-gekauft" : ""}" data-id="${esc(w.id)}">
       <div class="wk-bild">${bild ? `<img src="${bild}" alt="">` : `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></svg>`}</div>
       <div class="wk-text">
-        <h3>${esc(w.name)}</h3>
+        <h3>${esc(w.name)}${PRIO[w.prio] ? `<span class="p-prio p-prio-${w.prio}">${PRIO[w.prio]}</span>` : ""}</h3>
         ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : ""}
         ${w.notiz ? `<span class="info mit">${esc(w.notiz)}</span>` : ""}
+        ${w.gekauft ? `<span class="p-kaufinfo">${w.gekauftAm ? `Gekauft am ${datumCH(w.gekauftAm)}` : "Gekauft, Datum fehlt"}</span>` : privatSparstand(w)}
       </div>
       <div class="wk-rechts">
-        <span class="preis">${w.preis != null ? chf.format(w.preis) : "–"}</span>
+        <span class="preis">${w.gekauft ? chf.format(kaufBetrag(w)) : w.preis != null ? chf.format(w.preis) : "–"}</span>
         <div class="wk-aktionen">
+          ${w.gekauft ? `<button class="knopf klein" data-aktion="privat-kauf-aendern">Kauf ändern</button>` : `<button class="knopf klein" data-aktion="privat-sparen">Sparen</button>`}
           <button class="knopf klein" data-aktion="privat-gekauft">${w.gekauft ? "Wieder offen" : "Gekauft"}</button>
           <button class="knopf klein" data-aktion="privat-bearbeiten">Bearbeiten</button>
           <button class="knopf klein gefahr" data-aktion="privat-loeschen">Löschen</button>
@@ -1750,20 +1892,279 @@
       </div>
     </article>`;
   }
+
+  // ---------- Kachel „Meine Käufe“ ----------
+  // Säulen = Ausgaben pro Monat (oder pro Jahr), Balken = Anteil der Kategorien. Antippen einer Säule zeigt nur diesen Zeitraum.
+  const KAUF_FARBEN = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"];
+  const KAUF_UEBRIGE = "#898781";
+  const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+  const zahlCH = new Intl.NumberFormat("de-CH", { maximumFractionDigits: 0 });
+  const datumCH = s => String(s).split("-").reverse().join(".");
+  const kaufBetrag = w => w.bezahlt ?? w.preis ?? 0;
+  const kaufSumme = liste => liste.reduce((s, w) => s + kaufBetrag(w), 0);
+  const kaufAnzahl = n => `${n} ${n === 1 ? "Kauf" : "Käufe"}`;
+  let kaufJahr = String(new Date().getFullYear()); // Jahr als Text oder "alle"
+  let kaufAuswahl = null;   // angetippte Säule
+  let kaufVorher = {};      // zuletzt gezeigte Werte: daraus wächst die Animation zum neuen Wert
+
+  function kaufAchse(max) {
+    if (max <= 0) return { oben: 100, schritte: [0, 50, 100] };
+    const roh = max / 3;
+    const p = 10 ** Math.floor(Math.log10(roh));
+    const schritt = [1, 2, 2.5, 5, 10].map(f => f * p).find(s => s >= roh);
+    const oben = Math.ceil(max / schritt) * schritt;
+    const schritte = [];
+    for (let t = 0; t <= oben + schritt / 2; t += schritt) schritte.push(t);
+    return { oben, schritte };
+  }
+  // Die Farbe bleibt bei der Kategorie, auch wenn das Jahr wechselt: die 5 grössten über alle Jahre, der Rest ist „Übrige“
+  function kaufFarben(datiert) {
+    const summen = new Map();
+    datiert.forEach(w => { const k = w.kategorie || OHNE_KATEGORIE; summen.set(k, (summen.get(k) || 0) + kaufBetrag(w)); });
+    const rang = [...summen.keys()].sort((a, b) => summen.get(b) - summen.get(a) || a.localeCompare(b, "de"));
+    return new Map(rang.slice(0, KAUF_FARBEN.length).map((k, i) => [k, KAUF_FARBEN[i]]));
+  }
+
+  function kachelKaeufe() {
+    const alle = privatWuensche.filter(w => w.gekauft);
+    const datiert = alle.filter(w => w.gekauftAm);
+    const ohneDatum = alle.filter(w => !w.gekauftAm);
+    if (!datiert.length) {
+      return `<section class="kauf-kachel neu"><div class="kd-innen"><p class="kd-leer">${ohneDatum.length
+        ? `${kaufAnzahl(ohneDatum.length)} ohne Datum. Trage es bei den Wünschen unter „Gekauft“ mit „Kauf ändern“ nach, dann erscheint das Diagramm.`
+        : "Sobald du einen Wunsch als gekauft markierst, erscheint er hier im Diagramm."}</p></div></section>`;
+    }
+    const heuer = String(new Date().getFullYear());
+    const jahre = [...new Set([heuer, ...datiert.map(w => w.gekauftAm.slice(0, 4))])].sort().reverse();
+    if (kaufJahr !== "alle" && !jahre.includes(kaufJahr)) kaufJahr = heuer;
+    const imZeitraum = kaufJahr === "alle" ? datiert : datiert.filter(w => w.gekauftAm.startsWith(kaufJahr));
+    const spalten = kaufJahr === "alle"
+      ? [...jahre].reverse().map(j => ({ key: "j" + j, kurz: j, lang: j, liste: datiert.filter(w => w.gekauftAm.startsWith(j)) }))
+      : MONATE.map((m, i) => ({ key: "m" + i, kurz: m.slice(0, 3), lang: `${m} ${kaufJahr}`, liste: imZeitraum.filter(w => Number(w.gekauftAm.slice(5, 7)) === i + 1) }));
+    spalten.forEach(s => { s.summe = kaufSumme(s.liste); });
+    const gewaehlt = spalten.find(s => s.key === kaufAuswahl && s.liste.length) || null;
+    kaufAuswahl = gewaehlt ? gewaehlt.key : null;
+    const sicht = [...(gewaehlt ? gewaehlt.liste : imZeitraum)].sort((a, b) => b.gekauftAm.localeCompare(a.gekauftAm));
+    const summeSicht = kaufSumme(sicht);
+    const max = Math.max(...spalten.map(s => s.summe));
+    const achse = kaufAchse(max);
+    const spitze = spalten.find(s => s.summe === max && max > 0);
+
+    // Vergleich mit dem Vorjahr: nur eine Feststellung, mehr Ausgaben sind nicht „schlecht“
+    let vergleich = "";
+    if (!gewaehlt && kaufJahr !== "alle") {
+      const vorjahr = String(Number(kaufJahr) - 1);
+      const alt = kaufSumme(datiert.filter(w => w.gekauftAm.startsWith(vorjahr)));
+      if (alt > 0) {
+        const d = Math.round((summeSicht - alt) / alt * 100);
+        vergleich = ` · ${d > 0 ? "+" : ""}${d} % gegenüber ${vorjahr}`;
+      }
+    }
+    const schnitt = sicht.length ? ` · im Schnitt ${chf.format(summeSicht / sicht.length)}` : "";
+    const zeitraum = gewaehlt ? gewaehlt.lang : kaufJahr === "alle" ? "allen Jahren" : kaufJahr;
+
+    const chips = `<div class="chips">
+      ${jahre.map(j => `<button class="knopf chip ${kaufJahr === j ? "aktiv" : ""}" data-aktion="kauf-jahr" data-wert="${j}">${j}</button>`).join("")}
+      <button class="knopf chip ${kaufJahr === "alle" ? "aktiv" : ""}" data-aktion="kauf-jahr" data-wert="alle">Alle Jahre</button>
+      ${gewaehlt ? `<button class="knopf chip" data-aktion="kauf-spalte" data-wert="${gewaehlt.key}">Auswahl aufheben</button>` : ""}
+    </div>`;
+
+    const saeulen = spalten.map(s => {
+      const hoehe = s.summe / achse.oben * 100;
+      const klasse = gewaehlt ? (s === gewaehlt ? "gewaehlt" : "gedimmt") : "";
+      const text = `${s.lang}: ${chf.format(s.summe)}, ${kaufAnzahl(s.liste.length)}`;
+      return `<button class="kd-spalte ${klasse}" data-aktion="kauf-spalte" data-wert="${s.key}" aria-label="${esc(text)}" aria-pressed="${s === gewaehlt}" ${s.liste.length ? "" : "disabled"}>
+        <span class="kd-flaeche">
+          ${s.liste.length ? `<span class="kd-tip">${esc(s.lang)}<br><b>${chf.format(s.summe)}</b> · ${kaufAnzahl(s.liste.length)}</span>` : ""}
+          <i class="kd-balken" data-kd="${s.key}" style="height:${hoehe}%">${s === spitze ? `<b class="kd-wert">${zahlCH.format(s.summe)}</b>` : ""}</i>
+        </span>
+        <span class="kd-x">${esc(s.kurz)}</span>
+      </button>`;
+    }).join("");
+    const raster = achse.schritte.map(t => `<div class="kd-tick" style="bottom:${t / achse.oben * 100}%"><span>${zahlCH.format(t)}</span></div>`).join("");
+
+    // Anteile der Kategorien im gewählten Zeitraum
+    const farben = kaufFarben(datiert);
+    const gruppen = new Map();
+    sicht.forEach(w => {
+      const k = w.kategorie || OHNE_KATEGORIE;
+      const name = farben.has(k) ? k : "Übrige";
+      gruppen.set(name, (gruppen.get(name) || 0) + kaufBetrag(w));
+    });
+    const teile = [...gruppen.entries()].map(([name, wert]) => ({ name, wert, farbe: farben.get(name) || KAUF_UEBRIGE, anteil: summeSicht ? wert / summeSicht * 100 : 0 }))
+      .filter(t => t.wert > 0).sort((a, b) => b.wert - a.wert);
+    const segmente = teile.map(t => `<div class="kd-segment ${t.anteil >= 12 ? "mit-text" : ""} ${t.farbe === "#eda100" ? "dunkel" : ""}" data-kd-teil="${esc(t.name)}" data-anteil="${t.anteil}" style="flex:${t.anteil} 1 0;background:${t.farbe}" title="${esc(t.name)}: ${chf.format(t.wert)} (${Math.round(t.anteil)} %)">${t.anteil >= 12 ? `${Math.round(t.anteil)} %` : ""}</div>`).join("");
+    const legende = teile.map(t => `<li><i style="background:${t.farbe}"></i><span>${esc(t.name)}</span><b>${chf.format(t.wert)}</b><small>${Math.round(t.anteil)} %</small></li>`).join("");
+
+    const tabelleAuf = gewaehlt || offeneDetails.has("kauf-tabelle");
+    const zeilen = sicht.map(w => `<tr><td class="datum">${datumCH(w.gekauftAm)}</td><td>${esc(w.name)}</td><td>${esc(w.kategorie || OHNE_KATEGORIE)}</td><td class="zahl">${chf.format(kaufBetrag(w))}</td></tr>`).join("");
+
+    return `<section class="kauf-kachel neu">
+      <div class="kd-innen">
+        ${chips}
+        <div class="kd-held">
+          <small>Ausgegeben in ${esc(zeitraum)}</small>
+          <b data-kauf-summe="${summeSicht}">${chf.format(summeSicht)}</b>
+          <span>${kaufAnzahl(sicht.length)}${schnitt}${vergleich}</span>
+        </div>
+        <div class="kd-plot" role="group" aria-label="Ausgaben in Franken">
+          <div class="kd-raster">${raster}</div>
+          <div class="kd-spalten">${saeulen}</div>
+        </div>
+        ${teile.length ? `<div>
+          <h4 class="kd-titel">Nach Kategorie</h4>
+          <div class="kd-segmente">${segmente}</div>
+          <ul class="kd-legende">${legende}</ul>
+        </div>` : ""}
+        ${sicht.length ? `<details class="kd-tabelle" data-mitglied="kauf-tabelle" ${tabelleAuf ? "open" : ""}>
+          <summary>Einzelne Käufe (${sicht.length})</summary>
+          <table><thead><tr><th>Datum</th><th>Was</th><th>Kategorie</th><th class="zahl">Betrag</th></tr></thead><tbody>${zeilen}</tbody></table>
+        </details>` : ""}
+        ${ohneDatum.length ? `<p class="kd-leer">${kaufAnzahl(ohneDatum.length)} ohne Datum nicht eingerechnet (${chf.format(kaufSumme(ohneDatum))}). Bei den Wünschen unter „Gekauft“ mit „Kauf ändern“ nachtragen.</p>` : ""}
+      </div>
+    </section>`;
+  }
+
+  // Säulen wachsen federnd vom letzten Wert zum neuen. Unveränderte Werte bewegen sich nicht,
+  // darum stört das Neuzeichnen bei Echtzeit-Updates nicht.
+  function kaeufeAnimieren(neuStart) {
+    const wurzel = document.querySelector(".kauf-kachel");
+    if (!wurzel) return;
+    const bewegt = lokal.kaufAnimiert && !wenigBewegung;
+    const vor = neuStart ? {} : kaufVorher;
+    const jetzt = {};
+    wurzel.querySelectorAll("[data-kd]").forEach((el, i) => {
+      const key = el.dataset.kd;
+      const zu = parseFloat(el.style.height);
+      const von = vor[key] ?? 0;
+      jetzt[key] = zu;
+      if (bewegt && von !== zu) {
+        el.animate([{ height: `${von}%` }, { height: `${zu}%` }], { duration: 900, delay: neuStart ? i * 45 : 0, easing: "cubic-bezier(.34, 1.5, .5, 1)", fill: "backwards" });
+        const wert = el.querySelector(".kd-wert");
+        if (wert) wert.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: neuStart ? 800 : 400, fill: "backwards" });
+      }
+      // Antippen einer Säule: die anderen treten sanft zurück
+      const dunkel = el.closest(".kd-spalte").classList.contains("gedimmt") ? .3 : 1;
+      const dunkelVon = vor["o" + key] ?? dunkel;
+      jetzt["o" + key] = dunkel;
+      if (bewegt && dunkelVon !== dunkel) el.animate([{ opacity: dunkelVon }, { opacity: dunkel }], { duration: 250, easing: "ease" });
+    });
+    wurzel.querySelectorAll("[data-kd-teil]").forEach((el, i) => {
+      const key = "s" + el.dataset.kdTeil;
+      const zu = Number(el.dataset.anteil);
+      const von = vor[key] ?? 0;
+      jetzt[key] = zu;
+      if (bewegt && von !== zu) el.animate([{ flexGrow: von }, { flexGrow: zu }], { duration: 900, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" });
+    });
+    if (neuStart && bewegt) {
+      wurzel.querySelectorAll(".kd-legende li").forEach((el, i) => el.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 400, delay: 300 + i * 70, easing: "ease-out", fill: "backwards" }));
+    }
+    const held = wurzel.querySelector("[data-kauf-summe]");
+    if (held) {
+      const zu = Number(held.dataset.kaufSumme);
+      const von = vor.held ?? 0;
+      jetzt.held = zu;
+      if (bewegt && von !== zu) {
+        const t0 = performance.now();
+        const schritt = t => {
+          const p = Math.min(1, (t - t0) / 900);
+          held.textContent = chf.format(von + (zu - von) * (1 - (1 - p) ** 3));
+          if (p < 1 && held.isConnected) requestAnimationFrame(schritt);
+        };
+        requestAnimationFrame(schritt);
+      }
+    }
+    kaufVorher = jetzt;
+  }
+
+  function privatWerkzeug(namen, offen) {
+    const SORTEN = { prio: "Priorität", neu: "Neueste zuerst", alt: "Älteste zuerst", preisAuf: "Preis aufsteigend", preisAb: "Preis absteigend" };
+    const alleZu = namen.length && namen.every(n => lokal.privatZu.includes(n));
+    return `<div class="p-werkzeug">
+      <select data-aktion="privat-sort" aria-label="Sortieren">${Object.entries(SORTEN).map(([k, t]) => `<option value="${k}" ${lokal.privatSort === k ? "selected" : ""}>${t}</option>`).join("")}</select>
+      <button class="knopf chip ${lokal.privatFilter === "alle" ? "aktiv" : ""}" data-aktion="privat-filter" data-wert="alle">Alle</button>
+      <button class="knopf chip ${lokal.privatFilter === "ziel" ? "aktiv" : ""}" data-aktion="privat-filter" data-wert="ziel">Ziel erreicht</button>
+      <div class="rechts-buendig">
+        ${namen.length ? `<button class="knopf chip" data-aktion="privat-alle-klappen" data-wert="${alleZu ? "auf" : "zu"}">${alleZu ? "Alle ausklappen" : "Alle einklappen"}</button>` : ""}
+      </div>
+    </div>`;
+  }
+  const zielErreicht = w => w.preis > 0 && (w.gespart || 0) >= w.preis;
+  function privatSortieren(liste) {
+    const preis = (w, leer) => w.preis ?? leer;
+    const vergleiche = {
+      prio: (a, b) => (b.prio || 0) - (a.prio || 0),
+      neu: (a, b) => (b.erstellt || 0) - (a.erstellt || 0),
+      alt: (a, b) => (a.erstellt || 0) - (b.erstellt || 0),
+      // Wünsche ohne Preis stehen immer zuletzt
+      preisAuf: (a, b) => preis(a, Infinity) - preis(b, Infinity) || 0,
+      preisAb: (a, b) => preis(b, -1) - preis(a, -1)
+    };
+    return [...liste].sort(vergleiche[lokal.privatSort] || vergleiche.prio);
+  }
+
   function seitePrivat() {
     const liste = privatWuensche.filter(passt);
-    const offen = liste.filter(w => !w.gekauft);
-    const gekauft = liste.filter(w => w.gekauft);
-    const zaehlung = offen.length ? `<p class="privat-summe">${offen.length} ${offen.length === 1 ? "Wunsch" : "Wünsche"} offen · zusammen ${chf.format(summe(offen))}</p>` : "";
-    const hauptteil = offen.length ? `<div class="karten">${offen.map(privatKarte).join("")}</div>`
+    const offen = liste.filter(w => !w.gekauft && (lokal.privatFilter !== "ziel" || zielErreicht(w)));
+    const gekauft = liste.filter(w => w.gekauft).sort((a, b) => (b.gekauftAm || "").localeCompare(a.gekauftAm || ""));
+    const gespart = gespartVon(offen);
+    const zaehlung = offen.length ? `<p class="privat-summe">${offen.length} ${offen.length === 1 ? "Wunsch" : "Wünsche"} offen · zusammen ${chf.format(summe(offen))}${gespart ? ` · davon gespart ${chf.format(gespart)}` : ""}</p>` : "";
+    // Kategorien alphabetisch, "Ohne Kategorie" zuletzt; innerhalb nach der gewählten Sortierung
+    const namen = [...new Set(offen.map(w => w.kategorie || OHNE_KATEGORIE))]
+      .sort((a, b) => (a === OHNE_KATEGORIE) - (b === OHNE_KATEGORIE) || a.localeCompare(b, "de"));
+    const kategorien = namen.map(name => {
+      const inhalt = privatSortieren(offen.filter(w => (w.kategorie || OHNE_KATEGORIE) === name));
+      // Beim Suchen immer offen, sonst bliebe ein Treffer versteckt
+      const auf = suchtext || !lokal.privatZu.includes(name);
+      return `<details class="uebersicht p-kategorie neu" data-kategorie="${esc(name)}" ${auf ? "open" : ""}>
+        <summary><h3>${esc(name)}</h3><span>${inhalt.length}</span><span class="p-kat-summe">${chf.format(summe(inhalt))}</span><span class="pfeil">›</span></summary>
+        <div class="karten">${inhalt.map(privatKarte).join("")}</div>
+      </details>`;
+    }).join("");
+    const hauptteil = offen.length ? kategorien
       : suchtext ? `<p class="privat-summe">Nichts gefunden.</p>`
+      : lokal.privatFilter === "ziel" ? `<p class="privat-summe">Noch kein Wunsch hat sein Sparziel erreicht.</p>`
       : privatWuensche.length ? ""
       : `<p class="privat-summe">Noch nichts notiert. Halte hier fest, was du vielleicht einmal kaufen möchtest.</p>`;
     const erledigt = gekauft.length ? `<details class="uebersicht neu" data-mitglied="privat-gekauft" ${offeneDetails.has("privat-gekauft") ? "open" : ""}>
         <summary><h3>Gekauft</h3><span>${gekauft.length}</span><span class="pfeil">›</span></summary>
         <div class="karten">${gekauft.map(privatKarte).join("")}</div>
       </details>` : "";
-    return `<div class="privat-liste">${plusBalken("Wunsch notieren", "Name, Preis, Link, Bild und Notiz", "privat-neu")}${zaehlung}${hauptteil}${erledigt}</div>`;
+    return `${privatReiter()}<div class="privat-liste">${plusBalken("Wunsch notieren", "Kategorie, Priorität, Preis, Link, Bild und Notiz", "privat-neu")}${privatWerkzeug(namen, offen)}${zaehlung}${hauptteil}${erledigt}</div>`;
+  }
+
+  // Der private Bereich hat drei eigene Seiten
+  function privatReiter() {
+    const reiter = { privat: "Wünsche", "privat-kaeufe": "Käufe", "privat-einstellungen": "Einstellungen" };
+    return `<div class="p-reiter" role="navigation" aria-label="Privater Bereich">${Object.entries(reiter).map(([k, t]) => `<a href="#${k}" ${seite === k ? 'aria-current="page"' : ""}>${t}</a>`).join("")}</div>`;
+  }
+  function seitePrivatKaeufe() {
+    return privatReiter() + kachelKaeufe();
+  }
+  function seitePrivatEinstellungen() {
+    const namen = privatKategorien();
+    const zeilen = namen.length ? namen.map(k => {
+      const n = privatWuensche.filter(w => w.kategorie === k).length;
+      return `<div class="kat-zeile" data-alt="${esc(k)}">
+        <input value="${esc(k)}" maxlength="40" list="katVorschlaege" aria-label="Name der Kategorie ${esc(k)}" autocomplete="off">
+        <small>${n} ${n === 1 ? "Wunsch" : "Wünsche"}</small>
+        <button type="button" class="knopf klein" data-aktion="kategorie-aendern">Übernehmen</button>
+      </div>`;
+    }).join("") : `<p class="kd-leer">Noch keine Kategorien.</p>`;
+    return `${privatReiter()}<div class="p-einstellungen">
+      <section class="neu">
+        <div class="einstellung">
+          <div><strong>Animationen im Diagramm</strong><span>Säulen und Zahlen bei den Käufen bewegen sich (nur auf diesem Gerät)</span></div>
+          <button class="schalter ${lokal.kaufAnimiert ? "an" : ""}" data-aktion="kauf-animation" role="switch" aria-checked="${lokal.kaufAnimiert}" aria-label="Animationen im Diagramm"></button>
+        </div>
+      </section>
+      <section class="neu">
+        <h2>Kategorien verwalten</h2>
+        <p>Neuen Namen eintippen und übernehmen. Der Name einer anderen Kategorie legt beide zusammen, ein leeres Feld entfernt die Kategorie.</p>
+        <div class="kat-liste">${zeilen}</div>
+        <datalist id="katVorschlaege">${namen.map(k => `<option value="${esc(k)}"></option>`).join("")}</datalist>
+      </section>
+    </div>`;
   }
 
   // ---------- Alle Wünsche ----------
@@ -3064,7 +3465,7 @@
   // ---------- Rechte Spalte ----------
   function seitenleisteRechts() {
     // Im privaten Bereich keine Geschenk-Meldungen: die kommen beim Zurückschalten
-    if (seite === "privat") return;
+    if (istPrivatSeite(seite)) return;
     const geschenke = meineGeschenke();
     const z = $("zaehlerSchenkung");
     z.hidden = !geschenke.length;
@@ -3155,6 +3556,21 @@
   $("inhalt").addEventListener("toggle", e => {
     const d = e.target.closest && e.target.closest("details[data-mitglied]");
     if (d) d.open ? offeneDetails.add(d.dataset.mitglied) : offeneDetails.delete(d.dataset.mitglied);
+    // Private Wünsche: eingeklappte Kategorien auf diesem Gerät merken
+    const k = e.target.closest && e.target.closest("details[data-kategorie]");
+    if (k && !suchtext) {
+      lokal.privatZu = lokal.privatZu.filter(x => x !== k.dataset.kategorie);
+      if (!k.open) lokal.privatZu.push(k.dataset.kategorie);
+      lokalSpeichern();
+      // Der Knopf „Alle einklappen“ muss zum neuen Zustand passen
+      const namenAlle = [...document.querySelectorAll("details[data-kategorie]")].map(x => x.dataset.kategorie);
+      const klapp = document.querySelector('[data-aktion="privat-alle-klappen"]');
+      if (klapp) {
+        const alleZu = namenAlle.every(n => lokal.privatZu.includes(n));
+        klapp.dataset.wert = alleZu ? "auf" : "zu";
+        klapp.textContent = alleZu ? "Alle ausklappen" : "Alle einklappen";
+      }
+    }
   }, true);
 
   // Limite pro Person speichern (beim Verlassen des Feldes oder Enter)
@@ -3163,6 +3579,11 @@
     if (e.target.matches && e.target.matches('select[data-aktion="vorschau-tag"]')) {
       lokal.kalenderVorschau = Number(e.target.value);
       lokal.tuerchen = [];
+      lokalSpeichern();
+      return zeichnen(false);
+    }
+    if (e.target.matches && e.target.matches('select[data-aktion="privat-sort"]')) {
+      lokal.privatSort = e.target.value;
       lokalSpeichern();
       return zeichnen(false);
     }
@@ -3203,9 +3624,45 @@
           const p = privatWuensche.find(x => x.id === id);
           return p && oeffnen(p);
         }
+        case "privat-sparen": {
+          const p = privatWuensche.find(x => x.id === id);
+          return p && sparenOeffnen(p);
+        }
         case "privat-gekauft": {
           const p = privatWuensche.find(x => x.id === id);
-          return p && await schreiben(updateDoc(doc(db, "privat", id), { gekauft: !p.gekauft }));
+          if (!p) return;
+          if (!p.gekauft) return kaufOeffnen(p);
+          return await schreiben(updateDoc(doc(db, "privat", id), { gekauft: false, gekauftAm: null, bezahlt: null }));
+        }
+        case "privat-kauf-aendern": {
+          const p = privatWuensche.find(x => x.id === id);
+          return p && kaufOeffnen(p);
+        }
+        case "privat-filter":
+          lokal.privatFilter = knopf.dataset.wert;
+          lokalSpeichern();
+          return zeichnen(false);
+        case "privat-alle-klappen": {
+          const namen = [...document.querySelectorAll("details[data-kategorie]")].map(d => d.dataset.kategorie);
+          lokal.privatZu = knopf.dataset.wert === "zu" ? [...new Set([...lokal.privatZu, ...namen])] : lokal.privatZu.filter(n => !namen.includes(n));
+          lokalSpeichern();
+          return zeichnen(false);
+        }
+        case "kategorie-aendern": return await kategorieAendern(knopf.closest(".kat-zeile"));
+        case "kauf-animation":
+          lokal.kaufAnimiert = !lokal.kaufAnimiert;
+          lokalSpeichern();
+          return zeichnen(false);
+        case "kauf-jahr":
+          kaufJahr = knopf.dataset.wert;
+          kaufAuswahl = null;
+          return zeichnen(false);
+        case "kauf-spalte": {
+          const key = knopf.dataset.wert;
+          kaufAuswahl = kaufAuswahl === key ? null : key;
+          zeichnen(false);
+          const wieder = document.querySelector(`.kd-spalte[data-wert="${key}"]`);
+          return wieder && wieder.focus({ preventScroll: true });
         }
         case "privat-loeschen": {
           const p = privatWuensche.find(x => x.id === id);
@@ -3579,6 +4036,11 @@
     $("fensterText").textContent = formularPrivat ? "Nur für dich sichtbar." : "Fülle die Angaben aus und gib den Wunsch frei.";
     $("feldWichtig").hidden = formularPrivat;
     $("feldNotiz").hidden = !formularPrivat;
+    $("feldKategorie").hidden = !formularPrivat;
+    $("feldPrio").hidden = !formularPrivat;
+    $("eingabeKategorie").value = w ? w.kategorie || "" : "";
+    $("kategorieListe").innerHTML = privatKategorien().map(k => `<option value="${esc(k)}"></option>`).join("");
+    prioSetzen(w ? w.prio || 0 : 0);
     $("alsEntwurf").hidden = formularPrivat;
     $("freigeben").textContent = formularPrivat ? "Speichern" : "❄ Freigeben";
     $("eingabeNotiz").value = w ? w.notiz || "" : "";
@@ -3594,6 +4056,104 @@
     setTimeout(() => $("eingabeName").focus(), 150);
   }
   function schliessen() { $("huelle").classList.remove("offen"); }
+
+  // ---------- Private Wünsche: Kategorie, Priorität, Sparen ----------
+  const privatKategorien = () => [...new Set(privatWuensche.map(w => w.kategorie).filter(Boolean))].sort((a, b) => a.localeCompare(b, "de"));
+  let neuePrio = 0;
+  function prioSetzen(n) {
+    neuePrio = n;
+    $("prioWahl").querySelectorAll("button").forEach(b => b.classList.toggle("aktiv", Number(b.dataset.prio) === n));
+  }
+  $("prioWahl").addEventListener("click", e => {
+    const b = e.target.closest("button[data-prio]");
+    if (!b) return;
+    const n = Number(b.dataset.prio);
+    prioSetzen(n === neuePrio ? 0 : n);
+  });
+
+  let sparId = null;
+  function sparenOeffnen(w) {
+    sparId = w.id;
+    $("sparTitel").textContent = `Sparen für ${w.name}`;
+    const gespart = w.gespart || 0;
+    $("sparInfo").textContent = `Bisher gespart: ${chf.format(gespart)}${w.preis ? ` von ${chf.format(w.preis)}` : ""}`;
+    $("eingabeSpar").value = "";
+    $("sparHuelle").classList.add("offen");
+    setTimeout(() => $("eingabeSpar").focus(), 150);
+  }
+  const sparenSchliessen = () => $("sparHuelle").classList.remove("offen");
+  function sparenBuchen(vorzeichen) {
+    const betrag = Number($("eingabeSpar").value);
+    if (!(betrag > 0)) return wackeln("feldSpar");
+    const w = privatWuensche.find(x => x.id === sparId);
+    if (!w) return sparenSchliessen();
+    const neu = Math.max(0, Math.round(((w.gespart || 0) + vorzeichen * betrag) * 100) / 100);
+    schreiben(updateDoc(doc(db, "privat", w.id), { gespart: neu })).catch(() => {});
+    sparenSchliessen();
+  }
+  $("sparForm").addEventListener("submit", e => { e.preventDefault(); sparenBuchen(1); });
+  $("sparRaus").addEventListener("click", () => sparenBuchen(-1));
+  $("sparAbbrechen").addEventListener("click", sparenSchliessen);
+  $("sparHuelle").addEventListener("click", e => { if (e.target === $("sparHuelle")) sparenSchliessen(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") { sparenSchliessen(); kaufSchliessen(); } });
+
+  // Gekauft: Datum und Betrag festhalten (daraus entsteht die Kachel „Meine Käufe“)
+  let kaufId = null;
+  function kaufOeffnen(w) {
+    kaufId = w.id;
+    const heute = new Date();
+    const zweistellig = n => String(n).padStart(2, "0");
+    $("kaufTitel").textContent = `Gekauft: ${w.name}`;
+    $("eingabeKaufDatum").value = w.gekauftAm || `${heute.getFullYear()}-${zweistellig(heute.getMonth() + 1)}-${zweistellig(heute.getDate())}`;
+    const betrag = w.bezahlt ?? w.preis;
+    $("eingabeKaufBetrag").value = betrag != null ? betrag : "";
+    $("kaufHuelle").classList.add("offen");
+  }
+  const kaufSchliessen = () => $("kaufHuelle").classList.remove("offen");
+  $("kaufForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const datum = $("eingabeKaufDatum").value;
+    if (!datum) return wackeln("feldKaufDatum");
+    const text = $("eingabeKaufBetrag").value;
+    schreiben(updateDoc(doc(db, "privat", kaufId), { gekauft: true, gekauftAm: datum, bezahlt: text === "" ? null : Math.max(0, Number(text)) })).catch(() => {});
+    // Das Diagramm auf das Jahr des Kaufs stellen, damit man ihn gleich sieht
+    if (kaufJahr !== "alle") kaufJahr = datum.slice(0, 4);
+    kaufAuswahl = null;
+    kaufSchliessen();
+    spaeterZeichnen();
+  });
+  $("kaufAbbrechen").addEventListener("click", kaufSchliessen);
+  $("kaufHuelle").addEventListener("click", e => { if (e.target === $("kaufHuelle")) kaufSchliessen(); });
+
+  // Kategorien umbenennen, zusammenlegen oder entfernen
+  function kategorienZeichnen() {
+    // Solange ein Feld den Fokus hat, zeichnet die Seite nicht neu
+    if (document.activeElement) document.activeElement.blur();
+    zeichnen(false);
+  }
+  async function kategorieAendern(zeile) {
+    const alt = zeile.dataset.alt;
+    const eingabe = zeile.querySelector("input").value.trim();
+    if (eingabe === alt) return;
+    const anderes = privatKategorien().find(k => k !== alt && k.toLowerCase() === eingabe.toLowerCase());
+    const betroffen = privatWuensche.filter(w => w.kategorie === alt);
+    if (!eingabe && !confirm(`Kategorie „${alt}“ entfernen? Die Wünsche kommen zu „${OHNE_KATEGORIE}“.`)) return kategorienZeichnen();
+    if (anderes && !confirm(`„${alt}“ mit „${anderes}“ zusammenlegen?`)) return kategorienZeichnen();
+    const ziel = anderes || eingabe;
+    const stapel = writeBatch(db);
+    betroffen.forEach(w => stapel.update(doc(db, "privat", w.id), { kategorie: ziel }));
+    try { await schreiben(stapel.commit()); } catch { return; }
+    // War die alte Kategorie eingeklappt, bleibt es die neue auch (ausser sie gibt es schon)
+    if (lokal.privatZu.includes(alt)) {
+      lokal.privatZu = lokal.privatZu.filter(k => k !== alt);
+      if (ziel && !anderes) lokal.privatZu.push(ziel);
+      lokalSpeichern();
+    }
+    kategorienZeichnen();
+  }
+  $("inhalt").addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.matches(".kat-zeile input")) { e.preventDefault(); kategorieAendern(e.target.closest(".kat-zeile")); }
+  });
 
   $("abbrechen").addEventListener("click", schliessen);
   $("huelle").addEventListener("click", e => { if (e.target === $("huelle")) schliessen(); });
@@ -3822,13 +4382,16 @@
     if (!ok) return null;
 
     if (formularPrivat) {
-      const privatFelder = { name, link, bild: neuesBild, notiz: $("eingabeNotiz").value.trim(), preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
+      // Gleiche Kategorie mit anderer Schreibweise nicht doppelt anlegen
+      const kategorie = $("eingabeKategorie").value.trim();
+      const bekannt = privatKategorien().find(k => k.toLowerCase() === kategorie.toLowerCase());
+      const privatFelder = { name, link, bild: neuesBild, kategorie: bekannt || kategorie, prio: neuePrio, notiz: $("eingabeNotiz").value.trim(), preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
       if (bearbeiteId) {
         schreiben(updateDoc(doc(db, "privat", bearbeiteId), privatFelder)).catch(() => {});
         return bearbeiteId;
       }
       const neu = doc(collection(db, "privat"));
-      schreiben(setDoc(neu, { ...privatFelder, besitzer: uid, gekauft: false, erstellt: Date.now() })).catch(() => {});
+      schreiben(setDoc(neu, { ...privatFelder, besitzer: uid, gekauft: false, gespart: 0, erstellt: Date.now() })).catch(() => {});
       return neu.id;
     }
 
@@ -4145,7 +4708,7 @@
   // (folgt dem Test-Tag des Admins)
   function festSetzen() {
     const wurzel = document.documentElement;
-    const privat = seiteAusHash() === "privat";
+    const privat = istPrivatSeite(seiteAusHash());
     // Private Wünsche: normales Aussehen statt Weihnachten
     $("privatSchalter").hidden = !istAdmin();
     $("privatSchalter").setAttribute("aria-checked", privat);
@@ -4224,7 +4787,7 @@
   // Schalter: hin zu den privaten Wünschen und zurück auf die Seite, von der man kam
   let seiteVorPrivat = "alle";
   $("privatSchalter").addEventListener("click", () => {
-    if (seite === "privat") { location.hash = "#" + seiteVorPrivat; return; }
+    if (istPrivatSeite(seite)) { location.hash = "#" + seiteVorPrivat; return; }
     seiteVorPrivat = seite;
     location.hash = "#privat";
   });
