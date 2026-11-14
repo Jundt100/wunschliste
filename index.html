@@ -377,30 +377,6 @@
   .gruppe-kopf .summe { margin-left: auto; font-weight: 600; color: var(--akzent); font-size: 14px; }
   .gruppe-kopf .summe.rot { color: var(--rot); }
 
-  /* Schenkungslimite */
-  .wunsch-karte.ueber-limite { box-shadow: var(--aussen), inset 0 0 0 2px rgba(201, 74, 74, .45); }
-  .paket-kopf.ueber { background: linear-gradient(135deg, #d97a7a, var(--rot)); }
-  .budget-leiste { display: flex; gap: 14px; overflow-x: auto; padding: 4px 4px 10px; margin: -4px -4px 0; scrollbar-width: thin; }
-  .budget-chip { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 10px; min-width: 190px; border-radius: 20px; }
-  .budget-chip .avatar { width: 34px; height: 34px; font-size: 18px; }
-  .budget-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
-  .budget-info b { font-size: 13px; }
-  .budget-info span { font-size: 11px; color: var(--leise); white-space: nowrap; }
-  .budget-chip.ueber .budget-info span, .limite-zeile.ueber .budget-info span { color: var(--rot); font-weight: 600; }
-  .budget-balken { height: 7px; border-radius: 99px; box-shadow: var(--innen); overflow: hidden; }
-  .budget-balken i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--akzent-hell), var(--akzent)); transition: width 1s var(--feder); }
-  .budget-balken.ueber i { background: linear-gradient(90deg, #e09090, var(--rot)); }
-  .budget-balken.leer i { width: 0; }
-  .budget-hinweis { display: block; padding: 14px 18px; border-radius: 20px; font-size: 13px; color: var(--text); text-decoration: none; transition: transform .6s var(--feder); }
-  .budget-hinweis:hover { transform: translateY(-2px); }
-  .limiten { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-  .limiten .zeile h2 { font-size: 17px; }
-  .limiten-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-  .limite-zeile { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; box-shadow: var(--aussen-klein); }
-  .limite-zeile .avatar { width: 36px; height: 36px; font-size: 19px; }
-  .limite-feld { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--leise); }
-  .limite-feld input { width: 78px; border: 0; outline: 0; padding: 9px 10px; border-radius: 12px; background: var(--flaeche); box-shadow: var(--innen); text-align: right; color: var(--text); }
-  .limite-feld input:focus { box-shadow: var(--innen), 0 0 0 2px var(--akzent-hell); }
 
   /* Bescherung */
   .bescherung-banner {
@@ -923,7 +899,29 @@
   .sterne-legende { line-height: 1.6; }
   .sterne-legende .gelb { color: #e0a526; letter-spacing: 1px; }
   .wk-text .info.mit { color: var(--text); font-weight: 400; line-height: 1.5; }
-  .meldung-herz { font-size: 46px; text-align: center; color: var(--rot); animation: herzschlag 1.1s ease-in-out infinite; }
+  #teuerHuelle { z-index: 60; }
+  #teuerHuelle .fenster { max-width: 400px; overflow-x: hidden; text-align: center; padding: 30px 26px 26px; }
+  .teuer-icon {
+    width: 72px; height: 72px; margin: 0 auto 14px;
+    display: grid; place-items: center;
+    border-radius: 50%; font-size: 34px;
+    background: var(--flaeche); box-shadow: var(--aussen-klein);
+  }
+  .huelle.offen .teuer-icon { animation: teuerWippen 2.4s ease-in-out .6s infinite; }
+  @keyframes teuerWippen { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+  #teuerHuelle h2 { margin-bottom: 14px; }
+  .teuer-wunsch { font-weight: 600; font-size: 16px; overflow-wrap: anywhere; }
+  .teuer-preis {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+    margin: 12px auto 4px; padding: 12px 22px; border-radius: 18px; box-shadow: var(--innen);
+  }
+  .teuer-preis b { font-size: 26px; font-weight: 700; color: var(--akzent); }
+  .teuer-preis small { font-size: 12px; color: var(--leise); }
+  #teuerText { margin: 10px 0 0; color: var(--leise); line-height: 1.5; font-size: 14px; }
+  #teuerHuelle .fenster-knoepfe { justify-content: center; }
+  @media (max-width: 480px) { #teuerHuelle .fenster-knoepfe .knopf { flex: 1 1 100%; } }
+  @media (prefers-reduced-motion: reduce) { .huelle.offen .teuer-icon { animation: none; } }
+  .meldung-herz {font-size: 46px; text-align: center; color: var(--rot); animation: herzschlag 1.1s ease-in-out infinite; }
   .meldung-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
   .meldung-liste li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 16px; box-shadow: var(--innen); font-size: 14px; }
   .meldung-liste li span { margin-left: auto; color: var(--leise); font-size: 12px; text-align: right; }
@@ -1190,6 +1188,87 @@
   .wunsch-karte.p-gekauft { opacity: .65; }
   .wunsch-karte.p-gekauft h3 { text-decoration: line-through; }
 
+  /* ---------- Alle Wünsche: Kopf, Personen, Kacheln ---------- */
+  .alle-kopf { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .alle-knoepfe { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .info-i {
+    width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--akzent); color: #fff; font: 700 12px/1 Georgia, serif; font-style: italic;
+  }
+  .person-block { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .person-kopf { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid rgba(84, 131, 179, .18); }
+  .person-kopf .avatar { width: 46px; height: 46px; font-size: 24px; }
+  .person-kopf h2 { margin: 0; font-size: 19px; font-weight: 600; }
+  .person-kopf span { color: var(--leise); font-size: 12px; }
+  .kacheln { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 16px; }
+  .wunsch-karte.kachel {
+    display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+    padding: 10px 10px 12px; text-align: left; font: inherit; color: var(--text);
+    border: 0; border-radius: 20px; cursor: pointer;
+    background: var(--flaeche); box-shadow: var(--aussen-klein);
+  }
+  .wunsch-karte.kachel:focus-visible { outline: 0; box-shadow: var(--aussen-klein), 0 0 0 3px var(--akzent-hell); }
+  .wunsch-karte.kachel:active { transform: scale(.97); }
+  .kachel-bild {
+    position: relative; display: grid; place-items: center; aspect-ratio: 1 / 1;
+    border-radius: 14px; overflow: hidden; background: var(--zart); font-size: 46px; margin-bottom: 4px;
+  }
+  .kachel-bild img { width: 100%; height: 100%; object-fit: cover; }
+  .kachel-sterne, .kachel-marke {
+    position: absolute; top: 8px; padding: 3px 8px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; line-height: 1.3; background: rgba(255, 255, 255, .92);
+    box-shadow: 0 1px 4px rgba(2, 16, 36, .15);
+  }
+  .kachel-sterne { left: 8px; color: #e0a526; letter-spacing: 1px; font-size: 12px; }
+  .kachel-marke { right: 8px; color: var(--akzent); }
+  .kachel-name {
+    font-size: 14px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .kachel-preis { margin-top: auto; font-size: 15px; font-weight: 700; color: var(--akzent); }
+  @media (max-width: 760px) {
+    .person-block { padding: 14px; }
+    .kacheln { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .wunsch-karte.kachel { padding: 8px 8px 10px; }
+  }
+
+  /* Detailfenster eines Wunsches */
+  #detailHuelle, #infoHuelle { z-index: 55; }
+  .detail-fenster { max-width: 460px; padding: 0; overflow-x: hidden; }
+  .wunsch-karte.detail { display: block; padding: 0 0 22px; position: relative; }
+  .wunsch-karte.detail:hover { transform: none; }
+  .detail-zu {
+    position: absolute; top: 12px; right: 12px; z-index: 1; width: 36px; height: 36px; border: 0; border-radius: 50%;
+    background: rgba(255, 255, 255, .92); color: var(--text); font-size: 15px; cursor: pointer; box-shadow: 0 2px 8px rgba(2, 16, 36, .2);
+  }
+  .detail-bild { display: grid; place-items: center; height: 240px; background: var(--zart); font-size: 72px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; }
+  .detail-bild img { width: 100%; height: 100%; object-fit: cover; }
+  .wunsch-karte.detail > :not(.detail-bild):not(.detail-zu) { margin-left: 24px; margin-right: 24px; }
+  .detail-fuer { margin-top: 18px; font-size: 12px; color: var(--leise); }
+  .wunsch-karte.detail h2 { margin-top: 4px; margin-bottom: 6px; font-size: 21px; overflow-wrap: anywhere; }
+  .detail-sterne { font-size: 13px; color: var(--leise); }
+  .detail-sterne span { color: #e0a526; letter-spacing: 1px; font-size: 15px; }
+  .detail-preis { margin-top: 10px; font-size: 24px; font-weight: 700; color: var(--akzent); }
+  .detail-liste { margin-top: 16px; margin-bottom: 0; display: flex; flex-direction: column; gap: 10px; }
+  .detail-liste > div { padding: 12px 14px; border-radius: 14px; box-shadow: var(--innen); }
+  .detail-liste dt { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--leise); margin-bottom: 3px; }
+  .detail-liste dd { margin: 0; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-line; }
+  .detail-liste a { color: var(--akzent-hell); font-weight: 600; text-decoration: none; }
+  .detail-leer { color: var(--leise); }
+  .wunsch-karte.detail .fenster-knoepfe .knopf { flex: 1; }
+
+  /* Infofenster "So funktioniert's" */
+  .info-fenster { max-width: 480px; }
+  .info-schritte { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; counter-reset: schritt; }
+  .info-schritte li { position: relative; padding: 2px 0 2px 38px; font-size: 14px; line-height: 1.5; counter-increment: schritt; }
+  .info-schritte li::before {
+    content: counter(schritt); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; background: var(--akzent);
+  }
+  .info-sterne { margin-top: 16px; padding: 12px 14px; border-radius: 14px; box-shadow: var(--innen); font-size: 13px; line-height: 1.7; }
+  .info-sterne b { color: #e0a526; letter-spacing: 1px; display: inline-block; min-width: 44px; }
+  .info-tage { display: block; color: var(--akzent); font-weight: 600; font-size: 13px; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   }
@@ -1371,8 +1450,8 @@
         <button type="button" class="knopf klein" data-prio="1">Tief</button>
       </div>
     </div>
-    <label class="feld" id="feldNotiz" hidden>
-      <span>Notiz</span>
+    <label class="feld" id="feldNotiz">
+      <span id="notizTitel">Bemerkung</span>
       <textarea id="eingabeNotiz" maxlength="500" placeholder="z.B. Kaufen, wenn das alte kaputt ist"></textarea>
     </label>
     <div class="feld">
@@ -1434,6 +1513,51 @@
     <ul class="meldung-liste" id="meldungListe"></ul>
     <div class="fenster-knoepfe">
       <button type="button" class="knopf blau" id="meldungOk">Verstanden</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Fenster: Wunsch im Detail (Alle Wünsche) ===== -->
+<div class="huelle" id="detailHuelle">
+  <div class="fenster neu detail-fenster" id="detailFenster" role="dialog" aria-modal="true" aria-labelledby="detailTitel"></div>
+</div>
+
+<!-- ===== Fenster: So funktioniert's ===== -->
+<div class="huelle" id="infoHuelle">
+  <div class="fenster neu info-fenster" role="dialog" aria-modal="true" aria-labelledby="infoTitel">
+    <h2 id="infoTitel">So funktioniert's 🎄</h2>
+    <ol class="info-schritte">
+      <li><b>Bis und mit 29. November</b> erfassen alle ihre Wünsche. <span class="info-tage" id="infoTage"></span></li>
+      <li><b>Ab dem 30. November</b> kann geschenkt werden.</li>
+      <li><b>Wunsch antippen:</b> Du siehst Bild, Preis, Bemerkung und den Link zum Shop.</li>
+      <li><b>„Ich schenke das“:</b> Du übernimmst den ganzen Betrag oder 🤝 nur einen Teil – dann können andere mitschenken.</li>
+      <li><b>Alles bleibt geheim:</b> Was jemand ganz schenkt, verschwindet für alle anderen aus der Liste. Wer etwas schenkt, sieht die beschenkte Person erst bei der Bescherung am 24. Dezember.</li>
+      <li><b>Dein Paket</b> findest du unter „Schenkung“, mit Einkaufsliste zum Abhaken.</li>
+    </ol>
+    <div class="info-sterne">
+      <div><b>★★★</b> Herzenswunsch (Priorität 1)</div>
+      <div><b>★★</b> Wünscht sich die Person sehr (Priorität 2)</div>
+      <div><b>★</b> Wäre schön (Priorität 3)</div>
+      <div class="detail-leer">Herzenswünsche stehen jeweils zuoberst.</div>
+    </div>
+    <div class="fenster-knoepfe">
+      <button type="button" class="knopf blau" id="infoZu">Alles klar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Fenster: Wunsch über 300 CHF bestätigen ===== -->
+<div class="huelle" id="teuerHuelle">
+  <div class="fenster neu" role="alertdialog" aria-labelledby="teuerTitel" aria-describedby="teuerText">
+    <div class="teuer-icon" aria-hidden="true">💸</div>
+    <h2 id="teuerTitel">Bist du 100 % sicher?</h2>
+    <div class="teuer-wunsch" id="teuerName"></div>
+    <div class="teuer-preis"><b id="teuerPreis"></b><small>mehr als CHF 300.00</small></div>
+    <p id="teuerText"></p>
+    <div class="fenster-knoepfe">
+      <button type="button" class="knopf" id="teuerSpaeter" hidden>Später</button>
+      <button type="button" class="knopf" id="teuerNein">Abbrechen</button>
+      <button type="button" class="knopf blau" id="teuerJa">Ja, online stellen</button>
     </div>
   </div>
 </div>
@@ -1587,8 +1711,7 @@
   let einladungen = [];
   let abmelder = [];
   const geladen = new Set(); // welche Listen schon einmal angekommen sind (gegen Fehlalarm beim Start)
-  let limiten = {};         // meine Schenkungslimite pro Person { uid: CHF } – privat
-  let budgetGemeldet = null; // zuletzt gezeigte Budget-Meldung (damit sie nicht ständig wiederkommt)
+  let teuerGefragt = false;  // Rückfrage zu teuren Wünschen (über 300 CHF): einmal pro Öffnen der Seite
   // Gemeinsam schenken: anteile/{wunschId} = { besitzer, name, preis, gekauft, teile: { uid: { betrag, notiz, gekauft, erstellt } } }
   // Sehen dürfen das alle ausser dem Beschenkten.
   let anteileListe = [];
@@ -1646,8 +1769,11 @@
     mitglieder = []; eigene = []; fremde = []; vergeben = new Set(); meineRes = [];
     adminWuensche = []; adminRes = []; einladungen = [];
     geladen.clear();
-    limiten = {};
-    budgetGemeldet = null;
+    teuerGefragt = false;
+    $("teuerHuelle").classList.remove("offen");
+    detailId = null;
+    $("detailHuelle").classList.remove("offen");
+    $("infoHuelle").classList.remove("offen");
     bescherungRes = []; bescherungGemeldet = false;
     anteileListe = []; adminAnteile = []; bescherungAnteile = [];
     avatarGeprueft = false;
@@ -1661,12 +1787,11 @@
     const fehler = f => console.error(f);
     const hoeren = (q, fn) => abmelder.push(onSnapshot(q, s => { fn(s); spaeterZeichnen(); }, fehler));
     hoeren(collection(db, "mitglieder"), s => { mitglieder = listeAus(s).sort((a, b) => FAMILIE.indexOf(a.name) - FAMILIE.indexOf(b.name)); avatarPruefen(); });
-    hoeren(query(collection(db, "wuensche"), where("besitzer", "==", uid)), s => { eigene = nachDatum(listeAus(s)); });
+    hoeren(query(collection(db, "wuensche"), where("besitzer", "==", uid)), s => { eigene = nachDatum(listeAus(s)); geladen.add("eigene"); });
     hoeren(query(collection(db, "wuensche"), where("status", "==", "freigegeben")), s => { fremde = nachDatum(listeAus(s)); geladen.add("fremde"); });
     hoeren(query(collection(db, "vergeben"), where("besitzer", "!=", uid)), s => { vergeben = new Set(s.docs.map(d => d.id)); });
     hoeren(query(collection(db, "reservierungen"), where("von", "==", uid)), s => { meineRes = listeAus(s); geladen.add("res"); });
     hoeren(query(collection(db, "anteile"), where("besitzer", "!=", uid)), s => { anteileListe = listeAus(s); geladen.add("anteile"); });
-    hoeren(doc(db, "limiten", uid), s => { limiten = s.exists() ? (s.data().betraege || {}) : {}; geladen.add("limiten"); });
     hoeren(query(collection(db, "archiv"), where("besitzer", "==", uid)), s => { archivBekommen = listeAus(s); });
     hoeren(query(collection(db, "archiv"), where("von", "==", uid)), s => { archivGeschenkt = listeAus(s); });
     if (istBescherung()) {
@@ -1806,7 +1931,7 @@
     inhalt.innerHTML = { alle: seiteAlle, meine: seiteMeine, schenkung: seiteSchenkung, mitglieder: seiteMitglieder, kalender: seiteKalender, einstellungen: seiteEinstellungen, privat: seitePrivat, "privat-kaeufe": seitePrivatKaeufe, "privat-einstellungen": seitePrivatEinstellungen }[seite]();
 
     if (mitAnimation) {
-      [...inhalt.querySelectorAll(":scope > *, .karten > *, .mitglieder-raster > *")].forEach((el, i) => {
+      [...inhalt.querySelectorAll(":scope > *, .karten > *, .kacheln > *, .mitglieder-raster > *")].forEach((el, i) => {
         el.style.setProperty("--i", Math.min(i, 12));
         el.classList.add("reinfedern");
       });
@@ -1814,6 +1939,7 @@
     inhalt.querySelectorAll("[data-ring]").forEach(r => ring(r, Number(r.dataset.ring), mitAnimation));
     inhalt.querySelectorAll("[data-zahl]").forEach(z => hochzaehlen(z, Number(z.dataset.zahl), mitAnimation));
     if (seite === "privat-kaeufe") kaeufeAnimieren(mitAnimation);
+    detailAktualisieren();
   }
 
   // ---------- Bausteine ----------
@@ -1841,6 +1967,7 @@
       <div class="wk-text">
         <h3>${esc(w.name)}${w.wichtig > 0 ? `<span class="sterne" title="${esc(STERNE_TEXT[Math.min(3, w.wichtig)])}">${"★".repeat(Math.min(3, w.wichtig))}</span>` : ""}</h3>
         ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Zum Shop ↗</a>` : `<span>Kein Link</span>`}
+        ${w.notiz ? `<span class="info mit">📝 ${esc(w.notiz)}</span>` : ""}
         ${info ? `<span class="info">${info}</span>` : ""}
         ${hinweis ? `<span class="hinweis">${hinweis}</span>` : ""}
       </div>
@@ -2176,12 +2303,18 @@
     }
     if (!andere.some(m => m.id === filterPerson)) filterPerson = "alle";
 
-    const chips = `<div class="chips">
-      <button class="knopf chip ${filterPerson === "alle" ? "aktiv" : ""}" data-aktion="person" data-wert="alle">Alle</button>
-      ${andere.map(m => `<button class="knopf chip ${filterPerson === m.id ? "aktiv" : ""}" data-aktion="person" data-wert="${esc(m.id)}">${esc(m.avatar)} ${esc(m.name)}</button>`).join("")}
+    // Oben nur Personenwahl, Info-Knopf (Erklärung im Fenster) und für den Admin das Bearbeiten
+    const kopf = `<div class="alle-kopf">
+      <div class="chips">
+        <button class="knopf chip ${filterPerson === "alle" ? "aktiv" : ""}" data-aktion="person" data-wert="alle">Alle</button>
+        ${andere.map(m => `<button class="knopf chip ${filterPerson === m.id ? "aktiv" : ""}" data-aktion="person" data-wert="${esc(m.id)}">${esc(m.avatar)} ${esc(m.name)}</button>`).join("")}
+      </div>
+      <div class="alle-knoepfe">
+        ${istAdmin() ? `<button class="knopf klein" data-aktion="admin-verwalten">🔧 Alle bearbeiten</button>` : ""}
+        <button class="knopf klein" data-aktion="alle-info" aria-haspopup="dialog"><span class="info-i" aria-hidden="true">i</span> So funktioniert's</button>
+      </div>
     </div>`;
 
-    const geschenke = meineGeschenke();
     const gruppen = andere
       .filter(m => filterPerson === "alle" || filterPerson === m.id)
       .map(m => {
@@ -2189,34 +2322,104 @@
         const liste = fremde.filter(w => w.besitzer === m.id && !vergeben.has(w.id) && passt(w))
           .sort((a, b) => (b.wichtig || 0) - (a.wichtig || 0));
         if (!liste.length) return "";
-        const b = budget(m.id, geschenke);
-        return `<section class="gruppe">
-          <div class="gruppe-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"} offen</span></div>
-            ${b.limite != null ? `<span class="summe ${b.ueber ? "rot" : ""}">${b.ueber ? esc(budgetText(b)) : `noch ${chf.format(b.rest)}`}</span>` : ""}</div>
-          <div class="karten">${liste.map(w => {
-            // Gemeinsam schenken: wer ist schon dabei, wie viel ist noch offen?
-            const a = anteilVon(w.id);
-            const dabei = a && a.teile && a.teile[uid];
-            const zugesagt = anteilSumme(a);
-            const offen = w.preis != null ? Math.max(0, w.preis - zugesagt) : null;
-            const info = a && Object.keys(a.teile || {}).length
-              ? `<span class="info mit">🤝 ${anteileText(mitschenker(a))}${offen != null ? `<br><b>Noch offen: ${chf.format(offen)}</b>` : ""}</span>` : "";
-            const knopfText = dabei ? "✏️ Mein Anteil" : a ? "🤝 Mitschenken" : "🎁 Ich schenke das";
-            // Übersteigt dieses Produkt (bzw. der offene Rest) meine Limite für diese Person?
-            const kosten = a ? (offen ?? 0) : (w.preis || 0);
-            const zuTeuer = !dabei && b.limite != null && kosten > Math.max(0, b.rest);
-            return karte(w, dabei ? `<span class="abzeichen zart">Du bist dabei</span>` : "",
-              stichtagErreicht() ? `<button class="knopf blau klein" data-aktion="schenken">${knopfText}</button>`
-                : `<button class="knopf klein" disabled title="Geschenkt werden kann erst ab dem 30. November">🔒 Ab 30.11.</button>`,
-              zuTeuer ? "ueber-limite" : "",
-              zuTeuer ? `⚠ Übersteigt deine Limite um ${chf.format(kosten - Math.max(0, b.rest))}` : "", info);
-          }).join("")}</div>
+        return `<section class="person-block neu">
+          <div class="person-kopf"><div class="avatar">${esc(m.avatar)}</div><div><h2>${esc(m.name)}</h2><span>${liste.length} ${liste.length === 1 ? "Wunsch" : "Wünsche"} offen</span></div></div>
+          <div class="kacheln">${liste.map(kachel).join("")}</div>
         </section>`;
       }).join("");
 
-    const legende = `<p class="notiz sterne-legende">Wichtigkeit: <span class="gelb">★★★</span> = Priorität 1 (Herzenswunsch) · <span class="gelb">★★</span> = Priorität 2 · <span class="gelb">★</span> = Priorität 3 – Herzenswünsche stehen zuoberst.<br>🤝 Mit „Ich schenke das“ kannst du den ganzen Betrag oder nur einen Teil übernehmen.</p>`;
-    return tuerchenKnopf() + stichtagLeiste() + budgetLeiste() + chips + legende + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
+    return tuerchenKnopf() + kopf + (gruppen || leer("🎄", "Alles vergeben – oder noch nichts freigegeben", "Schau später nochmals vorbei."));
   }
+
+  // Ein Wunsch als Viereck: Bild, Name, Preis und Sterne. Antippen öffnet die Details.
+  function kachel(w) {
+    const bild = sicheresBild(w.bild);
+    const a = anteilVon(w.id);
+    const dabei = a && a.teile && a.teile[uid];
+    const stufe = Math.min(3, w.wichtig || 0);
+    const label = [w.name, w.preis != null ? chf.format(w.preis) : "", stufe ? STERNE_FREMD[stufe] : "", dabei ? "du bist dabei" : a ? "gemeinsames Geschenk" : ""].filter(Boolean).join(", ");
+    return `<button type="button" class="wunsch-karte kachel" data-aktion="detail" data-id="${esc(w.id)}" aria-label="${esc(label)}">
+      <span class="kachel-bild">${bild ? `<img src="${bild}" alt="" loading="lazy">` : "🎁"}
+        ${stufe ? `<span class="kachel-sterne" aria-hidden="true">${"★".repeat(stufe)}</span>` : ""}
+        ${dabei ? `<span class="kachel-marke" aria-hidden="true">✓ Dabei</span>` : a ? `<span class="kachel-marke" aria-hidden="true">🤝</span>` : ""}
+      </span>
+      <span class="kachel-name">${esc(w.name)}</span>
+      <span class="kachel-preis">${w.preis != null ? chf.format(w.preis) : "–"}</span>
+    </button>`;
+  }
+
+  // ---------- Detailfenster eines Wunsches ----------
+  const STERNE_FREMD = ["", "Wäre schön (Priorität 3)", "Wünscht sich die Person sehr (Priorität 2)", "Herzenswunsch ❤ (Priorität 1)"];
+  let detailId = null;
+  function detailInhalt(w) {
+    const m = mitglied(w.besitzer) || { name: "?", avatar: "❔" };
+    const bild = sicheresBild(w.bild);
+    const link = sichererLink(w.link);
+    const a = anteilVon(w.id);
+    const dabei = a && a.teile && a.teile[uid];
+    const mit = a ? mitschenker(a) : [];
+    const offen = w.preis != null ? Math.max(0, w.preis - anteilSumme(a)) : null;
+    const stufe = Math.min(3, w.wichtig || 0);
+    const knopfText = dabei ? "✏️ Mein Anteil ändern" : a ? "🤝 Mitschenken" : "🎁 Ich schenke das";
+    return `<article class="wunsch-karte detail" data-id="${esc(w.id)}">
+      <button type="button" class="detail-zu" data-aktion="detail-zu" aria-label="Schliessen">✕</button>
+      <div class="detail-bild">${bild ? `<img src="${bild}" alt="">` : "🎁"}</div>
+      <div class="detail-fuer">${esc(m.avatar)} Wunsch von ${esc(m.name)}</div>
+      <h2 id="detailTitel">${esc(w.name)}</h2>
+      ${stufe ? `<div class="detail-sterne"><span>${"★".repeat(stufe)}</span> ${esc(STERNE_FREMD[stufe])}</div>` : ""}
+      <div class="detail-preis">${w.preis != null ? chf.format(w.preis) : "Ohne Preisangabe"}</div>
+      <dl class="detail-liste">
+        <div><dt>Bemerkung</dt><dd>${w.notiz ? esc(w.notiz) : `<span class="detail-leer">Keine Bemerkung</span>`}</dd></div>
+        <div><dt>Link</dt><dd>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(shopVon(link) || "Zum Shop")} ↗</a>` : `<span class="detail-leer">Kein Link</span>`}</dd></div>
+        ${mit.length ? `<div><dt>🤝 Gemeinsam</dt><dd>${anteileText(mit)}${offen != null ? `<br><b>Noch offen: ${chf.format(offen)}</b>` : ""}</dd></div>` : ""}
+      </dl>
+      <div class="fenster-knoepfe">
+        ${stichtagErreicht() ? `<button type="button" class="knopf blau" data-aktion="schenken">${knopfText}</button>`
+          : `<button type="button" class="knopf" disabled>🔒 Schenken ab 30. November</button>`}
+      </div>
+    </article>`;
+  }
+  function detailOeffnen(id) {
+    detailId = id;
+    detailAktualisieren();
+    $("detailHuelle").classList.add("offen");
+    setTimeout(() => { const zu = $("detailFenster").querySelector(".detail-zu"); if (zu) zu.focus(); }, 150);
+  }
+  function detailSchliessen() {
+    if (!detailId) return;
+    const kachelEl = document.querySelector(`.kachel[data-id="${CSS.escape(detailId)}"]`);
+    detailId = null;
+    $("detailHuelle").classList.remove("offen");
+    if (kachelEl) kachelEl.focus({ preventScroll: true });
+  }
+  // Nach jeder Änderung: Inhalt nachführen, oder schliessen, wenn der Wunsch weg ist
+  function detailAktualisieren() {
+    if (!detailId) return;
+    const w = fremde.find(x => x.id === detailId);
+    if (!w || vergeben.has(w.id) || seite !== "alle") { detailSchliessen(); return; }
+    const html = detailInhalt(w);
+    if ($("detailFenster").dataset.html !== html) {
+      $("detailFenster").innerHTML = html;
+      $("detailFenster").dataset.html = html;
+    }
+  }
+  $("detailHuelle").addEventListener("click", e => { if (e.target === $("detailHuelle")) detailSchliessen(); });
+
+  // ---------- Infofenster "So funktioniert's" ----------
+  function infoOeffnen() {
+    const tage = Math.ceil((stichtagDatum() - new Date()) / 86400000);
+    $("infoTage").textContent = stichtagErreicht() ? "" : `Noch ${tage} ${tage === 1 ? "Tag" : "Tage"}.`;
+    $("infoHuelle").classList.add("offen");
+    setTimeout(() => $("infoZu").focus(), 150);
+  }
+  const infoSchliessen = () => $("infoHuelle").classList.remove("offen");
+  $("infoZu").addEventListener("click", infoSchliessen);
+  $("infoHuelle").addEventListener("click", e => { if (e.target === $("infoHuelle")) infoSchliessen(); });
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if ($("infoHuelle").classList.contains("offen")) infoSchliessen();
+    else if (detailId && !$("schenkHuelle").classList.contains("offen")) detailSchliessen();
+  });
 
   // Hinweis zum Stichtag – der Admin bekommt hier auch seinen Knopf zum Bearbeiten aller Wünsche
   function stichtagLeiste() {
@@ -2470,7 +2673,7 @@
         ? { ...w, gekauft: !!r.gekauft, stufe: stufeAus(r), genommen: r.erstellt, fehlt: false }
         : { id: r.id, name: r.name, preis: r.preis, besitzer: r.besitzer, gekauft: !!r.gekauft, stufe: stufeAus(r), fehlt: geladen.has("fremde") && geladen.has("res") };
     });
-    // Geteilte Geschenke: "preis" ist hier MEIN Anteil (zählt so auch in Limite und Summen)
+    // Geteilte Geschenke: "preis" ist hier MEIN Anteil (zählt so auch in den Summen)
     const geteilt = anteileListe.filter(a => a.teile && a.teile[uid]).map(a => {
       const mein = a.teile[uid];
       const w = fremde.find(x => x.id === a.id);
@@ -2520,11 +2723,8 @@
     $("eingabeAnteilNotiz").value = mein ? mein.notiz || "" : "";
     const pruefen = () => {
       const betrag = Number(feld.value) || 0;
-      const b = budget(w.besitzer);
-      const rest = b.rest == null ? null : b.rest + (mein ? mein.betrag || 0 : 0);
       let text = "", art = "";
       if (offen != null && betrag > offen) { text = `Das ist mehr als der offene Betrag (${chf.format(offen)}).`; art = "fehler"; }
-      else if (rest != null && betrag > rest) { text = `⚠ Übersteigt deine Limite für ${m.name} um ${chf.format(betrag - Math.max(0, rest))}.`; art = "fehler"; }
       else if (offen != null && betrag && betrag >= offen) { text = "✓ Damit ist das Geschenk komplett."; art = "ok"; }
       $("schenkHinweis").textContent = text;
       $("schenkHinweis").className = `link-status ${art}`;
@@ -2601,56 +2801,56 @@
     if (vergeben.has(a.id) && !(preis != null && anteilSumme(a, uid) >= preis - 0.001)) batch.delete(doc(db, "vergeben", a.id));
   }
 
-  // ---------- Schenkungslimite (privat, pro Person) ----------
-  const limiteVon = id => typeof limiten[id] === "number" ? limiten[id] : null;
-  const ausgegebenFuer = (id, geschenke = meineGeschenke()) => summe(geschenke.filter(g => g.besitzer === id && !g.fehlt));
-  function budget(id, geschenke) {
-    const limite = limiteVon(id);
-    const aus = ausgegebenFuer(id, geschenke);
-    return { limite, aus, rest: limite == null ? null : limite - aus, ueber: limite != null && aus > limite };
-  }
-  // Welche meiner gewählten Geschenke sprengen die Limite? (der Reihe nach aufsummiert)
-  function ueberLimiteIds(geschenke) {
-    const ids = new Set();
-    const proPerson = {};
-    for (const g of [...geschenke].filter(g => !g.fehlt).sort((a, b) => (a.genommen || 0) - (b.genommen || 0))) {
-      const limite = limiteVon(g.besitzer);
-      proPerson[g.besitzer] = (proPerson[g.besitzer] || 0) + (g.preis || 0);
-      if (limite != null && proPerson[g.besitzer] > limite) ids.add(g.id);
-    }
-    return ids;
-  }
-  function budgetBalken(b) {
-    if (b.limite == null) return `<div class="budget-balken leer"><i></i></div>`;
-    const anteil = b.limite > 0 ? Math.min(1, b.aus / b.limite) : 1;
-    return `<div class="budget-balken ${b.ueber ? "ueber" : ""}"><i style="width:${Math.round(anteil * 100)}%"></i></div>`;
-  }
-  function budgetText(b) {
-    if (b.limite == null) return "Keine Limite";
-    return b.ueber
-      ? `⚠ ${chf.format(b.aus - b.limite)} über Limite`
-      : `${chf.format(b.aus)} von ${chf.format(b.limite)}`;
-  }
-  // Kurze Übersicht auf der Hauptseite (Alle Wünsche)
-  function budgetLeiste() {
-    const andere = mitglieder.filter(m => m.id !== uid);
-    if (!andere.length) return "";
-    const geschenke = meineGeschenke();
-    const mitLimite = andere.filter(m => limiteVon(m.id) != null);
-    if (!mitLimite.length) {
-      return `<a class="budget-hinweis neu" href="#schenkung">💰 Leg in der <b>Schenkung</b> fest, wie viel du pro Person ausgeben möchtest.</a>`;
-    }
-    return `<section class="budget-leiste">${mitLimite.map(m => {
-      const b = budget(m.id, geschenke);
-      return `<div class="budget-chip neu ${b.ueber ? "ueber" : ""}" title="${esc(budgetText(b))}">
-        <div class="avatar">${esc(m.avatar)}</div>
-        <div class="budget-info"><b>${esc(m.name)}</b><span>${b.ueber ? esc(budgetText(b)) : `noch ${chf.format(b.rest)}`}</span>${budgetBalken(b)}</div>
-      </div>`;
-    }).join("")}</section>`;
+  // ---------- Teure Wünsche (über 300 CHF) ----------
+  // Teure Wünsche: wer einen Wunsch über 300 CHF online stellt, muss das ein zweites Mal bestätigen.
+  // "sicher" merkt sich den bestätigten Preis – ändert sich der Preis, wird wieder gefragt.
+  const TEUER_AB = 300;
+  const istTeuer = preis => typeof preis === "number" && preis > TEUER_AB;
+  const teuerUnbestaetigt = w => w.status === "freigegeben" && istTeuer(w.preis) && w.sicher !== w.preis;
+
+  // Fenster "Bist du 100 % sicher?" – Antwort true (ja), false (nein) oder null (später / geschlossen)
+  function teuerDialog(name, preis, bestehend) {
+    $("teuerName").textContent = `„${name}“`;
+    $("teuerPreis").textContent = chf.format(preis);
+    $("teuerText").textContent = bestehend
+      ? "Dieser Wunsch ist schon online. Möchtest du ihn wirklich drin behalten?"
+      : "Möchtest du diesen Wunsch wirklich online stellen?";
+    $("teuerJa").textContent = bestehend ? "Ja, behalten" : "Ja, online stellen";
+    $("teuerNein").textContent = bestehend ? "Zurückziehen" : "Abbrechen";
+    $("teuerSpaeter").hidden = !bestehend;
+    const huelle = $("teuerHuelle");
+    huelle.classList.add("offen");
+    setTimeout(() => $("teuerJa").focus(), 150);
+    return new Promise(fertig => {
+      const ende = antwort => {
+        huelle.classList.remove("offen");
+        $("teuerJa").onclick = $("teuerNein").onclick = $("teuerSpaeter").onclick = huelle.onclick = huelle.onkeydown = null;
+        fertig(antwort);
+      };
+      $("teuerJa").onclick = () => ende(true);
+      $("teuerNein").onclick = () => ende(false);
+      $("teuerSpaeter").onclick = () => ende(null);
+      huelle.onclick = e => { if (e.target === huelle) ende(bestehend ? null : false); };
+      huelle.onkeydown = e => { if (e.key === "Escape") ende(bestehend ? null : false); };
+    });
   }
 
-  // Kurze Budget-Meldung oben: beim Anmelden (sobald alles geladen ist)
-  // und immer dann, wenn sich etwas an einer Überschreitung ändert
+  // Beim Öffnen der Seite: eigene Wünsche über 300 CHF, die noch nicht bestätigt sind, nachfragen.
+  // "Später" fragt beim nächsten Öffnen wieder. Nur bis zum Stichtag – danach kann man nichts mehr ändern.
+  async function teuerPruefen() {
+    if (teuerGefragt || !geladen.has("eigene") || !erfassenOffen()) return;
+    const offen = eigene.filter(teuerUnbestaetigt);
+    teuerGefragt = true;
+    for (const w of offen) {
+      const antwort = await teuerDialog(w.name, w.preis, true);
+      if (antwort === null) continue;
+      try {
+        await schreiben(updateDoc(doc(db, "wuensche", w.id), antwort ? { sicher: w.preis } : { status: "entwurf" }));
+        ploppen(w.id);
+      } catch {}
+    }
+  }
+
   let toastTimer = null;
   function toast(html, ms = 6000) {
     const t = $("toast");
@@ -2664,21 +2864,6 @@
     bescherungGemeldet = true;
     const offen = eigene.filter(w => istBeschert(w.id) && !lokal.ausgepackt.includes(w.id)).length;
     if (offen) toast(`<h4>🎄 Es ist Bescherung!</h4><ul><li>${offen} ${offen === 1 ? "Geschenk wartet" : "Geschenke warten"} in <a href="#meine">Meine Wünsche</a> aufs Auspacken.</li></ul>`, 9000);
-  }
-  function budgetMelden(geschenke) {
-    if (istBescherung()) return bescherungMelden();
-    if (!["fremde", "res", "limiten"].every(x => geladen.has(x)) || !mitglieder.length) return;
-    const zeilen = mitglieder.filter(m => m.id !== uid && limiteVon(m.id) != null)
-      .map(m => ({ m, b: budget(m.id, geschenke) }));
-    const ueber = zeilen.filter(z => z.b.ueber);
-    const signatur = ueber.map(z => `${z.m.id}:${z.b.aus}:${z.b.limite}`).join("|");
-    const erstesMal = budgetGemeldet === null;
-    if (!erstesMal && signatur === budgetGemeldet) return;
-    budgetGemeldet = signatur;
-    // Beim Anmelden Übersicht zeigen, danach nur noch bei neuen Überschreitungen
-    if (!zeilen.length || (!erstesMal && !ueber.length)) return;
-    toast(`<h4>${ueber.length ? "⚠ Limite überschritten" : "💰 Dein Budget"}</h4><ul>${(erstesMal ? zeilen : ueber).map(({ m, b }) =>
-      `<li class="${b.ueber ? "rot" : ""}">${esc(m.avatar)} ${esc(m.name)}: ${b.ueber ? esc(budgetText(b)) : `noch ${chf.format(b.rest)} von ${chf.format(b.limite)}`}</li>`).join("")}</ul>`);
   }
 
   // Meldung, wenn ein Geschenk aus meinem Paket zurückgezogen oder gelöscht wurde.
@@ -2765,22 +2950,8 @@
     </section>
     ${schneemann(geschenke)}`;
 
-    // Meine Limiten: wie viel möchte ich für wen ausgeben?
-    const andere = mitglieder.filter(m => m.id !== uid);
-    const limitenTeil = andere.length ? `<section class="limiten neu">
-      <div class="zeile"><h2>💰 Meine Limiten</h2><span class="notiz">Nur du siehst diese Beträge</span></div>
-      <div class="limiten-liste">${andere.map(m => {
-        const b = budget(m.id, geschenke);
-        return `<label class="limite-zeile ${b.ueber ? "ueber" : ""}">
-          <div class="avatar">${esc(m.avatar)}</div>
-          <div class="budget-info"><b>${esc(m.name)}</b><span>${esc(budgetText(b))}</span>${budgetBalken(b)}</div>
-          <span class="limite-feld">CHF <input type="number" min="0" step="5" inputmode="decimal" placeholder="–" data-limite="${esc(m.id)}" value="${b.limite ?? ""}"></span>
-        </label>`;
-      }).join("")}</div>
-    </section>` : "";
-
     if (!geschenke.length) {
-      return kopf + limitenTeil + leer("🎁", "Dein Paket ist noch leer", `Wähle bei <a href="#alle">Alle Wünsche</a> aus, was du schenken möchtest.`);
+      return kopf + leer("🎁", "Dein Paket ist noch leer", `Wähle bei <a href="#alle">Alle Wünsche</a> aus, was du schenken möchtest.`);
     }
 
     const umschalter = `<div class="zeile">
@@ -2792,27 +2963,25 @@
     </div>`;
     if (ansichtSchenkung === "liste") return kopf + umschalter + einkaufsliste(geschenke);
 
-    const zuViel = ueberLimiteIds(geschenke);
     const pakete = personen.map(id => {
       const m = mitglied(id) || { name: "Unbekannt", avatar: "❔" };
       const liste = geschenke.filter(w => w.besitzer === id);
-      const b = budget(id, geschenke);
       return `<section class="gruppe">
-        <div class="paket-kopf ${b.ueber ? "ueber" : ""}">
+        <div class="paket-kopf">
           <div class="paket-icon">🎁</div>
-          <div><h2>Paket für ${esc(m.name)} ${esc(m.avatar)}</h2><span>${liste.length} ${liste.length === 1 ? "Geschenk" : "Geschenke"}${b.limite != null ? ` · ${esc(budgetText(b))}` : ""}</span></div>
+          <div><h2>Paket für ${esc(m.name)} ${esc(m.avatar)}</h2><span>${liste.length} ${liste.length === 1 ? "Geschenk" : "Geschenke"}</span></div>
           <span class="summe">${chf.format(summe(liste))}</span>
         </div>
         <div class="karten">${liste.map(w => karte(w,
           stufeAbzeichen(w),
           `<button class="knopf klein" data-aktion="zurueckgeben">Zurückgeben</button>`,
-          zuViel.has(w.id) ? "ueber-limite" : "",
-          w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : zuViel.has(w.id) ? "⚠ Damit übersteigst du deine Limite" : "",
+          "",
+          w.fehlt ? "⚠ Wurde zurückgezogen oder gelöscht" : "",
           (w.geteilt ? geteiltInfo(w) : "") + (w.fehlt ? "" : statusLeiste(w)))).join("")}</div>
       </section>`;
     }).join("");
 
-    return kopf + umschalter + limitenTeil + pakete +`<p class="notiz">🔒 Niemand sieht, dass du diese Geschenke genommen hast – für alle anderen sind sie einfach aus der Liste verschwunden.</p>`;
+    return kopf + umschalter + pakete + `<p class="notiz">🔒 Niemand sieht, dass du diese Geschenke genommen hast – für alle anderen sind sie einfach aus der Liste verschwunden.</p>`;
   }
 
   // ---------- Mitglieder ----------
@@ -3471,7 +3640,8 @@
     z.hidden = !geschenke.length;
     z.textContent = geschenke.length;
     alarmPruefen(geschenke);
-    budgetMelden(geschenke);
+    if (istBescherung()) bescherungMelden();
+    teuerPruefen();
     $("miniSchenkung").innerHTML = `
       <h3>Mein Geschenk-Paket 🎁</h3>
       <div class="panel-zahl">${chf.format(summe(geschenke))}</div>
@@ -3573,7 +3743,6 @@
     }
   }, true);
 
-  // Limite pro Person speichern (beim Verlassen des Feldes oder Enter)
   $("inhalt").addEventListener("change", async e => {
     // Admin: Vorschau-Tag im Adventskalender
     if (e.target.matches && e.target.matches('select[data-aktion="vorschau-tag"]')) {
@@ -3587,30 +3756,29 @@
       lokalSpeichern();
       return zeichnen(false);
     }
-    const feld = e.target.closest && e.target.closest("input[data-limite]");
-    if (!feld) return;
-    const neu = { ...limiten };
-    const wert = parseFloat(feld.value);
-    if (feld.value.trim() === "" || isNaN(wert)) delete neu[feld.dataset.limite];
-    else neu[feld.dataset.limite] = Math.max(0, Math.round(wert * 100) / 100);
-    try {
-      await schreiben(setDoc(doc(db, "limiten", uid), { betraege: neu }));
-      if (animiert()) { const r = feld.getBoundingClientRect(); splat(r.left + r.width / 2, r.top + r.height / 2); }
-      feld.blur();
-      zeichnen(false);
-    } catch {}
   });
 
-  $("inhalt").addEventListener("click", async e => {
-    const knopf = e.target.closest("[data-aktion]");
+  async function aktionKlick(e) {
+    let knopf = e.target.closest("[data-aktion]");
     if (!knopf) return;
     const aktion = knopf.dataset.aktion;
-    const kartenEl = knopf.closest(".wunsch-karte, .einkauf-zeile");
+    let kartenEl = knopf.closest(".wunsch-karte, .einkauf-zeile");
     const id = kartenEl ? kartenEl.dataset.id : null;
     const w = id ? wunsch(id) : null;
 
+    // Aus dem Detailfenster schenken: Fenster zu, die Animation startet bei der Kachel
+    if (aktion === "schenken" && knopf.closest("#detailHuelle")) {
+      detailSchliessen();
+      const kachelEl = document.querySelector(`.kachel[data-id="${CSS.escape(id)}"]`);
+      if (kachelEl) { kartenEl = kachelEl; knopf = kachelEl; }
+      await warte(250);
+    }
+
     try {
       switch (aktion) {
+        case "detail": return id && detailOeffnen(id);
+        case "detail-zu": return detailSchliessen();
+        case "alle-info": return infoOeffnen();
         case "neu":
           if (!erfassenOffen()) return toast(ERFASSEN_ZU);
           return oeffnen();
@@ -3719,8 +3887,11 @@
 
         case "freigeben":
           if (!erfassenOffen()) return toast(ERFASSEN_ZU);
+          // Über 300 CHF: ein zweites Mal nachfragen
+          const teuer = istTeuer(w.preis);
+          if (teuer && w.sicher !== w.preis && !(await teuerDialog(w.name, w.preis, false))) return;
           await schneeballAuf(kartenEl);
-          await schreiben(updateDoc(doc(db, "wuensche", id), { status: "freigegeben", freigegebenAm: Date.now() }));
+          await schreiben(updateDoc(doc(db, "wuensche", id), { status: "freigegeben", freigegebenAm: Date.now(), ...(teuer ? { sicher: w.preis } : {}) }));
           zeichnen(false);
           ploppen(id);
           return schneien(3500);
@@ -3772,11 +3943,6 @@
               zeichnen(false);
             }
             return;
-          }
-          const b = budget(w.besitzer);
-          if (b.limite != null && (w.preis || 0) > Math.max(0, b.rest)) {
-            const m = mitglied(w.besitzer) || { name: "diese Person" };
-            if (!confirm(`„${w.name}“ übersteigt deine Limite für ${m.name} um ${chf.format((w.preis || 0) - Math.max(0, b.rest))}. Trotzdem schenken?`)) return;
           }
           // Reservierung (geheim, mit "von") + Markierung "vergeben" (ohne Namen) zusammen speichern
           const batch = writeBatch(db);
@@ -3960,7 +4126,9 @@
     } catch {
       zeichnen(false);
     }
-  });
+  }
+  $("inhalt").addEventListener("click", aktionKlick);
+  $("detailHuelle").addEventListener("click", aktionKlick);
 
   function reservierungLoesen(id) {
     const batch = writeBatch(db);
@@ -4035,7 +4203,8 @@
       : (fremd ? `Neuer Wunsch für ${fremd} 🎁` : "Neuer Wunsch 🎁");
     $("fensterText").textContent = formularPrivat ? "Nur für dich sichtbar." : "Fülle die Angaben aus und gib den Wunsch frei.";
     $("feldWichtig").hidden = formularPrivat;
-    $("feldNotiz").hidden = !formularPrivat;
+    $("notizTitel").textContent = formularPrivat ? "Notiz" : "Bemerkung (optional)";
+    $("eingabeNotiz").placeholder = formularPrivat ? "z.B. Kaufen, wenn das alte kaputt ist" : "z.B. Grösse M, Farbe blau, lieber ohne Zubehör";
     $("feldKategorie").hidden = !formularPrivat;
     $("feldPrio").hidden = !formularPrivat;
     $("eingabeKategorie").value = w ? w.kategorie || "" : "";
@@ -4395,9 +4564,11 @@
       return neu.id;
     }
 
-    const felder = { name, link, bild: neuesBild, status, wichtig: neueWichtigkeit, preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
+    const felder = { name, link, bild: neuesBild, status, wichtig: neueWichtigkeit, notiz: $("eingabeNotiz").value.trim().slice(0, 500), preis: preisText === "" ? null : Math.max(0, Number(preisText)) };
     const alt = bearbeiteId && wunsch(bearbeiteId);
     if (status === "freigegeben" && !(alt && alt.status === "freigegeben")) felder.freigegebenAm = Date.now();
+    // Über 300 CHF: wurde vorher im Fenster bestätigt (siehe "submit")
+    if (status === "freigegeben" && istTeuer(felder.preis)) felder.sicher = felder.preis;
 
     if (alt) {
       schreiben(updateDoc(doc(db, "wuensche", alt.id), felder)).catch(() => {});
@@ -4427,6 +4598,13 @@
 
   $("formular").addEventListener("submit", async e => {
     e.preventDefault();
+    // Über 300 CHF: ein zweites Mal nachfragen (ausser der Preis wurde schon so bestätigt)
+    if (!formularPrivat) {
+      const name = $("eingabeName").value.trim();
+      const preis = $("eingabePreis").value === "" ? null : Math.max(0, Number($("eingabePreis").value));
+      const alt = bearbeiteId && wunsch(bearbeiteId);
+      if (name && istTeuer(preis) && !(alt && alt.sicher === preis) && !(await teuerDialog(name, preis, false))) return;
+    }
     const id = eingabenSpeichern("freigegeben");
     if (!id) return;
     if (formularPrivat) return schliessen();
