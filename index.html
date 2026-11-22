@@ -1354,7 +1354,7 @@
     <h2 id="infoTitel">So funktioniert's 🎄</h2>
     <ol class="info-schritte">
       <li><b>Bis und mit 29. November</b> erfassen alle ihre Wünsche. <span class="info-tage" id="infoTage"></span></li>
-      <li><b>Ab dem 30. November</b> kann geschenkt werden.</li>
+      <li><b>Ab dem 30. November</b> kann geschenkt werden – sobald Nicola das Schenken freischaltet. Dann lassen sich auch die Links zu den Shops öffnen.</li>
       <li><b>Wunsch antippen:</b> Du siehst Bild, Preis, Bemerkung und den Link zum Shop.</li>
       <li><b>„Ich schenke das“:</b> Du übernimmst den ganzen Betrag oder 🤝 nur einen Teil – dann können andere mitschenken.</li>
       <li><b>Alles bleibt geheim:</b> Was jemand ganz schenkt, verschwindet für alle anderen aus der Liste. Wer etwas schenkt, sieht die beschenkte Person erst bei der Bescherung am 24. Dezember.</li>
@@ -1548,10 +1548,14 @@
   // Stichtag 30. November (die Regeln in firestore.rules prüfen dasselbe):
   // bis dahin erfassen alle ihre Wünsche, ab dann kann geschenkt werden und nur noch der Admin ändert die Liste
   const stichtagDatum = () => new Date(new Date().getFullYear(), 10, 30);
-  const stichtagErreicht = () => new Date() >= stichtagDatum();
+  // Freischaltung zum Schenken (app/freischaltung): "auto" = ab dem 30.11., "an" = schon jetzt offen, "aus" = gesperrt.
+  // Nur der Admin stellt sie um. Die Regeln in firestore.rules prüfen dasselbe.
+  let freischaltung = "auto";
+  const datumErreicht = () => new Date() >= stichtagDatum();
+  const stichtagErreicht = () => freischaltung === "an" || (freischaltung !== "aus" && datumErreicht());
   const erfassenOffen = () => !stichtagErreicht() || istAdmin();
-  const SCHENKEN_ZU = "🔒 Geschenkt werden kann erst ab dem <b>30. November</b>.";
-  const ERFASSEN_ZU = "🔒 Die Wunschliste ist seit dem 30. November geschlossen. Für Änderungen wende dich an Nicola.";
+  const SCHENKEN_ZU = "🔒 Geschenkt werden kann erst, wenn das Schenken freigeschaltet ist (normalerweise am <b>30. November</b>).";
+  const ERFASSEN_ZU = "🔒 Die Wunschliste ist geschlossen, jetzt wird geschenkt. Für Änderungen wende dich an Nicola.";
   let zeichnenGeplant = false;
 
   const istAdmin = () => rolle === "admin";
@@ -1599,6 +1603,7 @@
     anteileListe = []; adminAnteile = []; bescherungAnteile = [];
     avatarGeprueft = false;
     archivBekommen = []; archivGeschenkt = [];
+    freischaltung = "auto";
     $("meldungHuelle").classList.remove("offen");
   }
 
@@ -1611,6 +1616,7 @@
     hoeren(query(collection(db, "vergeben"), where("besitzer", "!=", uid)), s => { vergeben = new Set(s.docs.map(d => d.id)); });
     hoeren(query(collection(db, "reservierungen"), where("von", "==", uid)), s => { meineRes = listeAus(s); geladen.add("res"); });
     hoeren(query(collection(db, "anteile"), where("besitzer", "!=", uid)), s => { anteileListe = listeAus(s); geladen.add("anteile"); });
+    hoeren(doc(db, "app", "freischaltung"), s => { freischaltung = (s.exists() && s.data().modus) || "auto"; });
     hoeren(query(collection(db, "archiv"), where("besitzer", "==", uid)), s => { archivBekommen = listeAus(s); });
     hoeren(query(collection(db, "archiv"), where("von", "==", uid)), s => { archivGeschenkt = listeAus(s); });
     if (istBescherung()) {
@@ -1872,12 +1878,15 @@
       <div class="detail-preis">${w.preis != null ? chf.format(w.preis) : "Ohne Preisangabe"}</div>
       <dl class="detail-liste">
         <div><dt>Bemerkung</dt><dd>${w.notiz ? esc(w.notiz) : `<span class="detail-leer">Keine Bemerkung</span>`}</dd></div>
-        <div><dt>Link</dt><dd>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(shopVon(link) || "Zum Shop")} ↗</a>` : `<span class="detail-leer">Kein Link</span>`}</dd></div>
+        <div><dt>Link</dt><dd>${!link ? `<span class="detail-leer">Kein Link</span>`
+          // Die Links der anderen gehen erst nach der Freischaltung – der Admin kann sie immer öffnen
+          : stichtagErreicht() || istAdmin() ? `<a href="${esc(link)}" target="_blank" rel="noopener">${esc(shopVon(link) || "Zum Shop")} ↗</a>`
+          : `<span class="detail-leer">🔒 ${esc(shopVon(link) || "Link")} – öffnet sich, sobald das Schenken freigeschaltet ist</span>`}</dd></div>
         ${mit.length ? `<div><dt>🤝 Gemeinsam</dt><dd>${anteileText(mit)}${offen != null ? `<br><b>Noch offen: ${chf.format(offen)}</b>` : ""}</dd></div>` : ""}
       </dl>
       <div class="fenster-knoepfe">
         ${stichtagErreicht() ? `<button type="button" class="knopf blau" data-aktion="schenken">${knopfText}</button>`
-          : `<button type="button" class="knopf" disabled>🔒 Schenken ab 30. November</button>`}
+          : `<button type="button" class="knopf" disabled>🔒 Schenken noch nicht freigeschaltet</button>`}
       </div>
     </article>`;
   }
@@ -1910,7 +1919,9 @@
   // ---------- Infofenster "So funktioniert's" ----------
   function infoOeffnen() {
     const tage = Math.ceil((stichtagDatum() - new Date()) / 86400000);
-    $("infoTage").textContent = stichtagErreicht() ? "" : `Noch ${tage} ${tage === 1 ? "Tag" : "Tage"}.`;
+    $("infoTage").textContent = stichtagErreicht() ? "✓ Das Schenken ist freigeschaltet."
+      : freischaltung === "aus" || datumErreicht() ? "Das Schenken ist im Moment noch gesperrt."
+      : `Noch ${tage} ${tage === 1 ? "Tag" : "Tage"}.`;
     $("infoHuelle").classList.add("offen");
     setTimeout(() => $("infoZu").focus(), 150);
   }
@@ -1927,10 +1938,12 @@
   function stichtagLeiste() {
     const tage = Math.ceil((stichtagDatum() - new Date()) / 86400000);
     const text = !stichtagErreicht()
-      ? `🗓️ Noch ${tage} ${tage === 1 ? "Tag" : "Tage"}: Bis und mit 29. November erfassen alle ihre Wünsche. Ab dem 30. November kann geschenkt werden.`
+      ? (freischaltung === "aus" || datumErreicht()
+        ? "🔒 Das Schenken ist noch gesperrt. Bis zur Freischaltung können alle ihre Wünsche erfassen."
+        : `🗓️ Noch ${tage} ${tage === 1 ? "Tag" : "Tage"}: Bis und mit 29. November erfassen alle ihre Wünsche. Ab dem 30. November kann geschenkt werden.`)
       : istAdmin() ? "🔒 Die Wunschliste ist für die anderen geschlossen. Nur du kannst noch Wünsche ändern oder hinzufügen."
       : seite === "meine" ? ERFASSEN_ZU : "";
-    const knopf = istAdmin() ? `<button class="knopf klein" data-aktion="admin-verwalten">🔧 Alle Wünsche bearbeiten</button>` : "";
+    const knopf = istAdmin() ? `<span class="wk-aktionen"><a class="knopf klein" href="#einstellungen">${stichtagErreicht() ? "🔓" : "🔒"} Freischaltung</a><button class="knopf klein" data-aktion="admin-verwalten">🔧 Alle Wünsche bearbeiten</button></span>` : "";
     return text ? `<div class="stichtag-leiste neu"><span>${text}</span>${knopf}</div>` : "";
   }
 
@@ -2576,10 +2589,28 @@
   }
 
   // ---------- Einstellungen ----------
+  // Admin: Schenken vorab ein- oder ausschalten (sonst automatisch ab dem 30. November)
+  function freischaltungTeil() {
+    const MODI = [["auto", "Automatisch (ab 30.11.)"], ["an", "Ein"], ["aus", "Aus"]];
+    const text = {
+      auto: "Ab dem 30. November öffnet sich das Schenken von selbst.",
+      an: "Das Schenken ist offen, die Links zu den Shops funktionieren. Die anderen können keine Wünsche mehr erfassen oder ändern.",
+      aus: "Das Schenken bleibt gesperrt, auch nach dem 30. November. Alle können weiter ihre Wünsche erfassen."
+    }[freischaltung];
+    return `<section class="formular-karte neu">
+      <h2>${stichtagErreicht() ? "🔓" : "🔒"} Freischaltung zum Schenken</h2>
+      <p class="notiz">Im Moment: <b>${stichtagErreicht() ? "Schenken ist offen" : "Schenken ist gesperrt"}</b>. Nur du siehst diese Einstellung.</p>
+      <div class="chips" role="group" aria-label="Freischaltung">${MODI.map(([k, t]) =>
+        `<button class="knopf chip ${freischaltung === k ? "aktiv" : ""}" data-aktion="freischaltung" data-wert="${k}" aria-pressed="${freischaltung === k}">${t}</button>`).join("")}</div>
+      <p class="notiz">${text}</p>
+    </section>`;
+  }
+
   function seiteEinstellungen() {
     const m = ich();
     avatarProfil = avatarProfil || m.avatar;
     return `
+      ${istAdmin() ? freischaltungTeil() : ""}
       <section class="formular-karte neu">
         <h2>Mein Avatar</h2>
         <p class="notiz">Jeder Avatar gibt es nur einmal – schon gewählte sind gesperrt.</p>
@@ -3259,6 +3290,16 @@
         case "detail": return id && detailOeffnen(id);
         case "detail-zu": return detailSchliessen();
         case "alle-info": return infoOeffnen();
+        case "freischaltung": {
+          const modus = knopf.dataset.wert;
+          if (!istAdmin() || modus === freischaltung) return;
+          const vorher = stichtagErreicht();
+          const nachher = modus === "an" || (modus !== "aus" && datumErreicht());
+          if (!vorher && nachher && !confirm("Schenken jetzt freischalten? Die anderen können dann keine Wünsche mehr erfassen oder ändern.")) return;
+          if (vorher && !nachher && !confirm("Schenken wieder sperren? Bereits gewählte Geschenke bleiben in den Paketen.")) return;
+          await schreiben(setDoc(doc(db, "app", "freischaltung"), { modus, geaendert: Date.now() }));
+          return zeichnen(false);
+        }
         case "neu":
           if (!erfassenOffen()) return toast(ERFASSEN_ZU);
           return oeffnen();
